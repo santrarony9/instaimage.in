@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://tablets-worldcat-participated-explanation.trycloudflare.com/api/:path*', // Proxy to VPS backend via tunnel
+        destination: 'https://tablets-worldcat-participated-explanation.trycloudflare.com/:path*', // Proxy to VPS backend via tunnel
       },
     ];
   },
