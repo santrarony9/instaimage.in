@@ -82,7 +82,7 @@ export default function CouponsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const payload = { ...currentCoupon };
+      const payload: any = { ...currentCoupon };
       delete payload._id;
       delete payload.isDeleted;
       delete payload.deletedAt;
