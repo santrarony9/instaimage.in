@@ -194,4 +194,25 @@ export class BookingsService {
       }
     });
   }
+
+  async getPhotographerAssignments(photographerId: string) {
+    return this.bookingsRepository.model.find({ 
+      assignedPhotographerId: new Types.ObjectId(photographerId), 
+      isDeleted: false 
+    })
+      .populate('customerId', 'name email phone')
+      .populate('serviceId', 'name')
+      .populate('packageId', 'name price')
+      .sort({ scheduledDate: 1 });
+  }
+
+  async assignPhotographer(bookingId: string, photographerId: string) {
+    const booking = await this.bookingsRepository.findById(bookingId);
+    if (!booking) throw new NotFoundException('Booking not found');
+    
+    return this.bookingsRepository.update(bookingId, {
+      assignedPhotographerId: new Types.ObjectId(photographerId),
+      status: BookingStatus.ASSIGNED,
+    });
+  }
 }

@@ -18,4 +18,4 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 ENV NODE_ENV=production
 ENV PORT=3000
 
-CMD ["node", "dist/apps/backend/main.js"]
+CMD ["node", "dist/apps/api/src/main.js"]

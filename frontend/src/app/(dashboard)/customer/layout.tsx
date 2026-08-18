@@ -1,35 +1,112 @@
-import Link from "next/link";
-import { ReactNode } from "react";
+"use client";
 
-export default function CustomerDashboardLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex h-screen bg-gray-50">
-      <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-gray-200">
-          <span className="text-lg font-bold text-gray-900">My Dashboard</span>
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuthStore } from '@/hooks/use-auth-store';
+
+const links = [
+  { href: '/customer', label: 'Overview' },
+];
+
+export default function CustomerLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
+  const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'C';
+
+  const NavContent = () => (
+    <div className="flex flex-col h-full bg-white border-r w-64">
+      <div className="p-4 border-b flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+          {initial}
         </div>
-        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-          <Link href="/customer" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Overview
-          </Link>
-
+        <div className="font-semibold truncate">My Dashboard</div>
+      </div>
+      <div className="flex-1 overflow-y-auto py-4">
+        <nav className="space-y-1 px-2">
+          {links.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
-      </aside>
+      </div>
+      <div className="p-4 border-t">
+        <button
+          onClick={handleLogout}
+          className="w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-colors"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  );
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8">
-          <div className="flex items-center md:hidden">
-            <span className="text-lg font-bold text-gray-900">Dashboard</span>
-          </div>
-          <div className="flex items-center space-x-4 ml-auto">
-            <button className="text-sm font-medium text-gray-500 hover:text-gray-700">Notifications</button>
-            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-              <span className="text-sm font-medium text-black">C</span>
+  return (
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:flex-shrink-0">
+        <NavContent />
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <div className="fixed inset-y-0 left-0 flex flex-col z-40">
+            <NavContent />
+            <div className="absolute top-0 right-0 -mr-12 pt-2">
+              <button
+                type="button"
+                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="sr-only">Close sidebar</span>
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
-        </header>
+        </div>
+      )}
 
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-8">
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="bg-white shadow-sm md:hidden">
+          <div className="px-4 py-3 flex items-center">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <span className="ml-4 font-semibold text-lg">My Dashboard</span>
+          </div>
+        </header>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
           {children}
         </main>
       </div>

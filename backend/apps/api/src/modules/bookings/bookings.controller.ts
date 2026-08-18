@@ -26,6 +26,12 @@ export class BookingsController {
     return this.bookingsService.getUserBookings(req.user.sub);
   }
 
+  @Get('my-assignments')
+  @Roles(Role.PHOTOGRAPHER)
+  getPhotographerAssignments(@Request() req: AuthenticatedRequest) {
+    return this.bookingsService.getPhotographerAssignments(req.user.sub);
+  }
+
   @Get('all')
   @Roles(Role.ADMIN)
   findAllBookings() {
@@ -42,6 +48,12 @@ export class BookingsController {
   @Roles(Role.ADMIN)
   updateStatus(@Param('id') id: string, @Body('status') status: BookingStatus) {
     return this.bookingsService.updateBookingStatus(id, status);
+  }
+
+  @Patch(':id/assign')
+  @Roles(Role.ADMIN)
+  assignPhotographer(@Param('id') id: string, @Body('photographerId') photographerId: string) {
+    return this.bookingsService.assignPhotographer(id, photographerId);
   }
 
   @Post(':id/surcharge')

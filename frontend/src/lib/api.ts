@@ -28,8 +28,16 @@ export async function fetchApi(endpoint: string, options?: RequestInit) {
     const response = await fetch(url, { ...options, headers });
     
     if (!response.ok) {
+      if (response.status === 401 && typeof window !== 'undefined') {
+        localStorage.removeItem('auth-storage');
+        window.location.href = '/login';
+      }
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API error: ${response.status} ${response.statusText}`);
+      let errorMessage = errorData.message;
+      if (Array.isArray(errorMessage)) {
+        errorMessage = errorMessage.join(', ');
+      }
+      throw new Error(errorMessage || `API error: ${response.status} ${response.statusText}`);
     }
     
     return await response.json();
