@@ -87,6 +87,9 @@ export default function ServicesManagementPage() {
     delete payload.createdAt;
     delete payload.updatedAt;
     delete payload.__v;
+    delete payload.images;
+    delete payload.videoUrl;
+    delete payload.isPopular;
     if (payload.basePrice) payload.basePrice = Number(payload.basePrice);
     if (payload.price) payload.price = Number(payload.price);
     if (payload.durationMinutes) payload.durationMinutes = Number(payload.durationMinutes);
