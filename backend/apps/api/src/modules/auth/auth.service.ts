@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { Role } from '@app/auth';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,7 @@ export class AuthService {
       name: registerDto.name,
       email: registerDto.email,
       passwordHash,
-      role: registerDto.email === 'admin@instaimage.com' ? 'ADMIN' : 'CUSTOMER'
+      role: registerDto.email === 'admin@instaimage.com' ? Role.ADMIN : Role.CUSTOMER
     });
 
     const payload = { sub: user._id, email: user.email, role: user.role };
