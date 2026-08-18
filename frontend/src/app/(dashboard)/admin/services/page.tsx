@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchApi } from '@/lib/api';
 import { useToast, ToastContainer } from '@/components/ui/toast';
+import ImageUpload from '@/components/ui/ImageUpload';
 
 export default function ServicesManagementPage() {
   const { toast } = useToast();
@@ -87,8 +88,6 @@ export default function ServicesManagementPage() {
     delete payload.createdAt;
     delete payload.updatedAt;
     delete payload.__v;
-    delete payload.images;
-    delete payload.videoUrl;
     delete payload.isPopular;
     if (payload.basePrice) payload.basePrice = Number(payload.basePrice);
     if (payload.price) payload.price = Number(payload.price);
@@ -288,6 +287,22 @@ export default function ServicesManagementPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Price (₹)</label>
                     <input required type="number" value={formData.price || ''} onChange={e => setFormData({ ...formData, price: e.target.value })} className="mt-1 block w-full border rounded p-2" />
+                  </div>
+                </>
+              )}
+
+              {(activeTab === 'services' || activeTab === 'packages') && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Images Gallery</label>
+                    <ImageUpload 
+                      images={formData.images || []}
+                      onChange={(imgs) => setFormData({ ...formData, images: imgs })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Video URL (YouTube/Vimeo)</label>
+                    <input type="url" value={formData.videoUrl || ''} onChange={e => setFormData({ ...formData, videoUrl: e.target.value })} className="mt-1 block w-full border rounded p-2" placeholder="https://youtube.com/..." />
                   </div>
                 </>
               )}

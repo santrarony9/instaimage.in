@@ -37,4 +37,13 @@ export class CreatePackageDto {
   @IsNumber()
   @IsOptional()
   extraHourRate?: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  images?: string[];
+
+  @IsString()
+  @IsOptional()
+  videoUrl?: string;
 }

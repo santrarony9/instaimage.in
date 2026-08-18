@@ -8,26 +8,34 @@ import { PackagesModule } from './modules/packages/packages.module';
 import { AddonsModule } from './modules/addons/addons.module';
 import { ServiceZonesModule } from './modules/service-zones/service-zones.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { AvailabilityModule } from './modules/availability/availability.module';
-import { UsersModule } from './modules/users/users.module';
-import { AuthModule } from './modules/auth/auth.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/v1/uploads',
+    }),
     ServicesModule,
     PackagesModule,
     AddonsModule,
     ServiceZonesModule,
     CouponsModule,
+    UsersModule,
+    AuthModule,
     BookingsModule,
     PaymentsModule,
     AvailabilityModule,
-    UsersModule,
-    AuthModule,
+    UploadsModule,
   ],
   controllers: [ApiController],
   providers: [ApiService],
