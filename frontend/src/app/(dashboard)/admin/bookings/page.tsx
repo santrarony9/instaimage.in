@@ -1,25 +1,61 @@
 "use client";
-import Link from 'next/link';
+
 import { useEffect, useState } from 'react';
 import { fetchApi } from '@/lib/api';
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Surcharge Modal State
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [surchargeName, setSurchargeName] = useState('');
+  const [surchargeAmount, setSurchargeAmount] = useState('');
+  const [surchargeReason, setSurchargeReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const loadBookings = async () => {
+    try {
+      const data = await fetchApi('/bookings/all');
+      setBookings(data);
+    } catch (err) {
+      console.error('Failed to load global bookings:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadBookings() {
-      try {
-        const data = await fetchApi('/bookings/all');
-        setBookings(data);
-      } catch (err) {
-        console.error('Failed to load global bookings:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadBookings();
   }, []);
+
+  const handleAddSurcharge = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedBooking) return;
+    
+    setIsSubmitting(true);
+    try {
+      await fetchApi(`/bookings/${selectedBooking._id}/surcharges`, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: surchargeName,
+          amount: Number(surchargeAmount),
+          reason: surchargeReason
+        })
+      });
+      // Close modal and refresh
+      setSelectedBooking(null);
+      setSurchargeName('');
+      setSurchargeAmount('');
+      setSurchargeReason('');
+      await loadBookings();
+    } catch (err) {
+      alert('Failed to add surcharge');
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (loading) {
     return <div className="p-8 text-center text-gray-500">Loading bookings table...</div>;
@@ -80,9 +116,12 @@ export default function AdminBookingsPage() {
                         </span>
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <Link href={`/admin/bookings/${booking._id}`} className="text-black hover:text-blue-900 font-bold">
-                          Manage &rarr;
-                        </Link>
+                        <button
+                          onClick={() => setSelectedBooking(booking)}
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          + Surcharge
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -92,6 +131,68 @@ export default function AdminBookingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Surcharge Modal */}
+      {selectedBooking && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+              Add Surcharge to {selectedBooking.bookingId}
+            </h3>
+            <form onSubmit={handleAddSurcharge}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Surcharge Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={surchargeName}
+                    onChange={(e) => setSurchargeName(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                    placeholder="e.g., Extra Travel"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Amount (₹)</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={surchargeAmount}
+                    onChange={(e) => setSurchargeAmount(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Reason (Optional)</label>
+                  <textarea
+                    value={surchargeReason}
+                    onChange={(e) => setSurchargeReason(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  {isSubmitting ? 'Adding...' : 'Add Surcharge'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedBooking(null)}
+                  className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
