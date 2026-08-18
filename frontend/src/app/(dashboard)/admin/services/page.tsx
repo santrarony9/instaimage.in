@@ -81,6 +81,12 @@ export default function ServicesManagementPage() {
     
     // Validate numbers
     const payload = { ...formData };
+    delete payload._id;
+    delete payload.isDeleted;
+    delete payload.deletedAt;
+    delete payload.createdAt;
+    delete payload.updatedAt;
+    delete payload.__v;
     if (payload.basePrice) payload.basePrice = Number(payload.basePrice);
     if (payload.price) payload.price = Number(payload.price);
     if (payload.durationMinutes) payload.durationMinutes = Number(payload.durationMinutes);

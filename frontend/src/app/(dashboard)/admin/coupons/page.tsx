@@ -82,16 +82,24 @@ export default function CouponsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const payload = { ...currentCoupon };
+      delete payload._id;
+      delete payload.isDeleted;
+      delete payload.deletedAt;
+      delete payload.createdAt;
+      delete payload.updatedAt;
+      delete payload.__v;
+      
       if (modalMode === 'create') {
         await fetchApi('/coupons', {
           method: 'POST',
-          body: JSON.stringify(currentCoupon),
+          body: JSON.stringify(payload),
         });
         addToast('Coupon created successfully', 'success');
       } else {
         await fetchApi(`/coupons/${currentCoupon._id}`, {
           method: 'PATCH',
-          body: JSON.stringify(currentCoupon),
+          body: JSON.stringify(payload),
         });
         addToast('Coupon updated successfully', 'success');
       }

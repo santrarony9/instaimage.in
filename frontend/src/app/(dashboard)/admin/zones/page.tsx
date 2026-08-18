@@ -95,7 +95,7 @@ export default function ZonesPage() {
         .map(p => p.trim())
         .filter(p => p !== '');
 
-      const payload = {
+      const payload: any = {
         name: formData.name,
         city: formData.city,
         pincodes: pincodesArray,
