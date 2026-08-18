@@ -21,34 +21,14 @@ export default async function HomePage() {
   return (
     <div className="bg-white min-h-screen">
       
-      {/* Creative Aesthetic Hero */}
-      <div className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden bg-black">
-        {/* Background Video/Image Mock */}
-        <div className="absolute inset-0 w-full h-full opacity-60">
-          <img 
-            src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop" 
-            alt="Photography Hero" 
-            className="w-full h-full object-cover object-center"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80"></div>
-        
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto space-y-6">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-tight drop-shadow-lg">
-            Capture The Moment.
-          </h1>
-          <p className="text-lg md:text-xl text-gray-200 font-medium max-w-2xl mx-auto drop-shadow-md">
-            The marketplace for elite photographers and post-production experts.
-          </p>
-          <div className="pt-4 flex justify-center space-x-4">
-            <Link href="#portfolio" className="bg-white text-black font-bold px-8 py-4 rounded-full text-sm uppercase tracking-wider hover:bg-gray-100 transition shadow-xl">
-              Photography
-            </Link>
-            <Link href="#post-production" className="bg-transparent border border-white text-white font-bold px-8 py-4 rounded-full text-sm uppercase tracking-wider hover:bg-white hover:text-black transition shadow-xl">
-              Post-Production
-            </Link>
-          </div>
-        </div>
+      {/* Services and Pricing Header */}
+      <div className="pt-24 pb-8 text-center px-4 max-w-4xl mx-auto">
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight">
+          Services and Pricing
+        </h1>
+        <p className="text-lg text-gray-500 font-medium mt-4">
+          Explore our professional photography and post-production packages.
+        </p>
       </div>
 
       {/* Filter Chips (Unified Theme) */}
