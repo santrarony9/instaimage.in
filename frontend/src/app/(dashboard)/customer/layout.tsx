@@ -12,15 +12,7 @@ export default function CustomerDashboardLayout({ children }: { children: ReactN
           <Link href="/customer" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
             Overview
           </Link>
-          <Link href="/customer/bookings" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            My Bookings
-          </Link>
-          <Link href="/customer/gallery" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            My Gallery
-          </Link>
-          <Link href="/customer/profile" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Profile Settings
-          </Link>
+
         </nav>
       </aside>
 

@@ -10,16 +10,7 @@ export default function PhotographerDashboardLayout({ children }: { children: Re
         </div>
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
           <Link href="/photographer" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Schedule
-          </Link>
-          <Link href="/photographer/assignments" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Assignments
-          </Link>
-          <Link href="/photographer/earnings" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Earnings
-          </Link>
-          <Link href="/photographer/portfolio" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Portfolio
+            Schedule & Assignments
           </Link>
         </nav>
       </aside>

@@ -17,16 +17,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
             Bookings
           </Link>
           <Link href="/admin/services" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Services
-          </Link>
-          <Link href="/admin/packages" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Packages
-          </Link>
-          <Link href="/admin/addons" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Addons
-          </Link>
-          <Link href="/admin/users" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-black">
-            Users
+            Catalog
           </Link>
         </nav>
       </aside>
