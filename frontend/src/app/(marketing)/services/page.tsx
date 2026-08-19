@@ -34,31 +34,33 @@ export default function ServicesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.filter(s => s.isActive !== false).map((service) => (
-            <div key={service._id} className="bg-white rounded-lg border shadow-sm overflow-hidden flex flex-col">
+            <Link href="/packages" key={service._id} className="group bg-white rounded-lg border shadow-sm overflow-hidden flex flex-col hover:shadow-lg hover:border-black transition-all cursor-pointer">
               {/* Display Image if available */}
               {service.images && service.images.length > 0 ? (
-                <div className="w-full h-48 bg-gray-200">
+                <div className="w-full h-56 bg-gray-200 overflow-hidden">
                   <img 
                     src={service.images[0].startsWith('http') ? service.images[0] : `${API_URL}${service.images[0]}`}
                     alt={service.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
               ) : (
-                <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-5xl">
+                <div className="w-full h-56 bg-gray-100 flex items-center justify-center text-5xl">
                   📸
                 </div>
               )}
               
               <div className="p-6 flex flex-col flex-grow items-center text-center">
-                <h3 className="text-xl font-semibold mb-2">{service.name}</h3>
-                <p className="text-gray-600 mb-4 flex-grow">{service.description}</p>
-                <div className="font-bold text-lg mb-4">Starting at ₹{service.basePrice}</div>
-                <Link href="/packages" className="mt-auto w-full text-black border border-black px-4 py-2 rounded text-center hover:bg-gray-50 transition">
-                  View Packages
-                </Link>
+                <h3 className="text-2xl font-bold mb-2 group-hover:text-blue-600 transition-colors">{service.name}</h3>
+                <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">{service.description}</p>
+                <div className="w-full border-t pt-4 mt-auto flex items-center justify-between">
+                  <div className="font-bold text-lg">Starting at ₹{service.basePrice}</div>
+                  <div className="text-sm font-semibold uppercase tracking-wider text-black group-hover:text-blue-600">
+                    View Packages ➔
+                  </div>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
