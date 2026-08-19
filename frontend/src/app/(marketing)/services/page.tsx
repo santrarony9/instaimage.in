@@ -34,7 +34,7 @@ export default function ServicesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.filter(s => s.isActive !== false).map((service) => (
-            <Link href="/packages" key={service._id} className="group bg-white rounded-lg border shadow-sm overflow-hidden flex flex-col hover:shadow-lg hover:border-black transition-all cursor-pointer">
+            <Link href={`/services/${service._id}`} key={service._id} className="group bg-white rounded-lg border shadow-sm overflow-hidden flex flex-col hover:shadow-lg hover:border-black transition-all cursor-pointer">
               {/* Display Image if available */}
               {service.images && service.images.length > 0 ? (
                 <div className="w-full h-56 bg-gray-200 overflow-hidden">
