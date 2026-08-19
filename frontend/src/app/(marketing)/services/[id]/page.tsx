@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { fetchApi } from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function ServiceDetailsPage({ params }: { params: { id: string } }) {
+export default function ServiceDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { id } = use(params);
   const [service, setService] = useState<any>(null);
   const [packages, setPackages] = useState<any[]>([]);
   const [addons, setAddons] = useState<any[]>([]);
@@ -21,7 +22,7 @@ export default function ServiceDetailsPage({ params }: { params: { id: string } 
 
   useEffect(() => {
     Promise.all([
-      fetchApi(`/services/${params.id}`),
+      fetchApi(`/services/${id}`),
       fetchApi('/packages'),
       fetchApi('/addons')
     ]).then(([serviceRes, packagesRes, addonsRes]) => {
@@ -31,7 +32,7 @@ export default function ServiceDetailsPage({ params }: { params: { id: string } 
       // Filter packages belonging to this service
       const servicePackages = allPackages.filter((p: any) => {
         const pServiceId = typeof p.serviceId === 'object' ? p.serviceId._id : p.serviceId;
-        return pServiceId === params.id && p.isActive !== false;
+        return pServiceId === id && p.isActive !== false;
       });
       setPackages(servicePackages);
       if (servicePackages.length > 0) {
@@ -41,7 +42,7 @@ export default function ServiceDetailsPage({ params }: { params: { id: string } 
       const allAddons = addonsRes.data || addonsRes || [];
       setAddons(allAddons.filter((a: any) => a.isActive !== false));
     }).catch(console.error).finally(() => setLoading(false));
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div></div>;
