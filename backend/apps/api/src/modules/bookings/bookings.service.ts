@@ -5,8 +5,7 @@ import { BookingStatus, PricingDetails, TimeFlexibility } from './schemas/bookin
 import { Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 
-import { PackagesService } from '../packages/packages.service';
-import { AddonsService } from '../addons/addons.service';
+import { ServicesService } from '../services/services.service';
 import { CouponsService } from '../coupons/coupons.service';
 import { PaymentsService } from '../payments/payments.service';
 import { AvailabilityService } from '../availability/availability.service';
@@ -18,16 +17,13 @@ export class BookingsService {
   constructor(
     private readonly bookingsRepository: BookingsRepository,
     private readonly configService: ConfigService,
-    private readonly packagesService: PackagesService,
-    private readonly addonsService: AddonsService,
+    private readonly servicesService: ServicesService,
     private readonly couponsService: CouponsService,
     private readonly paymentsService: PaymentsService,
     private readonly availabilityService: AvailabilityService,
   ) {}
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
-    // 0. Check and lock availability
-    // Wait, we need a booking ID for the lock. Let's generate it first.
     const date = new Date();
     const year = date.getFullYear();
     const count = await this.bookingsRepository.countDocuments({
@@ -38,7 +34,6 @@ export class BookingsService {
     });
     const bookingId = `BKG-${year}-${String(count + 1).padStart(4, '0')}`;
     
-    // Acquire the lock (throws ConflictException if unavailable)
     await this.availabilityService.lockSlot(
       new Date(createBookingDto.scheduledDate),
       createBookingDto.startTime,
@@ -48,34 +43,42 @@ export class BookingsService {
 
     try {
       // 1. Calculate pricing
-      const pkg = await this.packagesService.findOne(createBookingDto.packageId);
-      if (!pkg) throw new NotFoundException('Package not found');
+      const service = await this.servicesService.findOne(createBookingDto.serviceId);
+      if (!service) throw new NotFoundException('Service not found');
       
-      let basePrice = pkg.price;
-      let addonsPrice = 0;
+      let basePrice = 0;
       let extraHoursPrice = 0;
+
+      if (createBookingDto.pricingMode === 'fixed') {
+        basePrice = service.basePrice;
+        if (createBookingDto.extraHoursBooked && createBookingDto.extraHoursBooked > 0) {
+          if (!service.extraHourPrice) throw new BadRequestException('This service does not allow extra fixed hours.');
+          extraHoursPrice = createBookingDto.extraHoursBooked * service.extraHourPrice;
+        }
+      } else if (createBookingDto.pricingMode === 'flexible') {
+        if (!service.flexiblePrice) throw new BadRequestException('This service does not allow flexible pricing.');
+        // Calculate hours based on start and end time (assuming 1 hour for now, but should calculate properly)
+        // Simplified: assuming front-end passes exact extraHoursBooked as flexibleHours
+        const hours = createBookingDto.extraHoursBooked || 1; 
+        basePrice = service.flexiblePrice * hours;
+      }
+
+      let addonsPrice = 0;
+      const matchedAddons: Array<{name: string, price: number}> = [];
+      
+      if (createBookingDto.addonNames && createBookingDto.addonNames.length > 0 && service.addons) {
+        for (const addonName of createBookingDto.addonNames) {
+          const addonObj = service.addons.find(a => a.name === addonName);
+          if (addonObj) {
+            addonsPrice += addonObj.price;
+            matchedAddons.push({ name: addonObj.name, price: addonObj.price });
+          }
+        }
+      }
+      
       let surchargesPrice = 0;
       const surcharges: Array<{ name: string; amount: number; reason?: string }> = [];
       
-      if (
-        createBookingDto.timeFlexibility === 'FLEXIBLE' && 
-        createBookingDto.extraHoursBooked && 
-        createBookingDto.extraHoursBooked > 0
-      ) {
-        if (!pkg.allowExtraHours) {
-          throw new BadRequestException('This package does not allow extra flexible hours.');
-        }
-        extraHoursPrice = createBookingDto.extraHoursBooked * pkg.extraHourRate;
-      }
-
-      if (createBookingDto.addonIds && createBookingDto.addonIds.length > 0) {
-        for (const addonId of createBookingDto.addonIds) {
-          const addon = await this.addonsService.findOne(addonId);
-          if (addon) addonsPrice += addon.price;
-        }
-      }
-      
-      // Hardcode delivery charge for now since we haven't implemented ServiceZones matching perfectly
       const deliveryCharge = 500; 
       let discount = 0;
       
@@ -115,8 +118,8 @@ export class BookingsService {
         bookingId,
         customerId: new Types.ObjectId(customerId),
         serviceId: new Types.ObjectId(createBookingDto.serviceId),
-        packageId: new Types.ObjectId(createBookingDto.packageId),
-        addonIds: createBookingDto.addonIds?.map(id => new Types.ObjectId(id)) || [],
+        pricingMode: createBookingDto.pricingMode,
+        addons: matchedAddons,
         scheduledDate: new Date(createBookingDto.scheduledDate),
         startTime: createBookingDto.startTime,
         endTime: createBookingDto.endTime,
@@ -137,7 +140,6 @@ export class BookingsService {
         paymentOrder,
       };
     } catch (error) {
-      // Release lock if booking creation failed
       await this.availabilityService.releaseLock(
         new Date(createBookingDto.scheduledDate),
         createBookingDto.startTime,
@@ -150,8 +152,7 @@ export class BookingsService {
   async getBookingById(id: string) {
     const booking = await this.bookingsRepository.model.findById(id)
       .populate('customerId', 'name email phone')
-      .populate('serviceId', 'name')
-      .populate('packageId', 'name price');
+      .populate('serviceId', 'name');
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
@@ -160,14 +161,14 @@ export class BookingsService {
 
   async getUserBookings(customerId: string) {
     return this.bookingsRepository.model.find({ customerId: new Types.ObjectId(customerId), isDeleted: false })
-      .populate('packageId', 'name')
+      .populate('serviceId', 'name')
       .sort({ createdAt: -1 });
   }
 
   async findAllBookings() {
     return this.bookingsRepository.model.find({ isDeleted: false })
       .populate('customerId', 'name email')
-      .populate('packageId', 'name')
+      .populate('serviceId', 'name')
       .sort({ createdAt: -1 });
   }
 
@@ -202,7 +203,6 @@ export class BookingsService {
     })
       .populate('customerId', 'name email phone')
       .populate('serviceId', 'name')
-      .populate('packageId', 'name price')
       .sort({ scheduledDate: 1 });
   }
 

@@ -142,7 +142,7 @@ export default function BookingsManagementPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -154,7 +154,7 @@ export default function BookingsManagementPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 cursor-pointer" onClick={() => openDetails(b)}>{b._id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{b.customerId?.name || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{new Date(b.scheduledDate).toLocaleDateString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{b.packageId?.name || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap capitalize">{b.pricingMode || 'Fixed'}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium">₹{b.pricing?.totalPrice || b.totalPrice || 0}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(b.status)}`}>
@@ -191,7 +191,7 @@ export default function BookingsManagementPage() {
               <div><span className="font-semibold text-gray-600">ID:</span> {selectedBooking._id}</div>
               <div><span className="font-semibold text-gray-600">Customer:</span> {selectedBooking.customerId?.name} ({selectedBooking.customerId?.email})</div>
               <div><span className="font-semibold text-gray-600">Service:</span> {selectedBooking.serviceId?.name || 'N/A'}</div>
-              <div><span className="font-semibold text-gray-600">Package:</span> {selectedBooking.packageId?.name || 'N/A'}</div>
+              <div><span className="font-semibold text-gray-600">Pricing Mode:</span> <span className="capitalize">{selectedBooking.pricingMode || 'Fixed'}</span></div>
               <div><span className="font-semibold text-gray-600">Date:</span> {new Date(selectedBooking.scheduledDate).toLocaleDateString()}</div>
               <div><span className="font-semibold text-gray-600">Time Slot:</span> {selectedBooking.timeSlot?.startTime} - {selectedBooking.timeSlot?.endTime}</div>
               <div className="col-span-2">

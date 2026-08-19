@@ -31,13 +31,13 @@ export class CreateBookingDto {
   serviceId: string;
 
   @IsNotEmpty()
-  @IsMongoId()
-  packageId: string;
+  @IsString()
+  pricingMode: 'fixed' | 'flexible';
 
   @IsOptional()
   @IsArray()
-  @IsMongoId({ each: true })
-  addonIds?: string[];
+  @IsString({ each: true })
+  addonNames?: string[];
 
   @IsNotEmpty()
   @IsDateString()

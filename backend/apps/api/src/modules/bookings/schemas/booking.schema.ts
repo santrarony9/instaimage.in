@@ -81,11 +81,11 @@ export class Booking extends AbstractDocument {
   @Prop({ required: true, type: Types.ObjectId, ref: 'Service' })
   serviceId: Types.ObjectId;
 
-  @Prop({ required: true, type: Types.ObjectId, ref: 'Package' })
-  packageId: Types.ObjectId;
+  @Prop({ required: true, enum: ['fixed', 'flexible'], default: 'fixed' })
+  pricingMode: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Addon' }], default: [] })
-  addonIds: Types.ObjectId[];
+  @Prop({ type: [{ name: String, price: Number }], default: [] })
+  addons: Array<{ name: string; price: number }>;
 
   @Prop({ type: Types.ObjectId, ref: 'Photographer' })
   assignedPhotographerId?: Types.ObjectId;

@@ -6,8 +6,7 @@ import { DatabaseModule } from '@app/database';
 import { Booking, BookingSchema } from './schemas/booking.schema';
 import { BookingsRepository } from './bookings.repository';
 
-import { PackagesModule } from '../packages/packages.module';
-import { AddonsModule } from '../addons/addons.module';
+import { ServicesModule } from '../services/services.module';
 import { CouponsModule } from '../coupons/coupons.module';
 import { ServiceZonesModule } from '../service-zones/service-zones.module';
 import { PaymentsModule } from '../payments/payments.module';
@@ -17,8 +16,7 @@ import { AvailabilityModule } from '../availability/availability.module';
   imports: [
     DatabaseModule,
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
-    PackagesModule,
-    AddonsModule,
+    ServicesModule,
     CouponsModule,
     ServiceZonesModule,
     PaymentsModule,
