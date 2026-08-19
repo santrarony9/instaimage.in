@@ -4,11 +4,15 @@ export const revalidate = 60; // Revalidate every 60 seconds
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tablets-worldcat-participated-explanation.trycloudflare.com/v1';
+  // Use internal Docker DNS for server-side fetch, or fallback to public tunnel if running locally
+  const SERVER_API_URL = process.env.SERVER_API_URL || 'http://api:3000/v1';
+  // Use relative path for client-side images so Nginx can proxy it, regardless of domain
+  const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
+  
   let services: any[] = [];
   
   try {
-    const res = await fetch(`${API_URL}/services`, { next: { revalidate: 60 } });
+    const res = await fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } });
     if (res.ok) {
       const data = await res.json();
       services = Array.isArray(data) ? data : (data.data || []);
@@ -59,7 +63,7 @@ export default async function HomePage() {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {trending.map(service => <ServiceCard key={service._id} service={service} badge="Trending" API_URL={API_URL} />)}
+            {trending.map(service => <ServiceCard key={service._id} service={service} badge="Trending" API_URL={PUBLIC_API_URL} />)}
           </div>
         </div>
 
@@ -86,7 +90,7 @@ export default async function HomePage() {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge="New" API_URL={API_URL} />)}
+            {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge="New" API_URL={PUBLIC_API_URL} />)}
           </div>
         </div>
 
