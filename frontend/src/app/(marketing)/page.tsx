@@ -5,172 +5,139 @@ export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/v1';
-  let packages = [];
+  let services: any[] = [];
   
   try {
-    const res = await fetch(`${API_URL}/packages`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/services`, { next: { revalidate: 60 } });
     if (res.ok) {
-      packages = await res.json();
+      const data = await res.json();
+      services = Array.isArray(data) ? data : (data.data || []);
     }
   } catch (e) {
-    console.error('Failed to fetch packages:', e);
+    console.error('Failed to fetch services:', e);
   }
 
-  const categories = ["All", "Wedding", "Corporate", "Portrait", "Events", "Video Editing", "Reels & Shorts", "Podcast", "VFX / Greenscreen"];
+  // Filter out inactive
+  services = services.filter(s => s.isActive !== false);
+
+  // E-commerce logic
+  // Newly Added: Sort by createdAt (assuming _id timestamp or createdAt exists, we just reverse the list for now if no dates)
+  const newlyAdded = [...services].reverse().slice(0, 4);
+  
+  // Trending: Mock by picking the ones with highest basePrice, or just a slice of the middle
+  const trending = [...services].sort((a, b) => (b.basePrice || 0) - (a.basePrice || 0)).slice(0, 4);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-gray-50 min-h-screen pb-20">
       
-      {/* Cinematic Hero Section */}
-      <div className="relative bg-black text-white overflow-hidden min-h-[85vh] flex items-center">
-        {/* Background Overlay */}
+      {/* E-Commerce Hero Banner Slider (Simulated) */}
+      <div className="relative bg-black text-white h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop" 
-            alt="Studio Production" 
-            className="w-full h-full object-cover opacity-40"
+            src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop" 
+            alt="Wedding Banner" 
+            className="w-full h-full object-cover opacity-50"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-black/50 to-black/80"></div>
+        </div>
+        <div className="relative z-10 text-center px-4 max-w-3xl">
+          <span className="bg-white text-black px-3 py-1 text-xs font-bold uppercase tracking-widest mb-4 inline-block rounded-sm">Featured Collection</span>
+          <h1 className="text-5xl md:text-7xl font-black mb-6 uppercase tracking-tighter">Premium Photography</h1>
+          <p className="text-lg md:text-xl text-gray-200 mb-8 font-medium">Book world-class photographers for your next big moment. Secure your date today.</p>
+          <Link href="#shop" className="bg-blue-600 text-white px-8 py-4 font-bold text-lg hover:bg-blue-700 transition uppercase tracking-wide">
+            Shop Services
+          </Link>
+        </div>
+      </div>
+
+      <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+        
+        {/* Trending Section */}
+        <div className="mb-16">
+          <div className="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
+            <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900">🔥 Trending Services</h2>
+            <Link href="/services" className="text-blue-600 font-semibold hover:underline">View All</Link>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {trending.map(service => <ServiceCard key={service._id} service={service} badge="Trending" API_URL={API_URL} />)}
+          </div>
         </div>
 
-        <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-3xl">
-            <div className="inline-block px-3 py-1 border border-white/30 rounded-full text-xs font-bold tracking-widest uppercase mb-6 text-gray-300">
-              Entertainment • Photography • Post-Production
+        {/* Categories Banner */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+          <div className="bg-gray-900 h-64 rounded-xl overflow-hidden relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Weddings" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <h3 className="text-white text-4xl font-black tracking-widest uppercase">Weddings</h3>
             </div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-6">
-              Bring Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Vision</span> to the Big Screen.
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 font-medium mb-10 max-w-2xl leading-relaxed">
-              We are a full-scale creative agency. From high-end cinematic photography to industry-standard VFX, podcast multi-cam, and reel post-production, we deliver masterpieces.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="#portfolio" className="bg-white text-black px-8 py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-gray-200 transition text-center">
-                Explore Packages
-              </Link>
-              <Link href="/portfolio" className="bg-transparent border border-white text-white px-8 py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white/10 transition text-center flex items-center justify-center">
-                <span className="mr-2">▶</span> View Showreel
-              </Link>
+          </div>
+          <div className="bg-gray-900 h-64 rounded-xl overflow-hidden relative group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Corporate" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <h3 className="text-white text-4xl font-black tracking-widest uppercase">Corporate</h3>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Services and Pricing Header - Moved down for context */}
-      <div className="pt-20 pb-4 text-center px-4 max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight">
-          Select Your Production Tier
-        </h2>
-      </div>
-
-      {/* Filter Chips (Unified Theme) */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-8 sticky top-20 z-40 bg-white/90 backdrop-blur-md py-4 border-b border-gray-100">
-        <div className="flex overflow-x-auto space-x-2 md:space-x-4 hide-scrollbar pb-2">
-          {categories.map((cat, idx) => (
-            <button key={idx} className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-semibold transition ${
-              idx === 0 
-                ? 'bg-black text-white' 
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-black border border-gray-200'
-            }`}>
-              {cat}
-            </button>
-          ))}
+        {/* Newly Added Section */}
+        <div className="mb-16">
+          <div className="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
+            <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900">✨ Newly Added</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge="New" API_URL={API_URL} />)}
+          </div>
         </div>
-      </div>
 
-      {/* High-Density Creative Grid */}
-      <div id="portfolio" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-        {packages.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 font-medium">No packages available.</div>
+      </div>
+    </div>
+  );
+}
+
+// Reusable E-commerce Product Card Component
+function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string, API_URL: string }) {
+  const imageUrl = service.images && service.images.length > 0 
+    ? (service.images[0].startsWith('http') ? service.images[0] : `${API_URL}${service.images[0]}`)
+    : null;
+
+  // Next.js Link points to the new PDP (Product Details Page)
+  return (
+    <Link href={`/services/${service._id}`} className="group bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative">
+      {badge && (
+        <div className="absolute top-3 left-3 bg-black text-white text-xs font-bold uppercase tracking-wider px-2 py-1 rounded z-10">
+          {badge}
+        </div>
+      )}
+      
+      <div className="w-full aspect-[4/3] bg-gray-100 overflow-hidden relative">
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={service.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+          />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12">
-            {packages.map((pkg: any) => (
-              <Link href={`/packages/${pkg._id}`} key={pkg._id} className="group cursor-pointer flex flex-col">
-                
-                {/* Image Container (Minimalist, no border) */}
-                <div className="w-full aspect-[3/4] bg-gray-100 rounded-2xl overflow-hidden relative mb-4">
-                  {pkg.images && pkg.images.length > 0 ? (
-                    <img 
-                      src={pkg.images[0]} 
-                      alt={pkg.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-700 ease-in-out" 
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                      <span className="text-4xl">📷</span>
-                    </div>
-                  )}
-                  {pkg.isPopular && (
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-black text-[10px] uppercase font-bold px-3 py-1.5 rounded-full shadow-sm">
-                      Bestseller
-                    </div>
-                  )}
-                </div>
-                
-                {/* Text Details (High-end typography) */}
-                <div className="flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className="text-base font-bold text-gray-900 leading-tight group-hover:underline decoration-2 underline-offset-2">{pkg.name}</h3>
-                    <span className="text-base font-bold text-gray-900 whitespace-nowrap ml-2">₹{pkg.price.toLocaleString()}</span>
-                  </div>
-                  <p className="text-sm text-gray-500 line-clamp-1 mb-2">{pkg.description}</p>
-                  
-                  <div className="mt-auto text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    {pkg.durationMinutes ? `${pkg.durationMinutes / 60} Hours` : "Flexible"}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <div className="w-full h-full flex items-center justify-center text-4xl">📸</div>
         )}
       </div>
 
-      {/* Post-Production Dedicated Section */}
-      <div id="post-production" className="bg-black text-white py-24">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">The Editing Room.</h2>
-              <p className="text-gray-400 text-lg mb-8 leading-relaxed">
-                Raw footage is just the beginning. Our specialized post-production team turns your content into masterpieces with industry-standard editing, VFX, and audio mixing.
-              </p>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center space-x-3">
-                  <span className="text-blue-500 text-xl">✦</span>
-                  <span className="text-lg font-medium">Reels & TikToks (High Retention)</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-blue-500 text-xl">✦</span>
-                  <span className="text-lg font-medium">Podcast Multi-cam Edits</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-blue-500 text-xl">✦</span>
-                  <span className="text-lg font-medium">Green Screen & VFX Removal</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-blue-500 text-xl">✦</span>
-                  <span className="text-lg font-medium">Color Grading & Audio Mastering</span>
-                </div>
-              </div>
-
-              <Link href="/services" className="inline-block bg-white text-black font-bold px-8 py-4 rounded-full text-sm uppercase tracking-wider hover:bg-gray-200 transition">
-                View Editing Packages
-              </Link>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="aspect-[3/4] bg-gray-800 rounded-2xl overflow-hidden relative">
-                 <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-80" alt="Video Editing" />
-              </div>
-              <div className="aspect-[3/4] bg-gray-800 rounded-2xl overflow-hidden relative mt-12">
-                 <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-80" alt="Podcast Setup" />
-              </div>
-            </div>
+      <div className="p-5 flex flex-col flex-grow">
+        <h3 className="text-lg font-bold text-gray-900 line-clamp-1 mb-1 group-hover:text-blue-600 transition">{service.name}</h3>
+        <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-grow">{service.description}</p>
+        
+        <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+          <div className="flex flex-col">
+            <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Starting at</span>
+            <span className="text-xl font-black text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+          </div>
+          <div className="bg-blue-50 text-blue-700 p-2 rounded-full group-hover:bg-blue-600 group-hover:text-white transition">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
           </div>
         </div>
       </div>
-
-    </div>
+    </Link>
   );
 }
