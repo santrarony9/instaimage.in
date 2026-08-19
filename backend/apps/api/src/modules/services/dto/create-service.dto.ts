@@ -33,4 +33,8 @@ export class CreateServiceDto {
   @IsString()
   @IsOptional()
   videoUrl?: string;
+
+  @IsArray()
+  @IsOptional()
+  addons?: { name: string; price: number }[];
 }

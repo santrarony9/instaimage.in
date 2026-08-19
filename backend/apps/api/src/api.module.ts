@@ -4,8 +4,6 @@ import { DatabaseModule } from '@app/database';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 import { ServicesModule } from './modules/services/services.module';
-import { PackagesModule } from './modules/packages/packages.module';
-import { AddonsModule } from './modules/addons/addons.module';
 import { ServiceZonesModule } from './modules/service-zones/service-zones.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
 import { UsersModule } from './modules/users/users.module';
@@ -26,8 +24,6 @@ import { join } from 'path';
       serveRoot: '/v1/uploads',
     }),
     ServicesModule,
-    PackagesModule,
-    AddonsModule,
     ServiceZonesModule,
     CouponsModule,
     UsersModule,

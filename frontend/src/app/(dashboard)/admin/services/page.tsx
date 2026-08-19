@@ -7,9 +7,7 @@ import ImageUpload from '@/components/ui/ImageUpload';
 
 export default function ServicesManagementPage() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'services' | 'packages' | 'addons'>('services');
   const [data, setData] = useState<any[]>([]);
-  const [servicesList, setServicesList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -18,14 +16,8 @@ export default function ServicesManagementPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const endpoint = `/${activeTab}`;
-      const res = await fetchApi(endpoint);
+      const res = await fetchApi('/services');
       setData(res.data || res || []);
-      
-      if (activeTab === 'packages') {
-        const srvRes = await fetchApi('/services');
-        setServicesList(srvRes.data || srvRes || []);
-      }
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -35,11 +27,11 @@ export default function ServicesManagementPage() {
 
   useEffect(() => {
     loadData();
-  }, [activeTab]);
+  }, []);
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     try {
-      await fetchApi(`/${activeTab}/${id}`, {
+      await fetchApi(`/services/${id}`, {
         method: 'PATCH',
         body: JSON.stringify({ isActive: !currentStatus }),
       });
@@ -51,9 +43,9 @@ export default function ServicesManagementPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm(`Are you sure you want to delete this ${activeTab.slice(0, -1)}?`)) return;
+    if (!window.confirm('Are you sure you want to delete this service?')) return;
     try {
-      await fetchApi(`/${activeTab}/${id}`, { method: 'DELETE' });
+      await fetchApi(`/services/${id}`, { method: 'DELETE' });
       toast.success('Deleted successfully');
       loadData();
     } catch (error: any) {
@@ -64,9 +56,9 @@ export default function ServicesManagementPage() {
   const openModal = (item?: any) => {
     setEditingItem(item || null);
     if (item) {
-      setFormData({ ...item });
+      setFormData({ ...item, addons: item.addons || [] });
     } else {
-      setFormData({ isActive: true });
+      setFormData({ isActive: true, addons: [] });
     }
     setIsModalOpen(true);
   };
@@ -77,10 +69,27 @@ export default function ServicesManagementPage() {
     setFormData({});
   };
 
+  const handleAddAddon = () => {
+    const addons = formData.addons ? [...formData.addons] : [];
+    addons.push({ name: '', price: 0 });
+    setFormData({ ...formData, addons });
+  };
+
+  const handleRemoveAddon = (index: number) => {
+    const addons = [...formData.addons];
+    addons.splice(index, 1);
+    setFormData({ ...formData, addons });
+  };
+
+  const handleUpdateAddon = (index: number, field: string, value: any) => {
+    const addons = [...formData.addons];
+    addons[index][field] = value;
+    setFormData({ ...formData, addons });
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate numbers
     const payload = { ...formData };
     delete payload._id;
     delete payload.isDeleted;
@@ -89,31 +98,32 @@ export default function ServicesManagementPage() {
     delete payload.updatedAt;
     delete payload.__v;
     delete payload.isPopular;
-    if (payload.basePrice) payload.basePrice = Number(payload.basePrice);
-    if (payload.price) payload.price = Number(payload.price);
-    if (payload.durationMinutes) payload.durationMinutes = Number(payload.durationMinutes);
-    if (payload.extraHourRate) payload.extraHourRate = Number(payload.extraHourRate);
 
-    if (
-      (payload.basePrice && isNaN(payload.basePrice)) ||
-      (payload.price && isNaN(payload.price)) ||
-      (payload.durationMinutes && isNaN(payload.durationMinutes)) ||
-      (payload.extraHourRate && isNaN(payload.extraHourRate))
-    ) {
-      return toast.error('Number fields cannot be NaN');
+    if (payload.basePrice) payload.basePrice = Number(payload.basePrice);
+
+    // Validate addons
+    if (payload.addons) {
+      payload.addons = payload.addons.map((a: any) => ({
+        name: a.name,
+        price: Number(a.price)
+      }));
+    }
+
+    if (payload.basePrice && isNaN(payload.basePrice)) {
+      return toast.error('Base Price cannot be NaN');
     }
     
     payload.isActive = Boolean(payload.isActive);
 
     try {
       if (editingItem) {
-        await fetchApi(`/${activeTab}/${editingItem._id}`, {
+        await fetchApi(`/services/${editingItem._id}`, {
           method: 'PATCH',
           body: JSON.stringify(payload),
         });
         toast.success('Updated successfully');
       } else {
-        await fetchApi(`/${activeTab}`, {
+        await fetchApi(`/services`, {
           method: 'POST',
           body: JSON.stringify(payload),
         });
@@ -128,27 +138,15 @@ export default function ServicesManagementPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Catalog Management</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Services Catalog</h1>
       
-      <div className="flex space-x-4 mb-6 border-b">
-        {['services', 'packages', 'addons'].map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab as any)}
-            className={`pb-2 px-4 ${activeTab === tab ? 'border-b-2 border-indigo-600 text-indigo-600 font-medium' : 'text-gray-500'}`}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
-      </div>
-
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold capitalize">{activeTab}</h2>
+        <h2 className="text-xl font-semibold">All Services</h2>
         <button
           onClick={() => openModal()}
           className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
         >
-          Add New {activeTab.slice(0, -1)}
+          + Add New Service
         </button>
       </div>
 
@@ -157,22 +155,15 @@ export default function ServicesManagementPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
       ) : data.length === 0 ? (
-        <div className="text-center p-8 text-gray-500">No items found</div>
+        <div className="text-center p-8 text-gray-500">No services found</div>
       ) : (
         <div className="overflow-x-auto bg-white shadow rounded-lg">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                {activeTab === 'services' && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Price</th>}
-                {activeTab === 'packages' && (
-                  <>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                  </>
-                )}
-                {activeTab === 'addons' && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Options/Addons</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -180,18 +171,11 @@ export default function ServicesManagementPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {data.map(item => (
                 <tr key={item._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
-                  {activeTab === 'services' && <td className="px-6 py-4 whitespace-nowrap">₹{item.basePrice}</td>}
-                  {activeTab === 'packages' && (
-                    <>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {servicesList.find(s => s._id === item.serviceId)?.name || item.serviceId?.name || item.serviceId || 'Unknown'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">₹{item.price}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{item.durationMinutes} min</td>
-                    </>
-                  )}
-                  {activeTab === 'addons' && <td className="px-6 py-4 whitespace-nowrap">₹{item.price}</td>}
+                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">₹{item.basePrice}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {item.addons?.length || 0} options
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => handleToggleActive(item._id, item.isActive)}
@@ -213,110 +197,89 @@ export default function ServicesManagementPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold mb-4">{editingItem ? 'Edit' : 'Add'} {activeTab.slice(0, -1)}</h3>
-            <form onSubmit={handleSave} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
-                <input required type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="mt-1 block w-full border rounded p-2" />
-              </div>
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-6 border-b pb-2">{editingItem ? 'Edit Service' : 'Add New Service'}</h3>
+            <form onSubmit={handleSave} className="space-y-6">
               
-              {activeTab === 'services' && (
-                <>
+              <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
+                <h4 className="font-semibold text-gray-700">1. Base Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Slug</label>
-                    <input type="text" value={formData.slug || ''} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="mt-1 block w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border rounded p-2" />
+                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <input required type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Base Price (₹)</label>
-                    <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border rounded p-2" />
+                    <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
                   </div>
-                </>
-              )}
-
-              {activeTab === 'packages' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Service</label>
-                    <select required value={formData.serviceId || ''} onChange={e => setFormData({ ...formData, serviceId: e.target.value })} className="mt-1 block w-full border rounded p-2">
-                      <option value="">Select Service</option>
-                      {servicesList.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
-                    </select>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">Slug (URL friendly)</label>
+                    <input type="text" value={formData.slug || ''} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 text-gray-500" placeholder="e.g. personal-portraits" />
                   </div>
-                  <div>
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border rounded p-2" />
+                    <textarea rows={3} value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Price (₹)</label>
-                    <input required type="number" value={formData.price || ''} onChange={e => setFormData({ ...formData, price: e.target.value })} className="mt-1 block w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Duration (Minutes)</label>
-                    <input required type="number" value={formData.durationMinutes || ''} onChange={e => setFormData({ ...formData, durationMinutes: e.target.value })} className="mt-1 block w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="flex items-center space-x-2">
-                      <input type="checkbox" checked={formData.allowExtraHours || false} onChange={e => setFormData({ ...formData, allowExtraHours: e.target.checked })} className="rounded text-indigo-600 focus:ring-indigo-500" />
-                      <span className="text-sm font-medium text-gray-700">Allow Extra Hours</span>
-                    </label>
-                  </div>
-                  {formData.allowExtraHours && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Extra Hour Rate (₹)</label>
-                      <input type="number" value={formData.extraHourRate || ''} onChange={e => setFormData({ ...formData, extraHourRate: e.target.value })} className="mt-1 block w-full border rounded p-2" />
-                    </div>
-                  )}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Deliverables (comma separated)</label>
-                    <input type="text" value={Array.isArray(formData.deliverables) ? formData.deliverables.join(', ') : formData.deliverables || ''} onChange={e => setFormData({ ...formData, deliverables: e.target.value.split(',').map((s: string) => s.trim()) })} className="mt-1 block w-full border rounded p-2" />
-                  </div>
-                </>
-              )}
-
-              {activeTab === 'addons' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border rounded p-2" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Price (₹)</label>
-                    <input required type="number" value={formData.price || ''} onChange={e => setFormData({ ...formData, price: e.target.value })} className="mt-1 block w-full border rounded p-2" />
-                  </div>
-                </>
-              )}
-
-              {(activeTab === 'services' || activeTab === 'packages') && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Images Gallery</label>
-                    <ImageUpload 
-                      images={formData.images || []}
-                      onChange={(imgs) => setFormData({ ...formData, images: imgs })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Video URL (YouTube/Vimeo)</label>
-                    <input type="url" value={formData.videoUrl || ''} onChange={e => setFormData({ ...formData, videoUrl: e.target.value })} className="mt-1 block w-full border rounded p-2" placeholder="https://youtube.com/..." />
-                  </div>
-                </>
-              )}
-
-              <div>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" checked={formData.isActive !== false} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded text-indigo-600 focus:ring-indigo-500" />
-                  <span className="text-sm font-medium text-gray-700">Is Active</span>
-                </label>
+                </div>
               </div>
 
-              <div className="flex justify-end space-x-3 mt-6">
-                <button type="button" onClick={closeModal} className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-4">
+                <div className="flex justify-between items-center border-b border-blue-200 pb-2">
+                  <h4 className="font-semibold text-blue-900">2. Extra Options & Add-ons</h4>
+                  <button type="button" onClick={handleAddAddon} className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                    + Add Option
+                  </button>
+                </div>
+                
+                {formData.addons && formData.addons.length > 0 ? (
+                  <div className="space-y-3">
+                    {formData.addons.map((addon: any, index: number) => (
+                      <div key={index} className="flex gap-3 items-start bg-white p-3 rounded border border-blue-100 shadow-sm">
+                        <div className="flex-1">
+                          <label className="block text-xs font-medium text-gray-500">Option Name (e.g. "+1 Hour", "Drone")</label>
+                          <input required type="text" value={addon.name} onChange={e => handleUpdateAddon(index, 'name', e.target.value)} className="mt-1 block w-full border rounded p-1.5 text-sm" />
+                        </div>
+                        <div className="w-32">
+                          <label className="block text-xs font-medium text-gray-500">Price (₹)</label>
+                          <input required type="number" value={addon.price} onChange={e => handleUpdateAddon(index, 'price', e.target.value)} className="mt-1 block w-full border rounded p-1.5 text-sm" />
+                        </div>
+                        <div className="pt-6">
+                          <button type="button" onClick={() => handleRemoveAddon(index)} className="text-red-500 hover:text-red-700 p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 italic text-center py-2">No extra options added. Click "+ Add Option" to offer addons.</p>
+                )}
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
+                <h4 className="font-semibold text-gray-700">3. Media & Settings</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Images Gallery</label>
+                  <ImageUpload 
+                    images={formData.images || []}
+                    onChange={(imgs) => setFormData({ ...formData, images: imgs })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Video URL (Optional)</label>
+                  <input type="url" value={formData.videoUrl || ''} onChange={e => setFormData({ ...formData, videoUrl: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="https://youtube.com/..." />
+                </div>
+                <div className="pt-2">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" checked={formData.isActive !== false} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
+                    <span className="font-medium text-gray-700">Service is Active (Visible to customers)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-8 border-t pt-4">
+                <button type="button" onClick={closeModal} className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 font-medium">Cancel</button>
+                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium shadow-md">Save Service</button>
               </div>
             </form>
           </div>

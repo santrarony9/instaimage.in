@@ -26,6 +26,15 @@ export class Service extends AbstractDocument {
 
   @Prop()
   videoUrl?: string;
+
+  @Prop({
+    type: [{
+      name: { type: String, required: true },
+      price: { type: Number, required: true }
+    }],
+    default: []
+  })
+  addons: { name: string; price: number }[];
 }
 
 export const ServiceSchema = SchemaFactory.createForClass(Service);

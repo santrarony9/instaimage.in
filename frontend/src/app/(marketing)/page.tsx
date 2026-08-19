@@ -95,43 +95,48 @@ export default async function HomePage() {
   );
 }
 
-// Reusable E-commerce Product Card Component
+// Reusable Professional Product Card Component
 function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string, API_URL: string }) {
   const imageUrl = service.images && service.images.length > 0 
     ? (service.images[0].startsWith('http') ? service.images[0] : `${API_URL}${service.images[0]}`)
     : null;
 
-  // Dense Blinkit style card
   return (
-    <Link href={`/services/${service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col relative">
+    <Link href={`/services/${service._id}`} className="group bg-white rounded-md overflow-hidden border border-gray-200 hover:border-black transition-all duration-300 flex flex-col relative shadow-sm hover:shadow-lg">
       {badge && (
-        <div className="absolute top-2 left-2 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded z-10">
+        <div className="absolute top-2 left-2 bg-black text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 z-10">
           {badge}
         </div>
       )}
       
-      <div className="w-full aspect-square bg-gray-100 overflow-hidden relative p-2">
+      <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
         {imageUrl ? (
           <img 
             src={imageUrl} 
             alt={service.name}
-            className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition duration-500"
+            className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-3xl">📸</div>
+          <div className="w-full h-full flex items-center justify-center text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          </div>
         )}
+        
+        {/* Overlay hover effect */}
+        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-500"></div>
       </div>
 
-      <div className="p-3 flex flex-col flex-grow">
-        <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2 leading-tight mb-1 group-hover:text-blue-600 transition">{service.name}</h3>
-        <p className="text-[11px] md:text-xs text-gray-500 line-clamp-1 mb-2">{service.description}</p>
+      <div className="p-3 md:p-4 flex flex-col flex-grow">
+        <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2 leading-snug mb-1 uppercase tracking-tight">{service.name}</h3>
+        <p className="text-[11px] md:text-xs text-gray-500 line-clamp-1 mb-3 font-medium">{service.description}</p>
         
-        <div className="mt-auto flex items-center justify-between pt-2">
+        <div className="mt-auto border-t border-gray-100 pt-3 flex items-center justify-between">
           <div className="flex flex-col">
+            <span className="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Starts At</span>
             <span className="text-sm md:text-base font-black text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
           </div>
-          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded-md text-xs font-bold group-hover:bg-blue-600 group-hover:text-white transition">
-            ADD
+          <div className="text-[10px] font-bold uppercase tracking-wider text-black group-hover:text-blue-600 transition-colors flex items-center">
+            View <span className="ml-1 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all">➔</span>
           </div>
         </div>
       </div>
