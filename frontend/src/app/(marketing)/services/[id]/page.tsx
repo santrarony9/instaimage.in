@@ -92,7 +92,7 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
           <div className="w-full lg:w-7/12">
             {/* Main Image Gallery */}
             <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden mb-6 relative">
-              <img src={mainImage} alt={service.name} className="w-full h-full object-cover" />
+              <img src={mainImage} alt={service.name} className="w-full h-full object-contain" />
             </div>
             
             {/* Thumbnails */}
@@ -164,18 +164,18 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
               <h1 className="text-3xl font-bold text-gray-900 mb-2 leading-tight">{service.name}</h1>
               <div className="text-3xl font-black text-gray-900 mb-8">₹{totalPrice.toLocaleString()}</div>
 
-              {/* Pricing Mode Selector (if flexible pricing is available) */}
-              {service.flexiblePrice && (
-                <div className="mb-8 border-t border-gray-100 pt-6">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Pricing Type</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label 
-                      className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
-                      onClick={() => setPricingMode('fixed')}
-                    >
-                      <span className="font-bold text-gray-900">Fixed Package</span>
-                      <span className="text-xs text-gray-500">₹{service.basePrice} flat rate</span>
-                    </label>
+              {/* Pricing Mode Selector */}
+              <div className="mb-8 border-t border-gray-100 pt-6">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Pricing Type</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <label 
+                    className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                    onClick={() => setPricingMode('fixed')}
+                  >
+                    <span className="font-bold text-gray-900">Fixed Package</span>
+                    <span className="text-xs text-gray-500">₹{service.basePrice} flat rate</span>
+                  </label>
+                  {service.flexiblePrice ? (
                     <label 
                       className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'flexible' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                       onClick={() => setPricingMode('flexible')}
@@ -183,39 +183,53 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
                       <span className="font-bold text-gray-900">Flexible Hourly</span>
                       <span className="text-xs text-gray-500">₹{service.flexiblePrice}/hr</span>
                     </label>
-                  </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-md bg-gray-50 opacity-50 cursor-not-allowed">
+                      <span className="font-bold text-gray-500">Flexible Hourly</span>
+                      <span className="text-xs text-gray-400">Not Available</span>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* Time Configuration based on Mode */}
-              {pricingMode === 'fixed' && service.extraHourPrice && (
+              {pricingMode === 'fixed' && (
                 <div className="mb-8 border-t border-gray-100 pt-6">
                   <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Need More Time?</h3>
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md">
-                    <div>
-                      <div className="font-bold">Extra Hours</div>
-                      <div className="text-sm text-gray-500">+₹{service.extraHourPrice} / hr</div>
+                  {service.extraHourPrice ? (
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md bg-white">
+                      <div>
+                        <div className="font-bold">Extra Hours</div>
+                        <div className="text-sm text-gray-500">+₹{service.extraHourPrice} / hr</div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <button 
+                          className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50"
+                          onClick={() => setExtraHours(Math.max(0, extraHours - 1))}
+                          disabled={extraHours === 0}
+                        >-</button>
+                        <span className="font-bold w-4 text-center">{extraHours}</span>
+                        <button 
+                          className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100"
+                          onClick={() => setExtraHours(extraHours + 1)}
+                        >+</button>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <button 
-                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50"
-                        onClick={() => setExtraHours(Math.max(0, extraHours - 1))}
-                        disabled={extraHours === 0}
-                      >-</button>
-                      <span className="font-bold w-4 text-center">{extraHours}</span>
-                      <button 
-                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100"
-                        onClick={() => setExtraHours(extraHours + 1)}
-                      >+</button>
+                  ) : (
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md bg-gray-50 opacity-60">
+                      <div>
+                        <div className="font-bold">Extra Hours</div>
+                        <div className="text-sm text-gray-500">Not available for this package</div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
 
-              {pricingMode === 'flexible' && (
+              {pricingMode === 'flexible' && service.flexiblePrice && (
                 <div className="mb-8 border-t border-gray-100 pt-6">
                   <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">How many hours?</h3>
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md">
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md bg-white">
                     <div>
                       <div className="font-bold">Total Duration</div>
                       <div className="text-sm text-gray-500">₹{service.flexiblePrice} / hr</div>
