@@ -52,40 +52,40 @@ export default async function HomePage() {
       <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         
         {/* Trending Section */}
-        <div className="mb-16">
-          <div className="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900">🔥 Trending Services</h2>
-            <Link href="/services" className="text-blue-600 font-semibold hover:underline">View All</Link>
+        <div className="mb-12">
+          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-gray-900">🔥 Trending Services</h2>
+            <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
             {trending.map(service => <ServiceCard key={service._id} service={service} badge="Trending" API_URL={API_URL} />)}
           </div>
         </div>
 
         {/* Categories Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-          <div className="bg-gray-900 h-64 rounded-xl overflow-hidden relative group cursor-pointer">
+        <div className="grid grid-cols-2 gap-3 md:gap-6 mb-12">
+          <div className="bg-gray-900 h-32 md:h-48 rounded-xl overflow-hidden relative group cursor-pointer">
             <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Weddings" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <h3 className="text-white text-4xl font-black tracking-widest uppercase">Weddings</h3>
+              <h3 className="text-white text-xl md:text-3xl font-black tracking-widest uppercase">Weddings</h3>
             </div>
           </div>
-          <div className="bg-gray-900 h-64 rounded-xl overflow-hidden relative group cursor-pointer">
+          <div className="bg-gray-900 h-32 md:h-48 rounded-xl overflow-hidden relative group cursor-pointer">
             <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Corporate" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <h3 className="text-white text-4xl font-black tracking-widest uppercase">Corporate</h3>
+              <h3 className="text-white text-xl md:text-3xl font-black tracking-widest uppercase">Corporate</h3>
             </div>
           </div>
         </div>
 
         {/* Newly Added Section */}
-        <div className="mb-16">
-          <div className="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-gray-900">✨ Newly Added</h2>
+        <div className="mb-12">
+          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-gray-900">✨ Newly Added</h2>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
             {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge="New" API_URL={API_URL} />)}
           </div>
         </div>
@@ -101,40 +101,37 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
     ? (service.images[0].startsWith('http') ? service.images[0] : `${API_URL}${service.images[0]}`)
     : null;
 
-  // Next.js Link points to the new PDP (Product Details Page)
+  // Dense Blinkit style card
   return (
-    <Link href={`/services/${service._id}`} className="group bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative">
+    <Link href={`/services/${service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col relative">
       {badge && (
-        <div className="absolute top-3 left-3 bg-black text-white text-xs font-bold uppercase tracking-wider px-2 py-1 rounded z-10">
+        <div className="absolute top-2 left-2 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded z-10">
           {badge}
         </div>
       )}
       
-      <div className="w-full aspect-[4/3] bg-gray-100 overflow-hidden relative">
+      <div className="w-full aspect-square bg-gray-100 overflow-hidden relative p-2">
         {imageUrl ? (
           <img 
             src={imageUrl} 
             alt={service.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+            className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-4xl">📸</div>
+          <div className="w-full h-full flex items-center justify-center text-3xl">📸</div>
         )}
       </div>
 
-      <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-lg font-bold text-gray-900 line-clamp-1 mb-1 group-hover:text-blue-600 transition">{service.name}</h3>
-        <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-grow">{service.description}</p>
+      <div className="p-3 flex flex-col flex-grow">
+        <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2 leading-tight mb-1 group-hover:text-blue-600 transition">{service.name}</h3>
+        <p className="text-[11px] md:text-xs text-gray-500 line-clamp-1 mb-2">{service.description}</p>
         
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+        <div className="mt-auto flex items-center justify-between pt-2">
           <div className="flex flex-col">
-            <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Starting at</span>
-            <span className="text-xl font-black text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+            <span className="text-sm md:text-base font-black text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
           </div>
-          <div className="bg-blue-50 text-blue-700 p-2 rounded-full group-hover:bg-blue-600 group-hover:text-white transition">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded-md text-xs font-bold group-hover:bg-blue-600 group-hover:text-white transition">
+            ADD
           </div>
         </div>
       </div>
