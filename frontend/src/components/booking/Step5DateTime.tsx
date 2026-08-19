@@ -32,10 +32,6 @@ export function Step5DateTime() {
 
   const [endTime, setEndTime] = useState(data.endTime || getEndTime(startTime));
   
-  const [timeFlexibility, setTimeFlexibility] = useState<'STRICT' | 'FLEXIBLE'>(
-    data.timeFlexibility || 'STRICT'
-  );
-  const [extraHoursBooked, setExtraHoursBooked] = useState(data.extraHoursBooked || 0);
   const [error, setError] = useState('');
 
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -53,9 +49,7 @@ export function Step5DateTime() {
     updateData({ 
       scheduledDate: date,
       startTime,
-      endTime,
-      timeFlexibility,
-      extraHoursBooked: timeFlexibility === 'FLEXIBLE' ? extraHoursBooked : 0
+      endTime
     });
     nextStep();
   };
@@ -104,59 +98,6 @@ export function Step5DateTime() {
           </div>
         </div>
 
-        <div className="mt-8 border-t pt-6">
-          <h3 className="text-lg font-semibold mb-4">Time Flexibility</h3>
-          <div className="space-y-4">
-            <label className="flex items-start space-x-3 cursor-pointer p-4 border rounded-lg hover:bg-gray-50">
-              <input
-                type="radio"
-                name="flexibility"
-                checked={timeFlexibility === 'STRICT'}
-                onChange={() => setTimeFlexibility('STRICT')}
-                className="mt-1"
-              />
-              <div>
-                <span className="block font-medium">Strict Timing</span>
-                <span className="block text-sm text-gray-500">I don't expect the shoot to exceed the scheduled duration. Overtime charges may be higher if extended on the spot.</span>
-              </div>
-            </label>
-            
-            <label className="flex items-start space-x-3 cursor-pointer p-4 border rounded-lg hover:bg-gray-50">
-              <input
-                type="radio"
-                name="flexibility"
-                checked={timeFlexibility === 'FLEXIBLE'}
-                onChange={() => setTimeFlexibility('FLEXIBLE')}
-                className="mt-1"
-              />
-              <div>
-                <span className="block font-medium">Flexible Timing (Pre-book extra hours)</span>
-                <span className="block text-sm text-gray-500">I might need more time. Pre-book extra hours at a discounted rate. Unused hours are non-refundable.</span>
-              </div>
-            </label>
-          </div>
-
-          {timeFlexibility === 'FLEXIBLE' && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <label className="block text-sm font-medium text-gray-700 mb-2">How many extra hours?</label>
-              <div className="flex items-center space-x-4">
-                <button 
-                  onClick={() => setExtraHoursBooked(Math.max(1, extraHoursBooked - 1))}
-                  className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100"
-                >
-                  -
-                </button>
-                <span className="text-xl font-medium">{extraHoursBooked}</span>
-                <button 
-                  onClick={() => setExtraHoursBooked(Math.min(8, extraHoursBooked + 1))}
-                  className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="flex justify-between mt-8">

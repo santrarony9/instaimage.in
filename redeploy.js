@@ -2,14 +2,16 @@ const { Client } = require('ssh2');
 
 const conn = new Client();
 conn.on('ready', () => {
-  console.log('Connected to VPS');
-  const cmd = `cd ~/ && git clone https://github.com/santrarony9/insta-image-platform.git temp_clone && cp -r temp_clone/backend/* backend/ && rm -rf temp_clone && docker-compose build api && docker-compose up -d --no-deps api`;
+  const cmd = `cd ~/backend && docker compose build api && docker compose up -d --no-deps api`;
   conn.exec(cmd, (err, stream) => {
-    if (err) { console.error(err); conn.end(); return; }
+    if (err) throw err;
     let out = '';
-    stream.on('data', (d) => { out += d.toString(); });
-    stream.stderr.on('data', (d) => { out += d.toString(); });
-    stream.on('close', () => { console.log(out.trim()); conn.end(); });
+    stream.on('data', d => out += d);
+    stream.stderr.on('data', d => out += d);
+    stream.on('close', () => {
+      console.log(out);
+      conn.end();
+    });
   });
 }).connect({
   host: '135.125.9.81',
