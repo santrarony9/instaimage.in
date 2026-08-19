@@ -16,6 +16,12 @@ export class Service extends AbstractDocument {
   basePrice: number;
 
   @Prop()
+  extraHourPrice?: number;
+
+  @Prop()
+  flexiblePrice?: number;
+
+  @Prop()
   coverImage: string;
 
   @Prop({ default: true })

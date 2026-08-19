@@ -100,6 +100,8 @@ export default function ServicesManagementPage() {
     delete payload.isPopular;
 
     if (payload.basePrice) payload.basePrice = Number(payload.basePrice);
+    if (payload.extraHourPrice) payload.extraHourPrice = Number(payload.extraHourPrice);
+    if (payload.flexiblePrice) payload.flexiblePrice = Number(payload.flexiblePrice);
 
     // Validate addons
     if (payload.addons) {
@@ -109,8 +111,12 @@ export default function ServicesManagementPage() {
       }));
     }
 
-    if (payload.basePrice && isNaN(payload.basePrice)) {
-      return toast.error('Base Price cannot be NaN');
+    if (
+      (payload.basePrice && isNaN(payload.basePrice)) ||
+      (payload.extraHourPrice && isNaN(payload.extraHourPrice)) ||
+      (payload.flexiblePrice && isNaN(payload.flexiblePrice))
+    ) {
+      return toast.error('Price fields must be valid numbers');
     }
     
     payload.isActive = Boolean(payload.isActive);
@@ -202,17 +208,25 @@ export default function ServicesManagementPage() {
             <form onSubmit={handleSave} className="space-y-6">
               
               <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
-                <h4 className="font-semibold text-gray-700">1. Base Details</h4>
+                <h4 className="font-semibold text-gray-700">1. Base Details & Pricing</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">Service Name</label>
                     <input required type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Base Price (₹)</label>
-                    <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
+                    <label className="block text-sm font-medium text-gray-700">Fixed Time Price (₹)</label>
+                    <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 4000 for 45 mins" />
                   </div>
-                  <div className="md:col-span-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Extra Hour Price (₹) - Optional</label>
+                    <input type="number" value={formData.extraHourPrice || ''} onChange={e => setFormData({ ...formData, extraHourPrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 1500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Flexible Time Price (₹/hr) - Optional</label>
+                    <input type="number" value={formData.flexiblePrice || ''} onChange={e => setFormData({ ...formData, flexiblePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 2000" />
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700">Slug (URL friendly)</label>
                     <input type="text" value={formData.slug || ''} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 text-gray-500" placeholder="e.g. personal-portraits" />
                   </div>

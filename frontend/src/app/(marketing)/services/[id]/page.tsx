@@ -12,6 +12,9 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
   const [loading, setLoading] = useState(true);
 
   // User Selection State
+  const [pricingMode, setPricingMode] = useState<'fixed' | 'flexible'>('fixed');
+  const [flexibleHours, setFlexibleHours] = useState<number>(2); // Default to 2 hours for flexible
+  const [extraHours, setExtraHours] = useState<number>(0);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]); // Storing addon names
   
   const [activeTab, setActiveTab] = useState<'details' | 'delivery' | 'process'>('details');
@@ -47,15 +50,29 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
   };
 
   // Price Calculation
-  let basePrice = service.basePrice;
+  let basePrice = 0;
+  if (pricingMode === 'fixed') {
+    basePrice = service.basePrice;
+    if (service.extraHourPrice && extraHours > 0) {
+      basePrice += (service.extraHourPrice * extraHours);
+    }
+  } else if (pricingMode === 'flexible' && service.flexiblePrice) {
+    basePrice = service.flexiblePrice * flexibleHours;
+  }
+
   let addonsCost = (service.addons || [])
     .filter((a: any) => selectedAddons.includes(a.name))
     .reduce((sum: number, a: any) => sum + Number(a.price), 0);
   let totalPrice = basePrice + addonsCost;
 
   const handleCheckout = () => {
-    // Pass selected addons via URL or state
-    router.push(`/booking?serviceId=${service._id}&addons=${encodeURIComponent(selectedAddons.join(','))}`);
+    // Pass selected details via URL or state
+    let search = `?serviceId=${service._id}&mode=${pricingMode}`;
+    if (pricingMode === 'fixed' && extraHours > 0) search += `&extraHours=${extraHours}`;
+    if (pricingMode === 'flexible') search += `&flexibleHours=${flexibleHours}`;
+    if (selectedAddons.length > 0) search += `&addons=${encodeURIComponent(selectedAddons.join(','))}`;
+    
+    router.push(`/booking${search}`);
   };
 
   return (
@@ -147,10 +164,82 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
               <h1 className="text-3xl font-bold text-gray-900 mb-2 leading-tight">{service.name}</h1>
               <div className="text-3xl font-black text-gray-900 mb-8">₹{totalPrice.toLocaleString()}</div>
 
+              {/* Pricing Mode Selector (if flexible pricing is available) */}
+              {service.flexiblePrice && (
+                <div className="mb-8 border-t border-gray-100 pt-6">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Pricing Type</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label 
+                      className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                      onClick={() => setPricingMode('fixed')}
+                    >
+                      <span className="font-bold text-gray-900">Fixed Package</span>
+                      <span className="text-xs text-gray-500">₹{service.basePrice} flat rate</span>
+                    </label>
+                    <label 
+                      className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'flexible' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                      onClick={() => setPricingMode('flexible')}
+                    >
+                      <span className="font-bold text-gray-900">Flexible Hourly</span>
+                      <span className="text-xs text-gray-500">₹{service.flexiblePrice}/hr</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* Time Configuration based on Mode */}
+              {pricingMode === 'fixed' && service.extraHourPrice && (
+                <div className="mb-8 border-t border-gray-100 pt-6">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Need More Time?</h3>
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md">
+                    <div>
+                      <div className="font-bold">Extra Hours</div>
+                      <div className="text-sm text-gray-500">+₹{service.extraHourPrice} / hr</div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <button 
+                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50"
+                        onClick={() => setExtraHours(Math.max(0, extraHours - 1))}
+                        disabled={extraHours === 0}
+                      >-</button>
+                      <span className="font-bold w-4 text-center">{extraHours}</span>
+                      <button 
+                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100"
+                        onClick={() => setExtraHours(extraHours + 1)}
+                      >+</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {pricingMode === 'flexible' && (
+                <div className="mb-8 border-t border-gray-100 pt-6">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">How many hours?</h3>
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md">
+                    <div>
+                      <div className="font-bold">Total Duration</div>
+                      <div className="text-sm text-gray-500">₹{service.flexiblePrice} / hr</div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <button 
+                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50"
+                        onClick={() => setFlexibleHours(Math.max(1, flexibleHours - 1))}
+                        disabled={flexibleHours === 1}
+                      >-</button>
+                      <span className="font-bold w-4 text-center">{flexibleHours}</span>
+                      <button 
+                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100"
+                        onClick={() => setFlexibleHours(flexibleHours + 1)}
+                      >+</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Add-ons */}
               {service.addons && service.addons.length > 0 && (
                 <div className="mb-8 border-t border-gray-100 pt-6">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Customize your package</h3>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Customize your booking</h3>
                   <div className="space-y-3">
                     {service.addons.map((addon: any, idx: number) => (
                       <label 

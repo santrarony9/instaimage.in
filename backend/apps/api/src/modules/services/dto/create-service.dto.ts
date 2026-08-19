@@ -17,6 +17,14 @@ export class CreateServiceDto {
   @IsNotEmpty()
   basePrice: number;
 
+  @IsNumber()
+  @IsOptional()
+  extraHourPrice?: number;
+
+  @IsNumber()
+  @IsOptional()
+  flexiblePrice?: number;
+
   @IsString()
   @IsOptional()
   coverImage?: string;
