@@ -18,4 +18,4 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 ENV NODE_ENV=production
 
-CMD ["node", "dist/apps/workers/src/main.js"]
+CMD ["node", "dist/apps/workers/apps/workers/src/main.js"]
