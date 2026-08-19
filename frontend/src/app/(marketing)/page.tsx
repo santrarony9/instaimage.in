@@ -21,14 +21,46 @@ export default async function HomePage() {
   return (
     <div className="bg-white min-h-screen">
       
-      {/* Services and Pricing Header */}
-      <div className="pt-24 pb-8 text-center px-4 max-w-4xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight">
-          Services and Pricing
-        </h1>
-        <p className="text-lg text-gray-500 font-medium mt-4">
-          Explore our professional photography and post-production packages.
-        </p>
+      {/* Cinematic Hero Section */}
+      <div className="relative bg-black text-white overflow-hidden min-h-[85vh] flex items-center">
+        {/* Background Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop" 
+            alt="Studio Production" 
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-black/50 to-black/80"></div>
+        </div>
+
+        <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="max-w-3xl">
+            <div className="inline-block px-3 py-1 border border-white/30 rounded-full text-xs font-bold tracking-widest uppercase mb-6 text-gray-300">
+              Entertainment • Photography • Post-Production
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-6">
+              Bring Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Vision</span> to the Big Screen.
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 font-medium mb-10 max-w-2xl leading-relaxed">
+              We are a full-scale creative agency. From high-end cinematic photography to industry-standard VFX, podcast multi-cam, and reel post-production, we deliver masterpieces.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="#portfolio" className="bg-white text-black px-8 py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-gray-200 transition text-center">
+                Explore Packages
+              </Link>
+              <Link href="/portfolio" className="bg-transparent border border-white text-white px-8 py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white/10 transition text-center flex items-center justify-center">
+                <span className="mr-2">▶</span> View Showreel
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Services and Pricing Header - Moved down for context */}
+      <div className="pt-20 pb-4 text-center px-4 max-w-4xl mx-auto">
+        <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight">
+          Select Your Production Tier
+        </h2>
       </div>
 
       {/* Filter Chips (Unified Theme) */}

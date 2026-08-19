@@ -17,10 +17,15 @@ export default function ServicesPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <h1 className="text-4xl font-bold mb-8 text-center">Our Services</h1>
-      
-      {loading ? (
+    <div className="bg-white min-h-screen">
+      {/* Cinematic Header */}
+      <div className="bg-black text-white py-24 px-4 text-center">
+        <h1 className="text-5xl md:text-6xl font-black tracking-tighter mb-4">Production <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Services</span></h1>
+        <p className="text-gray-400 text-lg max-w-2xl mx-auto">From high-fashion photography to industry-standard cinematic video production, we have the tools and talent to execute your vision.</p>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {loading ? (
         <div className="flex justify-center p-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
         </div>
@@ -57,6 +62,7 @@ export default function ServicesPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }
