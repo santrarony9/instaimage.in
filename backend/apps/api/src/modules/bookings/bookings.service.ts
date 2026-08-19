@@ -57,10 +57,7 @@ export class BookingsService {
         }
       } else if (createBookingDto.pricingMode === 'flexible') {
         if (!service.flexiblePrice) throw new BadRequestException('This service does not allow flexible pricing.');
-        // Calculate hours based on start and end time (assuming 1 hour for now, but should calculate properly)
-        // Simplified: assuming front-end passes exact extraHoursBooked as flexibleHours
-        const hours = createBookingDto.extraHoursBooked || 1; 
-        basePrice = service.flexiblePrice * hours;
+        basePrice = service.flexiblePrice;
       }
 
       let addonsPrice = 0;

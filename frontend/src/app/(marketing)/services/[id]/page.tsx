@@ -57,7 +57,7 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
       basePrice += (service.extraHourPrice * extraHours);
     }
   } else if (pricingMode === 'flexible' && service.flexiblePrice) {
-    basePrice = service.flexiblePrice * flexibleHours;
+    basePrice = service.flexiblePrice;
   }
 
   let addonsCost = (service.addons || [])
@@ -69,7 +69,6 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
     // Pass selected details via URL or state
     let search = `?serviceId=${service._id}&mode=${pricingMode}`;
     if (pricingMode === 'fixed' && extraHours > 0) search += `&extraHours=${extraHours}`;
-    if (pricingMode === 'flexible') search += `&flexibleHours=${flexibleHours}`;
     if (selectedAddons.length > 0) search += `&addons=${encodeURIComponent(selectedAddons.join(','))}`;
     
     router.push(`/booking${search}`);
@@ -180,12 +179,12 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
                       className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'flexible' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                       onClick={() => setPricingMode('flexible')}
                     >
-                      <span className="font-bold text-gray-900">Flexible Hourly</span>
-                      <span className="text-xs text-gray-500">₹{service.flexiblePrice}/hr</span>
+                      <span className="font-bold text-gray-900">Flexible Timing</span>
+                      <span className="text-xs text-gray-500">₹{service.flexiblePrice} base price</span>
                     </label>
                   ) : (
                     <div className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-md bg-gray-50 opacity-50 cursor-not-allowed">
-                      <span className="font-bold text-gray-500">Flexible Hourly</span>
+                      <span className="font-bold text-gray-500">Flexible Timing</span>
                       <span className="text-xs text-gray-400">Not Available</span>
                     </div>
                   )}
@@ -228,24 +227,9 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
 
               {pricingMode === 'flexible' && service.flexiblePrice && (
                 <div className="mb-8 border-t border-gray-100 pt-6">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">How many hours?</h3>
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md bg-white">
-                    <div>
-                      <div className="font-bold">Total Duration</div>
-                      <div className="text-sm text-gray-500">₹{service.flexiblePrice} / hr</div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <button 
-                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50"
-                        onClick={() => setFlexibleHours(Math.max(1, flexibleHours - 1))}
-                        disabled={flexibleHours === 1}
-                      >-</button>
-                      <span className="font-bold w-4 text-center">{flexibleHours}</span>
-                      <button 
-                        className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-xl hover:bg-gray-100"
-                        onClick={() => setFlexibleHours(flexibleHours + 1)}
-                      >+</button>
-                    </div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Flexible Timing Notice</h3>
+                  <div className="p-4 border border-gray-200 rounded-md bg-blue-50 text-blue-800 text-sm">
+                    You have selected flexible timing. This reserves the photographer for your event with no back-to-back bookings, allowing you to extend time on the spot. You can pay the photographer directly in cash for any extra hours used on the day.
                   </div>
                 </div>
               )}

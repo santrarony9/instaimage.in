@@ -233,8 +233,8 @@ export default function ServicesManagementPage() {
                     <input type="number" value={formData.extraHourPrice || ''} onChange={e => setFormData({ ...formData, extraHourPrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 1500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Flexible Time Price (₹/hr) - Optional</label>
-                    <input type="number" value={formData.flexiblePrice || ''} onChange={e => setFormData({ ...formData, flexiblePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 2000" />
+                    <label className="block text-sm font-medium text-gray-700">Flexible Timing Premium Price (₹)</label>
+                    <input type="number" value={formData.flexiblePrice || ''} onChange={e => setFormData({ ...formData, flexiblePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 3000" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Slug (URL friendly)</label>
