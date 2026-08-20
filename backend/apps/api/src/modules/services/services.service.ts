@@ -16,8 +16,19 @@ export class ServicesService {
     return this.servicesRepository.create(data);
   }
 
+  // Public-facing: only return approved & active services
   async findAll() {
+    return this.servicesRepository.find({ isApproved: true, isActive: true });
+  }
+
+  // Admin: return ALL services (approved + pending)
+  async findAllAdmin() {
     return this.servicesRepository.find({});
+  }
+
+  // Admin: return only pending (unapproved) services
+  async findPending() {
+    return this.servicesRepository.find({ isApproved: false });
   }
 
   async findByCreator(creatorId: string) {
@@ -26,6 +37,22 @@ export class ServicesService {
 
   async findOne(id: string) {
     return this.servicesRepository.findOne({ _id: id });
+  }
+
+  // Admin: approve a service
+  async approveService(id: string) {
+    return this.servicesRepository.findOneAndUpdate(
+      { _id: id },
+      { isApproved: true },
+    );
+  }
+
+  // Admin: reject (delete or mark inactive)
+  async rejectService(id: string) {
+    return this.servicesRepository.findOneAndUpdate(
+      { _id: id },
+      { isApproved: false, isActive: false },
+    );
   }
 
   async update(id: string, updateServiceDto: UpdateServiceDto) {

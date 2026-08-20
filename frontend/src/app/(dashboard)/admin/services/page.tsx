@@ -22,6 +22,7 @@ const PREDEFINED_OCCASIONS = [
 export default function ServicesManagementPage() {
   const { toast } = useToast();
   const [data, setData] = useState<any[]>([]);
+  const [pendingData, setPendingData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -30,8 +31,14 @@ export default function ServicesManagementPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetchApi('/services');
-      setData(res.data || res || []);
+      const [allRes, pendingRes] = await Promise.all([
+        fetchApi('/services/admin/all'),
+        fetchApi('/services/pending'),
+      ]);
+      const allServices = allRes.data || allRes || [];
+      const pending = pendingRes.data || pendingRes || [];
+      setData(allServices.filter((s: any) => s.isApproved));
+      setPendingData(pending);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -164,7 +171,74 @@ export default function ServicesManagementPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Services Catalog</h1>
-      
+
+      {/* ===== PENDING APPROVAL SECTION ===== */}
+      {pendingData.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-xl font-semibold text-orange-700">⏳ Pending Approval</h2>
+            <span className="bg-orange-100 text-orange-800 text-sm font-bold px-3 py-1 rounded-full">{pendingData.length}</span>
+          </div>
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4 text-sm text-orange-800">
+            These services were submitted by Sellers and need your approval before going live. Customer won&apos;t see the seller&apos;s identity.
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {pendingData.map(item => (
+              <div key={item._id} className="bg-white rounded-lg shadow-sm border-2 border-orange-200 overflow-hidden">
+                {item.coverImage && (
+                  <img src={item.coverImage} alt={item.name} className="w-full h-40 object-cover" />
+                )}
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-900 mb-1">{item.name}</h3>
+                  <p className="text-sm text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+                  <div className="flex justify-between items-center text-sm mb-3">
+                    <span className="font-bold text-gray-900">₹{item.basePrice?.toLocaleString()}</span>
+                    <span className="text-gray-400">{item.category || 'Photography'}</span>
+                  </div>
+                  {item.locations?.length > 0 && (
+                    <p className="text-xs text-gray-400 mb-2">📍 {item.locations.join(', ')}</p>
+                  )}
+                  <div className="flex gap-2 mt-3 pt-3 border-t">
+                    <button
+                      onClick={async () => {
+                        try {
+                          await fetchApi(`/services/${item._id}/approve`, { method: 'PATCH' });
+                          toast.success(`"${item.name}" approved and is now live!`);
+                          loadData();
+                        } catch (err: any) { toast.error(err.message); }
+                      }}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium"
+                    >
+                      ✅ Approve
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Reject this service?')) return;
+                        try {
+                          await fetchApi(`/services/${item._id}/reject`, { method: 'PATCH' });
+                          toast.success(`"${item.name}" rejected.`);
+                          loadData();
+                        } catch (err: any) { toast.error(err.message); }
+                      }}
+                      className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded text-sm font-medium"
+                    >
+                      ❌ Reject
+                    </button>
+                    <button
+                      onClick={() => openModal(item)}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded text-sm font-medium"
+                    >
+                      ✏️ Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ===== ALL APPROVED SERVICES ===== */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">All Services</h2>
         <button

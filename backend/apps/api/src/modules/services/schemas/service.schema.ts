@@ -110,7 +110,7 @@ export class Service extends AbstractDocument {
   @Prop({ type: Types.ObjectId, ref: 'Creator' })
   creatorId?: Types.ObjectId; // Reference to Creator/Seller
 
-  @Prop({ default: true })
+  @Prop({ default: false })
   isApproved: boolean;
 
   @Prop({ default: false })

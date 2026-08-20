@@ -139,8 +139,8 @@ export class BookingsService {
       const advancePaid = totalPrice * 0.2; // 20% advance
       const balanceDue = totalPrice - advancePaid;
 
-      const platformFee = totalPrice * 0.15;
-      const sellerPayout = totalPrice * 0.85;
+      const platformFee = totalPrice * 0.10; // 10% platform commission
+      const sellerPayout = totalPrice * 0.90; // 90% goes to seller
 
       const pricing: PricingDetails = {
         basePrice,

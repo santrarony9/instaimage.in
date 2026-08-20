@@ -30,17 +30,32 @@ export class ServicesController {
     @Request() req: AuthenticatedRequest,
     @Body() createServiceDto: CreateServiceDto,
   ) {
-    if (req.user.role === Role.PHOTOGRAPHER) {
+    if (req.user.role === Role.PHOTOGRAPHER || req.user.role === Role.SELLER) {
       createServiceDto.creatorId = req.user.sub;
-      createServiceDto.isApproved = false; // Require admin approval or just true
+      createServiceDto.isApproved = false; // Always require admin approval for sellers
     }
     return this.servicesService.create(createServiceDto);
   }
 
+  // Public: only returns approved services (no creator identity)
   @Public()
   @Get()
   findAll() {
     return this.servicesService.findAll();
+  }
+
+  // Admin: get ALL services including unapproved
+  @Roles(Role.ADMIN)
+  @Get('admin/all')
+  findAllAdmin() {
+    return this.servicesService.findAllAdmin();
+  }
+
+  // Admin: get only pending (unapproved) services
+  @Roles(Role.ADMIN)
+  @Get('pending')
+  findPending() {
+    return this.servicesService.findPending();
   }
 
   @Roles(Role.PHOTOGRAPHER)
@@ -53,6 +68,20 @@ export class ServicesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.servicesService.findOne(id);
+  }
+
+  // Admin: approve a pending service
+  @Roles(Role.ADMIN)
+  @Patch(':id/approve')
+  approveService(@Param('id') id: string) {
+    return this.servicesService.approveService(id);
+  }
+
+  // Admin: reject a pending service
+  @Roles(Role.ADMIN)
+  @Patch(':id/reject')
+  rejectService(@Param('id') id: string) {
+    return this.servicesService.rejectService(id);
   }
 
   @Roles(Role.ADMIN, Role.PHOTOGRAPHER)
