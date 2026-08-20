@@ -24,7 +24,7 @@ interface AuthenticatedRequest extends ExpressRequest {
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
-  @Roles(Role.ADMIN, Role.PHOTOGRAPHER)
+  @Roles(Role.ADMIN, Role.PHOTOGRAPHER, Role.SELLER)
   @Post()
   create(
     @Request() req: AuthenticatedRequest,
@@ -58,7 +58,7 @@ export class ServicesController {
     return this.servicesService.findPending();
   }
 
-  @Roles(Role.PHOTOGRAPHER)
+  @Roles(Role.PHOTOGRAPHER, Role.SELLER)
   @Get('my-services')
   findMyServices(@Request() req: AuthenticatedRequest) {
     return this.servicesService.findByCreator(req.user.sub);
@@ -84,13 +84,13 @@ export class ServicesController {
     return this.servicesService.rejectService(id);
   }
 
-  @Roles(Role.ADMIN, Role.PHOTOGRAPHER)
+  @Roles(Role.ADMIN, Role.PHOTOGRAPHER, Role.SELLER)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateServiceDto: UpdateServiceDto) {
     return this.servicesService.update(id, updateServiceDto);
   }
 
-  @Roles(Role.ADMIN, Role.PHOTOGRAPHER)
+  @Roles(Role.ADMIN, Role.PHOTOGRAPHER, Role.SELLER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.servicesService.remove(id);
