@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ServiceZonesService } from './service-zones.service';
 import { CreateServiceZoneDto } from './dto/create-service-zone.dto';
 import { UpdateServiceZoneDto } from './dto/update-service-zone.dto';
@@ -28,7 +36,10 @@ export class ServiceZonesController {
 
   @Roles(Role.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateServiceZoneDto: UpdateServiceZoneDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateServiceZoneDto: UpdateServiceZoneDto,
+  ) {
     return this.serviceZonesService.update(id, updateServiceZoneDto);
   }
 

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { Request as ExpressRequest } from 'express';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
@@ -16,7 +25,10 @@ export class BookingsController {
 
   @Post()
   @Roles(Role.CUSTOMER)
-  create(@Request() req: AuthenticatedRequest, @Body() createBookingDto: CreateBookingDto) {
+  create(
+    @Request() req: AuthenticatedRequest,
+    @Body() createBookingDto: CreateBookingDto,
+  ) {
     return this.bookingsService.createBooking(req.user.sub, createBookingDto);
   }
 
@@ -27,9 +39,9 @@ export class BookingsController {
   }
 
   @Get('my-assignments')
-  @Roles(Role.PHOTOGRAPHER)
-  getPhotographerAssignments(@Request() req: AuthenticatedRequest) {
-    return this.bookingsService.getPhotographerAssignments(req.user.sub);
+  @Roles(Role.SELLER)
+  getsellerAssignments(@Request() req: AuthenticatedRequest) {
+    return this.bookingsService.getsellerAssignments(req.user.sub);
   }
 
   @Get('all')
@@ -39,7 +51,7 @@ export class BookingsController {
   }
 
   @Get(':id')
-  @Roles(Role.CUSTOMER, Role.ADMIN, Role.PHOTOGRAPHER)
+  @Roles(Role.CUSTOMER, Role.ADMIN, Role.SELLER)
   findOne(@Param('id') id: string) {
     return this.bookingsService.getBookingById(id);
   }
@@ -52,15 +64,31 @@ export class BookingsController {
 
   @Patch(':id/assign')
   @Roles(Role.ADMIN)
-  assignPhotographer(@Param('id') id: string, @Body('photographerId') photographerId: string) {
-    return this.bookingsService.assignPhotographer(id, photographerId);
+  assignseller(@Param('id') id: string, @Body('sellerId') sellerId: string) {
+    return this.bookingsService.assignseller(id, sellerId);
+  }
+
+  @Patch(':id/payout')
+  @Roles(Role.ADMIN)
+  markPayoutPaid(@Param('id') id: string) {
+    return this.bookingsService.markPayoutPaid(id);
+  }
+
+  @Patch(':id/seller-status')
+  @Roles(Role.SELLER)
+  updatesellerStatus(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body('status') status: BookingStatus,
+  ) {
+    return this.bookingsService.updatesellerStatus(id, req.user.sub, status);
   }
 
   @Post(':id/surcharge')
   @Roles(Role.ADMIN)
   addSurcharge(
-    @Param('id') id: string, 
-    @Body() surcharge: { name: string; amount: number; reason?: string }
+    @Param('id') id: string,
+    @Body() surcharge: { name: string; amount: number; reason?: string },
   ) {
     return this.bookingsService.addSurcharge(id, surcharge);
   }

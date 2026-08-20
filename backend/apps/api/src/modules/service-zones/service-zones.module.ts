@@ -9,7 +9,9 @@ import { ServiceZone, ServiceZoneSchema } from './schemas/service-zone.schema';
 @Module({
   imports: [
     DatabaseModule,
-    MongooseModule.forFeature([{ name: ServiceZone.name, schema: ServiceZoneSchema }]),
+    MongooseModule.forFeature([
+      { name: ServiceZone.name, schema: ServiceZoneSchema },
+    ]),
   ],
   controllers: [ServiceZonesController],
   providers: [ServiceZonesService, ServiceZonesRepository],

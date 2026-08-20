@@ -1,4 +1,10 @@
-import { Controller, Post, Body, Headers, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Headers,
+  BadRequestException,
+} from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { Public } from '@app/auth';
 
@@ -20,7 +26,7 @@ export class PaymentsController {
     // const isValid = verifyWebhookSignature(payload, signature, secret);
 
     const event = payload.event;
-    
+
     switch (event) {
       case 'payment.captured':
         // const bookingId = payload.payload.payment.entity.notes.bookingId;

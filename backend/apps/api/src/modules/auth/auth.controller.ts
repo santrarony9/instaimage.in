@@ -14,6 +14,12 @@ export class AuthController {
   }
 
   @Public()
+  @Post('register-creator')
+  registerSeller(@Body() registerDto: RegisterDto) {
+    return this.authService.registerSeller(registerDto);
+  }
+
+  @Public()
   @Post('login')
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);

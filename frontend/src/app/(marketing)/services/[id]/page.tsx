@@ -166,7 +166,7 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
               {/* Pricing Mode Selector */}
               <div className="mb-8 border-t border-gray-100 pt-6">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Pricing Type</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 mb-6">
                   <label 
                     className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                     onClick={() => setPricingMode('fixed')}
@@ -189,6 +189,14 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
                     </div>
                   )}
                 </div>
+                
+                {service.flexiblePrice && (
+                  <div className="p-4 border border-gray-200 rounded-md bg-blue-50 text-blue-800 text-sm space-y-2">
+                    <p><strong>Flexible Timing vs. Fixed Package:</strong></p>
+                    <p>If you select a <strong>Fixed Package</strong>, the booking duration is strict and cannot be extended after booking.</p>
+                    <p>By selecting <strong>Flexible Timing</strong>, you reserve the photographer with no back-to-back bookings. This means if you decide you need them for an extra 2 hours (or more) on the day of the event, it is entirely possible! You can simply extend on the spot and pay the photographer directly in cash for any extra time used.</p>
+                  </div>
+                )}
               </div>
 
               {/* Time Configuration based on Mode */}
@@ -225,14 +233,7 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
                 </div>
               )}
 
-              {pricingMode === 'flexible' && service.flexiblePrice && (
-                <div className="mb-8 border-t border-gray-100 pt-6">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Flexible Timing Notice</h3>
-                  <div className="p-4 border border-gray-200 rounded-md bg-blue-50 text-blue-800 text-sm">
-                    You have selected flexible timing. This reserves the photographer for your event with no back-to-back bookings, allowing you to extend time on the spot. You can pay the photographer directly in cash for any extra hours used on the day.
-                  </div>
-                </div>
-              )}
+
 
               {/* Add-ons */}
               {service.addons && service.addons.length > 0 && (
@@ -272,6 +273,19 @@ export default function ServiceDetailsPage({ params }: { params: Promise<{ id: s
           </div>
 
         </div>
+      </div>
+      {/* Mobile Sticky Footer */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50 flex items-center justify-between shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <div>
+          <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-0.5">{pricingMode}</div>
+          <div className="text-xl font-black text-gray-900">₹{totalPrice.toLocaleString()}</div>
+        </div>
+        <button 
+          onClick={handleCheckout}
+          className="bg-[#2874f0] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider text-sm hover:bg-blue-700 transition shadow-md"
+        >
+          Book Now
+        </button>
       </div>
     </div>
   );

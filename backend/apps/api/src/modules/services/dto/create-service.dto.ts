@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 
 export class CreateServiceDto {
   @IsString()
@@ -45,4 +52,31 @@ export class CreateServiceDto {
   @IsArray()
   @IsOptional()
   addons?: { name: string; price: number }[];
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  locations?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  occasions?: string[];
+
+  @IsString()
+  @IsOptional()
+  creatorId?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isApproved?: boolean;
 }

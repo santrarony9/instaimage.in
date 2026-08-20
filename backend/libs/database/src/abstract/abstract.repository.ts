@@ -15,9 +15,7 @@ type FilterQuery<T> = Record<string, any>;
 export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   protected abstract readonly logger: Logger;
 
-  constructor(
-    public readonly model: Model<TDocument>,
-  ) {}
+  constructor(public readonly model: Model<TDocument>) {}
 
   async create(
     document: Partial<TDocument>,
@@ -35,7 +33,13 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     session?: ClientSession,
   ): Promise<HydratedDocument<TDocument> | null> {
     return this.model
-      .findOne({ _id: new Types.ObjectId(id), isDeleted: false } as FilterQuery<TDocument>, projection)
+      .findOne(
+        {
+          _id: new Types.ObjectId(id),
+          isDeleted: false,
+        } as FilterQuery<TDocument>,
+        projection,
+      )
       .session(session || null)
       .exec() as Promise<HydratedDocument<TDocument> | null>;
   }
@@ -46,7 +50,10 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     session?: ClientSession,
   ): Promise<HydratedDocument<TDocument> | null> {
     const doc = await this.model
-      .findOne({ ...filterQuery, isDeleted: false } as FilterQuery<TDocument>, projection)
+      .findOne(
+        { ...filterQuery, isDeleted: false } as FilterQuery<TDocument>,
+        projection,
+      )
       .session(session || null)
       .exec();
     return doc as HydratedDocument<TDocument> | null;
@@ -59,7 +66,9 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   ): Promise<HydratedDocument<TDocument>> {
     const doc = await this.findOne(filterQuery, projection, session);
     if (!doc) {
-      this.logger.warn(`Entity not found with filter: ${JSON.stringify(filterQuery)}`);
+      this.logger.warn(
+        `Entity not found with filter: ${JSON.stringify(filterQuery)}`,
+      );
       throw new NotFoundException('Requested resource was not found');
     }
     return doc;
@@ -111,11 +120,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     update: UpdateQuery<TDocument>,
     session?: ClientSession,
   ): Promise<HydratedDocument<TDocument> | null> {
-    return this.findAndUpdate(
-      { _id: new Types.ObjectId(id) } as FilterQuery<TDocument>,
-      update,
-      session,
-    );
+    return this.findAndUpdate({ _id: new Types.ObjectId(id) }, update, session);
   }
 
   async findOneAndDelete(
@@ -132,7 +137,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     const res = await this.model
       .updateOne(
         { ...filterQuery, isDeleted: false } as FilterQuery<TDocument>,
-        { isDeleted: true, deletedAt: new Date() } as UpdateQuery<TDocument>,
+        { isDeleted: true, deletedAt: new Date() },
       )
       .session(session || null)
       .exec();
@@ -140,8 +145,13 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   }
 
   async countDocuments(
-    filterQuery: FilterQuery<TDocument> = {} as FilterQuery<TDocument>,
+    filterQuery: FilterQuery<TDocument> = {},
   ): Promise<number> {
-    return this.model.countDocuments({ ...filterQuery, isDeleted: false } as FilterQuery<TDocument>).exec();
+    return this.model
+      .countDocuments({
+        ...filterQuery,
+        isDeleted: false,
+      } as FilterQuery<TDocument>)
+      .exec();
   }
 }

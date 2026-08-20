@@ -8,9 +8,7 @@ import { Booking } from './schemas/booking.schema';
 export class BookingsRepository extends AbstractRepository<Booking> {
   protected readonly logger = new Logger(BookingsRepository.name);
 
-  constructor(
-    @InjectModel(Booking.name) bookingModel: Model<Booking>,
-  ) {
+  constructor(@InjectModel(Booking.name) bookingModel: Model<Booking>) {
     super(bookingModel);
   }
 }

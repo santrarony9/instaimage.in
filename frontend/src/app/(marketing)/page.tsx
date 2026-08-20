@@ -44,9 +44,15 @@ export default async function HomePage() {
           />
         </div>
         <div className="relative z-10 text-center px-4 max-w-3xl">
-          <span className="bg-white text-black px-3 py-1 text-xs font-bold uppercase tracking-widest mb-4 inline-block rounded-sm">Featured Collection</span>
-          <h1 className="text-5xl md:text-7xl font-black mb-6 uppercase tracking-tighter">Premium Photography</h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-8 font-medium">Book world-class photographers for your next big moment. Secure your date today.</p>
+          <span className="bg-white text-black px-3 py-1 text-xs font-bold uppercase tracking-widest mb-4 inline-block rounded-sm">
+            Everything in One Place
+          </span>
+          <h1 className="text-5xl md:text-7xl font-black mb-6 uppercase tracking-tighter">
+            All Photography Services
+          </h1>
+          <p className="text-lg md:text-xl text-gray-200 mb-8 font-medium">
+            Trusted, quick, and built on fully strong infrastructure. Find and book the perfect photographer instantly.
+          </p>
           <Link href="#shop" className="bg-blue-600 text-white px-8 py-4 font-bold text-lg hover:bg-blue-700 transition uppercase tracking-wide">
             Shop Services
           </Link>
@@ -131,7 +137,19 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
       </div>
 
       <div className="p-3 md:p-4 flex flex-col flex-grow">
+        {service.category && (
+          <span className="text-[9px] md:text-[10px] font-bold text-[#2874f0] uppercase tracking-widest mb-1.5">{service.category}</span>
+        )}
         <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2 leading-snug mb-1 uppercase tracking-tight">{service.name}</h3>
+        
+        {service.tags && service.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {service.tags.slice(0, 3).map((tag: string, idx: number) => (
+              <span key={idx} className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">{tag}</span>
+            ))}
+          </div>
+        )}
+        
         <p className="text-[11px] md:text-xs text-gray-500 line-clamp-1 mb-3 font-medium">{service.description}</p>
         
         <div className="mt-auto border-t border-gray-100 pt-3 flex items-center justify-between">

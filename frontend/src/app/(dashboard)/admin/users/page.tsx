@@ -8,7 +8,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
-  role: 'ADMIN' | 'CUSTOMER' | 'PHOTOGRAPHER';
+  role: 'ADMIN' | 'CUSTOMER' | 'SELLER';
   createdAt: string;
 }
 
@@ -59,7 +59,7 @@ export default function UsersPage() {
         return 'bg-red-100 text-red-800';
       case 'CUSTOMER':
         return 'bg-blue-100 text-blue-800';
-      case 'PHOTOGRAPHER':
+      case 'SELLER':
         return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -122,7 +122,7 @@ export default function UsersPage() {
                       className="mt-1 block w-full pl-3 pr-10 py-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
                       <option value="CUSTOMER">CUSTOMER</option>
-                      <option value="PHOTOGRAPHER">PHOTOGRAPHER</option>
+                      <option value="SELLER">SELLER</option>
                       <option value="ADMIN">ADMIN</option>
                     </select>
                   </td>

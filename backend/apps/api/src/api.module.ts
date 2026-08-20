@@ -12,8 +12,21 @@ import { BookingsModule } from './modules/bookings/bookings.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { AvailabilityModule } from './modules/availability/availability.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
+import { SellersModule } from './modules/sellers/sellers.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { SubcategoriesModule } from './modules/subcategories/subcategories.module';
+import { PackagesModule } from './modules/packages/packages.module';
+import { AddonsModule } from './modules/addons/addons.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
+import { PortfoliosModule } from './modules/portfolios/portfolios.module';
+import { PayoutsModule } from './modules/payouts/payouts.module';
+import { SellerAvailabilityModule } from './modules/seller-availability/seller-availability.module';
+import { SupportModule } from './modules/support/support.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -32,6 +45,19 @@ import { join } from 'path';
     PaymentsModule,
     AvailabilityModule,
     UploadsModule,
+    SellersModule,
+    CategoriesModule,
+    SubcategoriesModule,
+    PackagesModule,
+    AddonsModule,
+    ReviewsModule,
+    PortfoliosModule,
+    PayoutsModule,
+    SellerAvailabilityModule,
+    SupportModule,
+    NotificationsModule,
+    AuditLogsModule,
+    SettingsModule,
   ],
   controllers: [ApiController],
   providers: [ApiService],

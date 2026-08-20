@@ -20,19 +20,36 @@ export function Step5DateTime() {
   const [date, setDate] = useState(data.scheduledDate || '');
   const [startTime, setStartTime] = useState(data.startTime || '10:00');
   
-  // Basic calculation for end time - 4 hours after start
-  const getEndTime = (start: string) => {
+  const baseHours = data.pricingMode === 'fixed' ? 1 : 0;
+  const totalBookedHours = baseHours + (data.extraHoursBooked || 0);
+
+  const getEndTimeForDuration = (start: string, hours: number) => {
     const startIndex = TIME_SLOTS.indexOf(start);
     if (startIndex !== -1) {
-      const endIndex = Math.min(startIndex + 8, TIME_SLOTS.length - 1);
+      const endIndex = Math.min(startIndex + hours * 2, TIME_SLOTS.length - 1);
       return TIME_SLOTS[endIndex];
     }
-    return '14:00';
+    return start;
   };
+
+  const getEndTime = (start: string) => getEndTimeForDuration(start, totalBookedHours);
 
   const [endTime, setEndTime] = useState(data.endTime || getEndTime(startTime));
   
   const [error, setError] = useState('');
+
+  const getSelectedDuration = () => {
+    const startIdx = TIME_SLOTS.indexOf(startTime);
+    const endIdx = TIME_SLOTS.indexOf(endTime);
+    if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+      return (endIdx - startIdx) / 2;
+    }
+    return 0;
+  };
+  
+  const selectedDuration = getSelectedDuration();
+  const needsExtraHours = selectedDuration > totalBookedHours;
+  const extraHoursNeeded = selectedDuration - totalBookedHours;
 
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStart = e.target.value;
@@ -46,6 +63,17 @@ export function Step5DateTime() {
       return;
     }
     
+    if (needsExtraHours) {
+      setError('Please resolve the duration mismatch above before proceeding.');
+      return;
+    }
+    
+    if (selectedDuration <= 0) {
+      setError('End time must be after start time.');
+      return;
+    }
+    
+    setError('');
     updateData({ 
       scheduledDate: date,
       startTime,
@@ -88,7 +116,10 @@ export function Step5DateTime() {
             <label className="block text-sm font-medium text-gray-700 mb-1">End Time *</label>
             <select
               value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={(e) => {
+                setEndTime(e.target.value);
+                setError('');
+              }}
               className="w-full px-4 py-2 border rounded-lg focus:ring-black focus:border-black"
             >
               {TIME_SLOTS.map(time => (
@@ -97,6 +128,37 @@ export function Step5DateTime() {
             </select>
           </div>
         </div>
+
+        {needsExtraHours && (
+          <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+            <h3 className="font-bold text-orange-800 mb-2">Duration Mismatch</h3>
+            <p className="text-orange-700 text-sm mb-4">
+              You originally booked for <strong>{totalBookedHours} hour{totalBookedHours !== 1 ? 's' : ''}</strong>, 
+              but your selected time span is <strong>{selectedDuration} hours</strong>. 
+              Would you like to buy {extraHoursNeeded} extra hour(s) or adjust your end time?
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => {
+                  updateData({ extraHoursBooked: (data.extraHoursBooked || 0) + extraHoursNeeded });
+                  setError('');
+                }}
+                className="px-4 py-2 bg-orange-600 text-white text-sm font-bold rounded-md hover:bg-orange-700 transition-colors"
+              >
+                Buy {extraHoursNeeded} Extra Hour{extraHoursNeeded !== 1 ? 's' : ''}
+              </button>
+              <button
+                onClick={() => {
+                  setEndTime(getEndTimeForDuration(startTime, totalBookedHours));
+                  setError('');
+                }}
+                className="px-4 py-2 bg-white text-orange-700 border border-orange-300 text-sm font-bold rounded-md hover:bg-orange-50 transition-colors"
+              >
+                Adjust to {totalBookedHours} Hour{totalBookedHours !== 1 ? 's' : ''}
+              </button>
+            </div>
+          </div>
+        )}
 
       </div>
 

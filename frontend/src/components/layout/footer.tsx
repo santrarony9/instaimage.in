@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-xl font-bold mb-4">InstaImage</h3>
-            <p className="text-gray-400 text-sm md:text-base">Capturing moments, creating memories. Book professional photographers on-demand.</p>
+            <p className="text-gray-400 text-sm md:text-base">Capturing moments, creating memories. Book professional sellers on-demand.</p>
           </div>
           <div className="col-span-1">
             <h4 className="font-semibold mb-4 text-sm md:text-base">Quick Links</h4>
@@ -30,7 +30,8 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-sm md:text-base">Support & Contact</h4>
             <ul className="space-y-2 text-sm md:text-base text-gray-400">
               <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
-              <li><Link href="/become-a-photographer" className="hover:text-white transition-colors">Join as Photographer</Link></li>
+              <li><Link href="/become-a-seller" className="hover:text-white transition-colors">Join as Photographer</Link></li>
+              <li><Link href="/seller/login" className="hover:text-white transition-colors font-semibold text-indigo-400">Seller Login</Link></li>
               <li className="pt-4 mt-4 border-t border-gray-800"><a href="mailto:info.instaimage@gmail.com" className="hover:text-white transition-colors break-all">info.instaimage@gmail.com</a></li>
               <li><a href="tel:+918240508915" className="hover:text-white transition-colors">+91 8240508915</a></li>
             </ul>

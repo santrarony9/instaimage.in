@@ -23,7 +23,7 @@ export function Navbar() {
             <nav className="hidden md:flex space-x-6">
               <Link href="/services" className="text-sm font-semibold text-gray-600 hover:text-black transition">Services</Link>
               <Link href="/portfolio" className="text-sm font-semibold text-gray-600 hover:text-black transition">Portfolio</Link>
-              <Link href="/photographers" className="text-sm font-semibold text-gray-600 hover:text-black transition">Creators</Link>
+              <Link href="/sellers" className="text-sm font-semibold text-gray-600 hover:text-black transition">Sellers</Link>
             </nav>
           </div>
 
@@ -33,19 +33,21 @@ export function Navbar() {
               <Search className="h-5 w-5" />
             </button>
 
-            <div className="hidden md:flex items-center">
+            <div className="hidden md:flex items-center h-20">
               {user ? (
-                <div className="relative group cursor-pointer">
-                  <div className="flex items-center space-x-2 text-gray-600 hover:text-black transition font-semibold text-sm">
+                <div className="relative group cursor-pointer h-full flex items-center px-2">
+                  <div className="flex items-center space-x-2 text-gray-600 group-hover:text-black transition font-semibold text-sm">
                     <User className="h-5 w-5" />
                     <span>Account</span>
                   </div>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl py-2 hidden group-hover:block border border-gray-100">
-                    <Link href="/customer" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">My Bookings</Link>
-                    {user?.role === 'ADMIN' && (
-                      <Link href="/admin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-bold border-t border-gray-100">Admin Dashboard</Link>
-                    )}
-                    <button onClick={logout} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Sign out</button>
+                  <div className="absolute right-0 top-full w-48 hidden group-hover:block z-50 -mt-2">
+                    <div className="bg-white rounded-xl shadow-2xl py-2 border border-gray-100">
+                      <Link href="/customer" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">My Bookings</Link>
+                      {user?.role === 'ADMIN' && (
+                        <Link href="/admin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-bold border-t border-gray-100">Admin Dashboard</Link>
+                      )}
+                      <button onClick={logout} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Sign out</button>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -72,7 +74,7 @@ export function Navbar() {
           <nav className="flex flex-col space-y-4">
             <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Services</Link>
             <Link href="/portfolio" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Portfolio</Link>
-            <Link href="/photographers" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Creators</Link>
+            <Link href="/sellers" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Sellers</Link>
             
             {user ? (
               <>

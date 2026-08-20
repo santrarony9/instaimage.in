@@ -5,7 +5,9 @@ import { UpdateServiceZoneDto } from './dto/update-service-zone.dto';
 
 @Injectable()
 export class ServiceZonesService {
-  constructor(private readonly serviceZonesRepository: ServiceZonesRepository) {}
+  constructor(
+    private readonly serviceZonesRepository: ServiceZonesRepository,
+  ) {}
 
   async create(createServiceZoneDto: CreateServiceZoneDto) {
     return this.serviceZonesRepository.create(createServiceZoneDto);
@@ -22,7 +24,7 @@ export class ServiceZonesService {
   async update(id: string, updateServiceZoneDto: UpdateServiceZoneDto) {
     return this.serviceZonesRepository.findOneAndUpdate(
       { _id: id },
-      updateServiceZoneDto
+      updateServiceZoneDto,
     );
   }
 

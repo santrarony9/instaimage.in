@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useBookingStore } from '@/hooks/use-booking-store';
+
+const MapSelector = dynamic(() => import('./MapSelector'), { 
+  ssr: false,
+  loading: () => <div className="w-full h-[300px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center text-gray-400">Loading map...</div>
+});
 
 export function Step4Location() {
   const { data, updateData, nextStep, prevStep } = useBookingStore();
@@ -9,6 +15,10 @@ export function Step4Location() {
   const [landmark, setLandmark] = useState(data.location?.landmark || '');
   const [pincode, setPincode] = useState(data.location?.pincode || '');
   const [city, setCity] = useState(data.location?.city || '');
+  // coordinates stored as [lng, lat] for backend GeoJSON compatibility
+  const [coordinates, setCoordinates] = useState<number[] | null>(
+    (data as any).location?.coordinates || null
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleNext = () => {
@@ -22,7 +32,7 @@ export function Step4Location() {
       return;
     }
 
-    updateData({ location: { address, landmark, pincode, city } });
+    updateData({ location: { address, landmark, pincode, city, coordinates } as any });
     nextStep();
   };
 
@@ -30,7 +40,18 @@ export function Step4Location() {
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-sm border border-gray-100">
       <h2 className="text-2xl font-bold mb-6">Where is the shoot happening?</h2>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Pinpoint Location (Optional)</label>
+          <MapSelector 
+            defaultPosition={coordinates ? [coordinates[1], coordinates[0]] : undefined}
+            onLocationSelect={(lat, lng) => setCoordinates([lng, lat])}
+          />
+          {coordinates && (
+            <p className="text-xs text-green-600 mt-2">Location pinned successfully!</p>
+          )}
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
           <textarea

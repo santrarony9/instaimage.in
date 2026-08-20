@@ -5,10 +5,27 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/use-auth-store';
 
-const links = [
-  { href: '/customer', label: 'Overview' },
-];
+import { 
+  Home, 
+  Calendar, 
+  CreditCard, 
+  Image as ImageIcon, 
+  Star, 
+  User, 
+  LifeBuoy, 
+  Bell 
+} from 'lucide-react';
 
+const links = [
+  { href: '/customer', label: 'Overview', icon: Home },
+  { href: '/customer/bookings', label: 'My Bookings', icon: Calendar },
+  { href: '/customer/payments', label: 'Payments & Invoices', icon: CreditCard },
+  { href: '/customer/gallery', label: 'Photo Gallery', icon: ImageIcon },
+  { href: '/customer/reviews', label: 'My Reviews', icon: Star },
+  { href: '/customer/profile', label: 'Profile Settings', icon: User },
+  { href: '/customer/support', label: 'Support Tickets', icon: LifeBuoy },
+  { href: '/customer/notifications', label: 'Notifications', icon: Bell },
+];
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -39,12 +56,13 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-sm font-medium ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
+                <link.icon className={`h-5 w-5 ${isActive ? 'text-indigo-600' : 'text-gray-400'}`} />
                 {link.label}
               </Link>
             );

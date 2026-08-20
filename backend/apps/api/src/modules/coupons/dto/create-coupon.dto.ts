@@ -1,4 +1,13 @@
-import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional, IsEnum, IsDate, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  IsEnum,
+  IsDate,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { DiscountType } from '../schemas/coupon.schema';
 

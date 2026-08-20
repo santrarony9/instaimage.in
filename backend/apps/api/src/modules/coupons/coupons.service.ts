@@ -22,7 +22,7 @@ export class CouponsService {
   async update(id: string, updateCouponDto: UpdateCouponDto) {
     return this.couponsRepository.findOneAndUpdate(
       { _id: id },
-      updateCouponDto
+      updateCouponDto,
     );
   }
 

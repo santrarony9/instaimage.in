@@ -11,6 +11,8 @@ import { CouponsModule } from '../coupons/coupons.module';
 import { ServiceZonesModule } from '../service-zones/service-zones.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { AvailabilityModule } from '../availability/availability.module';
+import { SellersModule } from '../sellers/sellers.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AvailabilityModule } from '../availability/availability.module';
     ServiceZonesModule,
     PaymentsModule,
     AvailabilityModule,
+    SellersModule,
+    NotificationsModule,
   ],
   controllers: [BookingsController],
   providers: [BookingsService, BookingsRepository],

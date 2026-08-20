@@ -1,4 +1,8 @@
-import { SetMetadata, createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  SetMetadata,
+  createParamDecorator,
+  ExecutionContext,
+} from '@nestjs/common';
 import { Role, Permission } from '../interfaces/rbac.interface';
 
 export const IS_PUBLIC_KEY = 'isPublic';

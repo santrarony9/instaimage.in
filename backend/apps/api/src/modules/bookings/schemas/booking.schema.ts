@@ -48,7 +48,10 @@ export class PricingDetails {
   @Prop({ required: true, min: 0, default: 0 })
   extraHoursPrice: number;
 
-  @Prop({ type: [{ name: String, amount: Number, reason: String }], default: [] })
+  @Prop({
+    type: [{ name: String, amount: Number, reason: String }],
+    default: [],
+  })
   surcharges: Array<{ name: string; amount: number; reason?: string }>;
 
   @Prop({ required: true, min: 0, default: 0 })
@@ -63,6 +66,12 @@ export class PricingDetails {
   @Prop({ required: true, min: 0 })
   totalPrice: number;
 
+  @Prop({ required: false, min: 0 })
+  platformFee: number; // 15%
+
+  @Prop({ required: false, min: 0 })
+  sellerPayout: number; // 85%
+
   @Prop({ required: true, min: 0 })
   advancePaid: number; // For example 20%
 
@@ -73,13 +82,16 @@ export class PricingDetails {
 @Schema({ timestamps: true, collection: 'bookings' })
 export class Booking extends AbstractDocument {
   @Prop({ required: true, unique: true })
-  bookingId: string; // e.g., BKG-2024-0001
+  bookingId: string; // e.g., BKG-2024-0001 (Acts as bookingNumber)
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  customerId: Types.ObjectId;
+  customerId: Types.ObjectId; // Acts as clientId
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Service' })
   serviceId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Package' })
+  packageId?: Types.ObjectId;
 
   @Prop({ required: true, enum: ['fixed', 'flexible'], default: 'fixed' })
   pricingMode: string;
@@ -87,8 +99,14 @@ export class Booking extends AbstractDocument {
   @Prop({ type: [{ name: String, price: Number }], default: [] })
   addons: Array<{ name: string; price: number }>;
 
-  @Prop({ type: Types.ObjectId, ref: 'Photographer' })
-  assignedPhotographerId?: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Seller' }) // Will be renamed to Seller later
+  sellerId?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  photographerId?: Types.ObjectId;
+
+  @Prop({ enum: ['PENDING', 'PAID'], default: 'PENDING' })
+  payoutStatus: string;
 
   @Prop({ type: Date, required: true })
   scheduledDate: Date;
@@ -99,7 +117,11 @@ export class Booking extends AbstractDocument {
   @Prop({ required: true })
   endTime: string; // e.g., "14:00"
 
-  @Prop({ required: true, enum: TimeFlexibility, default: TimeFlexibility.STRICT })
+  @Prop({
+    required: true,
+    enum: TimeFlexibility,
+    default: TimeFlexibility.STRICT,
+  })
   timeFlexibility: TimeFlexibility;
 
   @Prop({ required: true, default: 0 })
@@ -111,8 +133,33 @@ export class Booking extends AbstractDocument {
   @Prop({ type: PricingDetails, required: true })
   pricing: PricingDetails;
 
-  @Prop({ required: true, enum: BookingStatus, default: BookingStatus.PENDING_PAYMENT })
+  @Prop({ type: Object })
+  priceSnapshot?: Record<string, any>; // Immutable copy of prices/items at confirmation time
+
+  @Prop({
+    required: true,
+    enum: BookingStatus,
+    default: BookingStatus.PENDING_PAYMENT,
+  })
   status: BookingStatus;
+
+  @Prop({
+    type: [
+      {
+        status: String,
+        timestamp: Date,
+        note: String,
+        updatedBy: { type: Types.ObjectId, ref: 'User' },
+      },
+    ],
+    default: [],
+  })
+  timeline: Array<{
+    status: string;
+    timestamp: Date;
+    note?: string;
+    updatedBy?: Types.ObjectId;
+  }>;
 
   @Prop({ type: Types.ObjectId, ref: 'Coupon' })
   appliedCouponId?: Types.ObjectId;
@@ -122,6 +169,9 @@ export class Booking extends AbstractDocument {
 
   @Prop()
   adminNotes?: string;
+
+  @Prop()
+  invoiceUrl?: string;
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);

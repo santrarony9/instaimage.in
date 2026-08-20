@@ -95,12 +95,20 @@ export function Step8Confirmation() {
           </div>
         </div>
 
-        <button
-          onClick={handleDone}
-          className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
-        >
-          Go to My Bookings
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            href={`/customer/bookings/${booking?._id}/invoice`}
+            className="flex-1 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            Download Invoice
+          </Link>
+          <button
+            onClick={handleDone}
+            className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+          >
+            Go to My Bookings
+          </button>
+        </div>
       </div>
     );
   }

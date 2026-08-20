@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 
 export class CreateServiceZoneDto {
   @IsString()

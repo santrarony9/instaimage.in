@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from './schemas/user.schema';
 
@@ -24,10 +28,11 @@ export class UsersService {
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
+        { email: { $regex: search, $options: 'i' } },
       ];
     }
-    return this.usersRepository.model.find(filter)
+    return this.usersRepository.model
+      .find(filter)
       .select('-passwordHash')
       .sort({ createdAt: -1 })
       .exec();

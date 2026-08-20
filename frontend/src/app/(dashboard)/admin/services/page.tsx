@@ -5,6 +5,20 @@ import { fetchApi } from '@/lib/api';
 import { useToast, ToastContainer } from '@/components/ui/toast';
 import ImageUpload from '@/components/ui/ImageUpload';
 
+const PREDEFINED_LOCATIONS = [
+  "Kolkata", "Salt Lake", "New Town", "Rajarhat", "Park Street", "Ballygunge", "Gariahat", 
+  "Alipore", "Behala", "Tollygunge", "Jadavpur", "Dum Dum", "Lake Town", "Shyambazar", 
+  "Esplanade", "New Market", "Kasba", "Mukundapur", "Garia", "Barasat", "Madhyamgram", "Howrah", "Hooghly"
+];
+
+const PREDEFINED_OCCASIONS = [
+  "Wedding", "Engagement", "Reception", "Birthday", "Anniversary", "Baby Shower", "Naming Ceremony", 
+  "Annaprashan", "Upanayan", "Housewarming", "Puja", "Festival", "Corporate Event", "Conference", 
+  "Seminar", "Exhibition", "Concert", "Party", "Reunion", "Award Ceremony", "Inauguration", 
+  "Product Launch", "Fashion Show", "Sports Event", "Cultural Event", "Religious Event", 
+  "School Event", "College Event", "Community Event", "Private Event", "Public Event"
+];
+
 export default function ServicesManagementPage() {
   const { toast } = useToast();
   const [data, setData] = useState<any[]>([]);
@@ -111,6 +125,10 @@ export default function ServicesManagementPage() {
       }));
     }
 
+    if (typeof payload.tags === 'string') {
+      payload.tags = payload.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+    }
+
     if (
       (payload.basePrice && isNaN(payload.basePrice)) ||
       (payload.extraHourPrice && isNaN(payload.extraHourPrice)) ||
@@ -138,7 +156,8 @@ export default function ServicesManagementPage() {
       closeModal();
       loadData();
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message || 'An error occurred');
+      console.error(error);
     }
   };
 
@@ -168,8 +187,9 @@ export default function ServicesManagementPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Options/Addons</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Options</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -177,7 +197,13 @@ export default function ServicesManagementPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {data.map(item => (
                 <tr key={item._id}>
-                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+                    <div>{item.name}</div>
+                    {item.tags && item.tags.length > 0 && (
+                      <div className="text-xs text-gray-400 mt-1">{item.tags.join(', ')}</div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.category || '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">₹{item.basePrice}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {item.addons?.length || 0} options
@@ -244,12 +270,70 @@ export default function ServicesManagementPage() {
                     <label className="block text-sm font-medium text-gray-700">Description</label>
                     <textarea rows={3} value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Category</label>
+                    <input type="text" value={formData.category || ''} onChange={e => setFormData({ ...formData, category: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. Wedding, Birthday" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Tags (comma separated)</label>
+                    <input type="text" value={Array.isArray(formData.tags) ? formData.tags.join(', ') : formData.tags || ''} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. popular, premium, outdoor" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-100 space-y-4">
+                <h4 className="font-semibold text-purple-900">2. Discovery & Filtering (Locations & Occasions)</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Service Areas (Locations)</label>
+                    <div className="max-h-48 overflow-y-auto border border-gray-200 rounded p-2 bg-white space-y-1">
+                      {PREDEFINED_LOCATIONS.map(loc => (
+                        <label key={loc} className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-gray-50 p-1 rounded">
+                          <input 
+                            type="checkbox" 
+                            checked={formData.locations?.includes(loc) || false}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              const current = formData.locations || [];
+                              setFormData({
+                                ...formData,
+                                locations: checked ? [...current, loc] : current.filter((l: string) => l !== loc)
+                              });
+                            }}
+                          />
+                          <span>{loc}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Suitable Occasions</label>
+                    <div className="max-h-48 overflow-y-auto border border-gray-200 rounded p-2 bg-white space-y-1">
+                      {PREDEFINED_OCCASIONS.map(occ => (
+                        <label key={occ} className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-gray-50 p-1 rounded">
+                          <input 
+                            type="checkbox" 
+                            checked={formData.occasions?.includes(occ) || false}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              const current = formData.occasions || [];
+                              setFormData({
+                                ...formData,
+                                occasions: checked ? [...current, occ] : current.filter((o: string) => o !== occ)
+                              });
+                            }}
+                          />
+                          <span>{occ}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-4">
                 <div className="flex justify-between items-center border-b border-blue-200 pb-2">
-                  <h4 className="font-semibold text-blue-900">2. Extra Options & Add-ons</h4>
+                  <h4 className="font-semibold text-blue-900">3. Extra Options & Add-ons</h4>
                   <button type="button" onClick={handleAddAddon} className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                     + Add Option
                   </button>
@@ -281,7 +365,7 @@ export default function ServicesManagementPage() {
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
-                <h4 className="font-semibold text-gray-700">3. Media & Settings</h4>
+                <h4 className="font-semibold text-gray-700">4. Media & Settings</h4>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Images Gallery</label>
                   <ImageUpload 

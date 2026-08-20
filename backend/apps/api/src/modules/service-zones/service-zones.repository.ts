@@ -8,7 +8,9 @@ import { ServiceZone } from './schemas/service-zone.schema';
 export class ServiceZonesRepository extends AbstractRepository<ServiceZone> {
   protected readonly logger = new Logger(ServiceZonesRepository.name);
 
-  constructor(@InjectModel(ServiceZone.name) serviceZoneModel: Model<ServiceZone>) {
+  constructor(
+    @InjectModel(ServiceZone.name) serviceZoneModel: Model<ServiceZone>,
+  ) {
     super(serviceZoneModel);
   }
 }

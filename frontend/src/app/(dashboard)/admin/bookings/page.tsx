@@ -7,6 +7,7 @@ import { useToast, ToastContainer } from '@/components/ui/toast';
 export default function BookingsManagementPage() {
   const { toast } = useToast();
   const [bookings, setBookings] = useState<any[]>([]);
+  const [sellers, setSellers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -33,11 +34,15 @@ export default function BookingsManagementPage() {
     }
   };
 
-  const loadBookings = async () => {
+  const loadData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetchApi('/bookings/all');
-      setBookings(res.data || res || []);
+      const [bookingsRes, sellersRes] = await Promise.all([
+        fetchApi('/bookings/all'),
+        fetchApi('/sellers')
+      ]);
+      setBookings(bookingsRes.data || bookingsRes || []);
+      setSellers(sellersRes.data || sellersRes || []);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -46,7 +51,7 @@ export default function BookingsManagementPage() {
   };
 
   useEffect(() => {
-    loadBookings();
+    loadData();
   }, []);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
@@ -56,7 +61,39 @@ export default function BookingsManagementPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       toast.success(`Status updated to ${newStatus}`);
-      loadBookings();
+      loadData();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleAssignSeller = async (bookingId: string, sellerId: string) => {
+    if (!sellerId) return;
+    try {
+      await fetchApi(`/bookings/${bookingId}/assign`, {
+        method: 'PATCH',
+        body: JSON.stringify({ sellerId }),
+      });
+      toast.success('Seller assigned successfully!');
+      loadData();
+      if (selectedBooking && selectedBooking._id === bookingId) {
+        setIsDetailModalOpen(false);
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleMarkPaid = async (bookingId: string) => {
+    try {
+      await fetchApi(`/bookings/${bookingId}/payout`, {
+        method: 'PATCH',
+      });
+      toast.success('Payout marked as PAID!');
+      loadData();
+      if (selectedBooking && selectedBooking._id === bookingId) {
+        setIsDetailModalOpen(false);
+      }
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -89,9 +126,9 @@ export default function BookingsManagementPage() {
       });
       toast.success('Surcharge added successfully');
       setIsSurchargeModalOpen(false);
-      loadBookings();
+      loadData();
       if (isDetailModalOpen && selectedBooking && selectedBooking._id === surchargeBookingId) {
-          setIsDetailModalOpen(false); // Close details modal to refresh it
+          setIsDetailModalOpen(false);
       }
     } catch (error: any) {
       toast.error(error.message);
@@ -126,10 +163,6 @@ export default function BookingsManagementPage() {
         </select>
       </div>
 
-      <div className="mb-4 text-sm text-gray-600">
-        Showing {filteredBookings.length} of {bookings.length} bookings
-      </div>
-
       {isLoading ? (
         <div className="flex justify-center p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -139,23 +172,36 @@ export default function BookingsManagementPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Seller Assigned</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredBookings.map(b => (
+              {filteredBookings.map(b => {
+                const assignedSeller = sellers.find(c => c._id === (b.sellerId?._id || b.sellerId));
+                return (
                 <tr key={b._id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 cursor-pointer" onClick={() => openDetails(b)}>{b._id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{b.customerId?.name || 'N/A'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{new Date(b.scheduledDate).toLocaleDateString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap capitalize">{b.pricingMode || 'Fixed'}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium">₹{b.pricing?.totalPrice || b.totalPrice || 0}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {assignedSeller ? (
+                      <span className="text-sm font-medium text-gray-900">{assignedSeller.name}</span>
+                    ) : (
+                      <select 
+                        onChange={(e) => handleAssignSeller(b._id, e.target.value)}
+                        className="border rounded p-1 text-sm bg-yellow-50 border-yellow-300 text-yellow-800"
+                        defaultValue=""
+                      >
+                        <option value="" disabled>Assign Seller</option>
+                        {sellers.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                      </select>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(b.status)}`}>
                       {b.status}
@@ -163,7 +209,6 @@ export default function BookingsManagementPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-3 items-center">
                     <button onClick={() => openDetails(b)} className="text-indigo-600 hover:text-indigo-900">Details</button>
-                    <button onClick={() => openSurcharge(b._id)} className="text-orange-600 hover:text-orange-900">+ Surcharge</button>
                     <select 
                       value={b.status} 
                       onChange={(e) => handleStatusChange(b._id, e.target.value)}
@@ -173,7 +218,7 @@ export default function BookingsManagementPage() {
                     </select>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
@@ -189,54 +234,40 @@ export default function BookingsManagementPage() {
             
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div><span className="font-semibold text-gray-600">ID:</span> {selectedBooking._id}</div>
-              <div><span className="font-semibold text-gray-600">Customer:</span> {selectedBooking.customerId?.name} ({selectedBooking.customerId?.email})</div>
+              <div><span className="font-semibold text-gray-600">Customer:</span> {selectedBooking.customerId?.name}</div>
               <div><span className="font-semibold text-gray-600">Service:</span> {selectedBooking.serviceId?.name || 'N/A'}</div>
-              <div><span className="font-semibold text-gray-600">Pricing Mode:</span> <span className="capitalize">{selectedBooking.pricingMode || 'Fixed'}</span></div>
               <div><span className="font-semibold text-gray-600">Date:</span> {new Date(selectedBooking.scheduledDate).toLocaleDateString()}</div>
-              <div><span className="font-semibold text-gray-600">Time Slot:</span> {selectedBooking.timeSlot?.startTime} - {selectedBooking.timeSlot?.endTime}</div>
-              <div className="col-span-2">
-                <span className="font-semibold text-gray-600">Location:</span> {selectedBooking.location?.address}, {selectedBooking.location?.city}, {selectedBooking.location?.pincode}
-              </div>
-              <div><span className="font-semibold text-gray-600">Time Flexibility:</span> {selectedBooking.timeFlexibility || 'None'}</div>
-              <div><span className="font-semibold text-gray-600">Extra Hours:</span> {selectedBooking.extraHoursRequested || 0}</div>
             </div>
 
-            <h4 className="mt-6 mb-2 font-bold text-gray-800 border-b pb-1">Pricing Breakdown</h4>
-            <div className="grid grid-cols-2 gap-2 text-sm bg-gray-50 p-4 rounded">
-              <div>Base Price: ₹{selectedBooking.pricing?.basePrice || 0}</div>
-              <div>Addons Total: ₹{selectedBooking.pricing?.addonsTotal || 0}</div>
-              <div>Extra Hours: ₹{selectedBooking.pricing?.extraHoursTotal || 0}</div>
-              <div>Delivery Fee: ₹{selectedBooking.pricing?.deliveryFee || 0}</div>
-              <div>Discount: -₹{selectedBooking.pricing?.discountAmount || 0}</div>
-              <div>Surcharges Total: ₹{selectedBooking.pricing?.surchargesTotal || 0}</div>
-              <div className="font-bold text-base mt-2 pt-2 border-t border-gray-200">Total Price: ₹{selectedBooking.pricing?.totalPrice || 0}</div>
-              <div className="font-bold text-base mt-2 pt-2 border-t border-gray-200 text-green-700">Advance Paid: ₹{selectedBooking.pricing?.advancePaid || 0}</div>
-              <div className="font-bold text-base mt-2 text-red-600">Balance Due: ₹{selectedBooking.pricing?.balanceDue || 0}</div>
-            </div>
-
-            {selectedBooking.surcharges && selectedBooking.surcharges.length > 0 && (
-              <>
-                <h4 className="mt-6 mb-2 font-bold text-gray-800 border-b pb-1">Surcharges</h4>
-                <ul className="list-disc pl-5 text-sm">
-                  {selectedBooking.surcharges.map((s: any, idx: number) => (
-                    <li key={idx}>{s.name}: ₹{s.amount} ({s.reason})</li>
-                  ))}
-                </ul>
-              </>
-            )}
-
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-bold text-gray-800 mb-1">Customer Notes</h4>
-                <p className="text-sm bg-gray-50 p-2 rounded min-h-[60px]">{selectedBooking.customerNotes || 'None'}</p>
+            <h4 className="mt-6 mb-2 font-bold text-gray-800 border-b pb-1">Financial Split (15% / 85%)</h4>
+            <div className="grid grid-cols-2 gap-2 text-sm bg-indigo-50 p-4 rounded border border-indigo-100">
+              <div className="font-bold text-base">Total Price: ₹{selectedBooking.pricing?.totalPrice || 0}</div>
+              <div className="text-right">Advance Paid: ₹{selectedBooking.pricing?.advancePaid || 0}</div>
+              
+              <div className="font-bold text-indigo-700 mt-2 pt-2 border-t border-indigo-200">
+                Platform Fee (15%): ₹{selectedBooking.pricing?.platformFee || 0}
               </div>
-              <div>
-                <h4 className="font-bold text-gray-800 mb-1">Admin Notes</h4>
-                <p className="text-sm bg-gray-50 p-2 rounded min-h-[60px]">{selectedBooking.adminNotes || 'None'}</p>
+              <div className="font-bold text-green-700 mt-2 pt-2 border-t border-indigo-200">
+                Seller Payout (85%): ₹{selectedBooking.pricing?.sellerPayout || 0}
+              </div>
+              
+              <div className="col-span-2 mt-2 pt-2 border-t border-indigo-200 flex justify-between items-center">
+                <span>
+                  <strong>Payout Status:</strong>{' '}
+                  <span className={selectedBooking.payoutStatus === 'PAID' ? 'text-green-600' : 'text-red-600'}>
+                    {selectedBooking.payoutStatus || 'PENDING'}
+                  </span>
+                </span>
+                {selectedBooking.payoutStatus !== 'PAID' && selectedBooking.sellerId && (
+                  <button onClick={() => handleMarkPaid(selectedBooking._id)} className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                    Mark Payout as PAID
+                  </button>
+                )}
               </div>
             </div>
-            
-            <div className="mt-6 flex justify-end">
+
+            <div className="mt-6 flex justify-between">
+              <button onClick={() => openSurcharge(selectedBooking._id)} className="px-4 py-2 bg-orange-100 text-orange-800 rounded hover:bg-orange-200">Add Surcharge</button>
               <button onClick={() => setIsDetailModalOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Close</button>
             </div>
           </div>

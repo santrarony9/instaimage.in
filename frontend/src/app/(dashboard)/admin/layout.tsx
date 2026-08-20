@@ -11,6 +11,8 @@ const links = [
   { href: '/admin/services', label: 'Catalog' },
   { href: '/admin/coupons', label: 'Coupons' },
   { href: '/admin/users', label: 'Users' },
+  { href: '/admin/sellers', label: 'Sellers' },
+  { href: '/admin/payouts', label: 'Payouts' },
   { href: '/admin/zones', label: 'Service Zones' },
 ];
 
@@ -19,6 +21,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  React.useEffect(() => {
+    let hasToken = false;
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        const parsed = JSON.parse(authStorage);
+        if (parsed.state?.token && parsed.state?.user?.role === 'ADMIN') {
+          hasToken = true;
+        }
+      }
+    } catch(e) {}
+    
+    if (!hasToken) {
+      router.push('/login');
+    }
+  }, [router]);
 
   const handleLogout = () => {
     logout();

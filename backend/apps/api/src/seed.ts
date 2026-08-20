@@ -6,13 +6,13 @@ import { UsersService } from './modules/users/users.service';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(ApiModule);
-  
+
   const servicesService = app.get(ServicesService);
   const zonesService = app.get(ServiceZonesService);
   const usersService = app.get(UsersService);
 
   console.log('Seed starting');
-  
+
   await app.close();
 }
 
