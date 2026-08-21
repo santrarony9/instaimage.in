@@ -24,6 +24,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://mongo:27017/marketplace
@@ -41,6 +43,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.workers
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://mongo:27017/marketplace

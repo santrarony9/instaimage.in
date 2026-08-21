@@ -21,6 +21,7 @@ import { PaymentsService } from '../payments/payments.service';
 import { AvailabilityService } from '../availability/availability.service';
 import { SellersService } from '../sellers/sellers.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class BookingsService {
@@ -35,6 +36,7 @@ export class BookingsService {
     private readonly availabilityService: AvailabilityService,
     private readonly SellersService: SellersService,
     private readonly notificationsService: NotificationsService,
+    private readonly emailService: EmailService,
   ) {}
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
@@ -187,6 +189,18 @@ export class BookingsService {
         'INR',
       );
 
+      // Async email sending (no await)
+      this.bookingsRepository.model.findById(booking._id).populate('customerId', 'name email').populate('serviceId', 'title name').then(b => {
+        if (b && b.customerId && (b.customerId as any).email) {
+          this.emailService.sendBookingConfirmation(
+            (b.customerId as any).email,
+            (b.customerId as any).name,
+            (b.serviceId as any).title || (b.serviceId as any).name || 'Service',
+            b.scheduledDate.toLocaleDateString()
+          );
+        }
+      });
+
       return {
         booking,
         paymentOrder,
@@ -283,6 +297,18 @@ export class BookingsService {
         'BOOKING_ASSIGNED',
         { bookingId },
       );
+      
+      if (seller.email) {
+        // Fetch service to get name
+        this.servicesService.findOne(booking.serviceId.toString()).then(s => {
+          this.emailService.sendBookingAlert(
+            seller.email,
+            seller.name,
+            s?.title || 'a Service',
+            booking.scheduledDate.toLocaleDateString()
+          );
+        });
+      }
     }
 
     return this.bookingsRepository.update(bookingId, {

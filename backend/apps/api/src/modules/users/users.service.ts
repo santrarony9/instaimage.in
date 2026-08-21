@@ -38,6 +38,10 @@ export class UsersService {
       .exec();
   }
 
+  async update(id: string, data: Partial<User>) {
+    return this.usersRepository.findOneAndUpdate({ _id: id }, data);
+  }
+
   async updateRole(id: string, role: string) {
     if (!['ADMIN', 'CUSTOMER', 'SELLER'].includes(role)) {
       throw new BadRequestException('Invalid role');

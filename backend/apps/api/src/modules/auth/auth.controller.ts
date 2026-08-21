@@ -1,4 +1,5 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req, Res } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Public, Roles, Role } from '@app/auth';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
@@ -6,6 +7,28 @@ import { RegisterDto, LoginDto } from './dto/auth.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get('me')
+  getMe(@Req() req: any) {
+    return { user: req.user };
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req: any) {
+    // Initiates the Google OAuth flow
+  }
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req: any, @Res() res: any) {
+    const result = await this.authService.validateGoogleUser(req.user);
+    // Redirect back to frontend with the token
+    const frontendUrl = 'https://instaimage.in/login';
+    return res.redirect(`${frontendUrl}?token=${result.access_token}`);
+  }
 
   @Public()
   @Post('register')
@@ -29,5 +52,17 @@ export class AuthController {
   @Roles(Role.ADMIN)
   adminRegister(@Body() registerDto: RegisterDto & { role: string }) {
     return this.authService.adminRegister(registerDto);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  forgotPassword(@Body() forgotPasswordDto: { email: string }) {
+    return this.authService.forgotPassword(forgotPasswordDto.email);
+  }
+
+  @Public()
+  @Post('reset-password')
+  resetPassword(@Body() resetPasswordDto: any) {
+    return this.authService.resetPassword(resetPasswordDto.email, resetPasswordDto.token, resetPasswordDto.password);
   }
 }

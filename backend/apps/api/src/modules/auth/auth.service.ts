@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { UsersService } from '../users/users.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { Role } from '@app/auth';
-
 import { SellersService } from '../sellers/sellers.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly SellersService: SellersService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -39,6 +41,10 @@ export class AuthService {
     });
 
     const payload = { sub: user._id, email: user.email, role: user.role };
+    
+    // Send welcome email asynchronously
+    this.emailService.sendWelcomeEmail(user.email, user.name);
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -78,6 +84,9 @@ export class AuthService {
     });
 
     const payload = { sub: user._id, email: user.email, role: user.role };
+    
+    this.emailService.sendWelcomeEmail(user.email, user.name);
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -144,6 +153,87 @@ export class AuthService {
       });
     }
 
+    this.emailService.sendWelcomeEmail(user.email, user.name);
+
     return { success: true, user: { id: user._id, name: user.name, role: user.role } };
+  }
+
+  async validateGoogleUser(googleUser: any) {
+    let user = await this.usersService.findByEmail(googleUser.email);
+    
+    if (!user) {
+      // Create user if they don't exist
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(Math.random().toString(36).slice(-8), salt);
+      
+      user = await this.usersService.create({
+        name: googleUser.name,
+        email: googleUser.email,
+        passwordHash,
+        role: Role.CUSTOMER,
+      });
+
+      this.emailService.sendWelcomeEmail(user.email, user.name);
+    }
+
+    const payload = { sub: user._id, email: user.email, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      // Return success anyway to prevent email enumeration
+      return { success: true, message: 'If an account exists, a reset link was sent.' };
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = await bcrypt.hash(token, 10);
+    
+    await this.usersService.update(user._id.toString(), {
+      resetPasswordToken: tokenHash,
+      resetPasswordExpires: new Date(Date.now() + 3600000), // 1 hour from now
+    });
+
+    const resetLink = `https://instaimage.in/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+    this.emailService.sendPasswordResetEmail(user.email, resetLink);
+
+    return { success: true, message: 'If an account exists, a reset link was sent.' };
+  }
+
+  async resetPassword(email: string, token: string, newPassword: string) {
+    const user = await this.usersService.findByEmail(email);
+    
+    if (!user || !user.resetPasswordToken || !user.resetPasswordExpires) {
+      throw new BadRequestException('Invalid or expired password reset token');
+    }
+
+    if (user.resetPasswordExpires < new Date()) {
+      throw new BadRequestException('Password reset token has expired');
+    }
+
+    const isValid = await bcrypt.compare(token, user.resetPasswordToken);
+    if (!isValid) {
+      throw new BadRequestException('Invalid password reset token');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+
+    await this.usersService.update(user._id.toString(), {
+      passwordHash,
+      resetPasswordToken: undefined,
+      resetPasswordExpires: undefined,
+    });
+
+    return { success: true, message: 'Password has been reset successfully' };
   }
 }

@@ -15,6 +15,12 @@ export class User extends AbstractDocument {
 
   @Prop({ required: true, enum: Role, default: Role.CUSTOMER })
   role: Role;
+
+  @Prop()
+  resetPasswordToken?: string;
+
+  @Prop()
+  resetPasswordExpires?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -27,6 +27,7 @@ import { SupportModule } from './modules/support/support.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SettingsModule } from './modules/settings/settings.module';
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/v1/uploads',
     }),
+    EmailModule,
     ServicesModule,
     ServiceZonesModule,
     CouponsModule,

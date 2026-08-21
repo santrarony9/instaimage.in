@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'instaimage.in',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.instaimage.in',
       }
     ],
   },
@@ -43,7 +47,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://tablets-worldcat-participated-explanation.trycloudflare.com/:path*', // Proxy to VPS backend via tunnel
+        destination: 'https://api.instaimage.in/:path*',
       },
     ];
   },
