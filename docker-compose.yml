@@ -24,10 +24,12 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    command: ["node", "dist/apps/api/apps/api/src/main.js"]
     env_file:
       - .env
     environment:
       - NODE_ENV=production
+      - PORT=3000
       - MONGODB_URI=mongodb://mongo:27017/marketplace
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -42,7 +44,8 @@ services:
   workers:
     build:
       context: ./backend
-      dockerfile: Dockerfile.workers
+      dockerfile: Dockerfile
+    command: ["node", "dist/apps/workers/apps/workers/src/main.js"]
     env_file:
       - .env
     environment:

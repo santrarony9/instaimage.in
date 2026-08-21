@@ -6,7 +6,8 @@ RUN apk add --no-cache python3 make g++
 RUN npm install
 
 COPY . .
-RUN npm run build
+RUN npm run build api
+RUN npm run build workers
 
 FROM node:20-alpine AS production
 
@@ -17,6 +18,3 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 ENV NODE_ENV=production
-ENV PORT=3000
-
-CMD ["node", "dist/apps/api/src/main.js"]
