@@ -304,7 +304,7 @@ export class BookingsService {
           this.emailService.sendBookingAlert(
             seller.email,
             seller.name,
-            s?.title || 'a Service',
+            s?.name || 'a Service',
             booking.scheduledDate.toLocaleDateString()
           );
         });
