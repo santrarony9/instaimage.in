@@ -107,6 +107,9 @@ export class Service extends AbstractDocument {
   @Prop({ type: [String], default: [] })
   occasions: string[];
 
+  @Prop({ enum: ['ON_SPOT', 'REMOTE'], default: 'ON_SPOT' })
+  deliveryMethod: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Creator' })
   creatorId?: Types.ObjectId; // Reference to Creator/Seller
 

@@ -11,6 +11,7 @@ interface LocationData {
 interface BookingData {
   serviceId?: string;
   pricingMode?: 'fixed' | 'flexible';
+  deliveryMethod?: 'ON_SPOT' | 'REMOTE';
   addonNames?: string[];
   location?: LocationData;
   scheduledDate?: string;

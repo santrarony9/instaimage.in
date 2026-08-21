@@ -63,12 +63,12 @@ export function Step5DateTime() {
       return;
     }
     
-    if (needsExtraHours) {
+    if (needsExtraHours && data.deliveryMethod !== 'REMOTE') {
       setError('Please resolve the duration mismatch above before proceeding.');
       return;
     }
     
-    if (selectedDuration <= 0) {
+    if (selectedDuration <= 0 && data.deliveryMethod !== 'REMOTE') {
       setError('End time must be after start time.');
       return;
     }
@@ -76,8 +76,8 @@ export function Step5DateTime() {
     setError('');
     updateData({ 
       scheduledDate: date,
-      startTime,
-      endTime
+      startTime: data.deliveryMethod === 'REMOTE' ? '00:00' : startTime,
+      endTime: data.deliveryMethod === 'REMOTE' ? '23:59' : endTime
     });
     nextStep();
   };
@@ -99,37 +99,43 @@ export function Step5DateTime() {
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Time *</label>
-            <select
-              value={startTime}
-              onChange={handleStartTimeChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-black focus:border-black"
-            >
-              {TIME_SLOTS.map(time => (
-                <option key={time} value={time}>{time}</option>
-              ))}
-            </select>
+        {data.deliveryMethod === 'REMOTE' ? (
+          <div className="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-200">
+            <strong>Project Timeline:</strong> Since this is a remote service, the date above represents when you want the project to start. The delivery timeline is fixed based on the service package.
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Time *</label>
-            <select
-              value={endTime}
-              onChange={(e) => {
-                setEndTime(e.target.value);
-                setError('');
-              }}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-black focus:border-black"
-            >
-              {TIME_SLOTS.map(time => (
-                <option key={time} value={time}>{time}</option>
-              ))}
-            </select>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start Time *</label>
+              <select
+                value={startTime}
+                onChange={handleStartTimeChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-black focus:border-black"
+              >
+                {TIME_SLOTS.map(time => (
+                  <option key={time} value={time}>{time}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">End Time *</label>
+              <select
+                value={endTime}
+                onChange={(e) => {
+                  setEndTime(e.target.value);
+                  setError('');
+                }}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-black focus:border-black"
+              >
+                {TIME_SLOTS.map(time => (
+                  <option key={time} value={time}>{time}</option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
+        )}
 
-        {needsExtraHours && (
+        {needsExtraHours && data.deliveryMethod !== 'REMOTE' && (
           <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
             <h3 className="font-bold text-orange-800 mb-2">Duration Mismatch</h3>
             <p className="text-orange-700 text-sm mb-4">
@@ -164,7 +170,14 @@ export function Step5DateTime() {
 
       <div className="flex justify-between mt-8">
         <button
-          onClick={prevStep}
+          onClick={() => {
+            if (data.deliveryMethod === 'REMOTE') {
+              // Remote services skip location (Step 4), so go back to wherever they came from, or we can just push to service details
+              window.history.back();
+            } else {
+              prevStep();
+            }
+          }}
           className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Back

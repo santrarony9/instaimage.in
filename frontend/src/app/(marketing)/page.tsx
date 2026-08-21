@@ -1,7 +1,14 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  title: 'All Photography Services in One Place — Book Trusted Photographers',
+  description: 'InstaImage is the premier platform to book premium photography, videography, and drone services on-demand in Kolkata. Trusted and quick with a strong infrastructure.',
+};
 
 export default async function HomePage() {
   // Use internal Docker DNS for server-side fetch, or fallback to public tunnel if running locally
@@ -33,14 +40,17 @@ export default async function HomePage() {
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
-      
+      <WebSiteJsonLd />
       {/* E-Commerce Hero Banner Slider (Simulated) */}
       <div className="relative bg-black text-white h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
+          <Image 
             src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop" 
-            alt="Wedding Banner" 
-            className="w-full h-full object-cover opacity-50"
+            alt="All Photography Services In One Place - InstaImage" 
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-50"
           />
         </div>
         <div className="relative z-10 text-center px-4 max-w-3xl">
@@ -76,13 +86,13 @@ export default async function HomePage() {
         {/* Categories Banner */}
         <div className="grid grid-cols-2 gap-3 md:gap-6 mb-12">
           <div className="bg-gray-900 h-32 md:h-48 rounded-xl overflow-hidden relative group cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Weddings" />
+            <Image fill sizes="(max-width: 768px) 50vw, 33vw" src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop" className="object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Wedding Photography Services" />
             <div className="absolute inset-0 flex items-center justify-center">
               <h3 className="text-white text-xl md:text-3xl font-black tracking-widest uppercase">Weddings</h3>
             </div>
           </div>
           <div className="bg-gray-900 h-32 md:h-48 rounded-xl overflow-hidden relative group cursor-pointer">
-            <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Corporate" />
+            <Image fill sizes="(max-width: 768px) 50vw, 33vw" src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop" className="object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Corporate Photography Services" />
             <div className="absolute inset-0 flex items-center justify-center">
               <h3 className="text-white text-xl md:text-3xl font-black tracking-widest uppercase">Corporate</h3>
             </div>
@@ -121,10 +131,12 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
       
       <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
         {imageUrl ? (
-          <img 
+          <Image 
             src={imageUrl} 
             alt={service.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
+            className="object-cover group-hover:scale-110 transition duration-700"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">

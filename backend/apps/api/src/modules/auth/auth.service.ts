@@ -111,4 +111,39 @@ export class AuthService {
       },
     };
   }
+
+  async adminRegister(registerDto: RegisterDto & { role: string }) {
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new BadRequestException('User with this email already exists');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(registerDto.password, salt);
+    
+    let parsedRole = Role.CUSTOMER;
+    if (registerDto.role === 'ADMIN') parsedRole = Role.ADMIN;
+    if (registerDto.role === 'SELLER') parsedRole = Role.SELLER;
+
+    const user = await this.usersService.create({
+      name: registerDto.name,
+      email: registerDto.email,
+      passwordHash,
+      role: parsedRole,
+    });
+
+    if (parsedRole === Role.SELLER) {
+      await this.SellersService.create({
+        name: user.name,
+        email: user.email,
+        phone: '0000000000',
+        bankDetails: 'Pending',
+        isActive: true,
+        // @ts-ignore
+        userId: user._id,
+      });
+    }
+
+    return { success: true, user: { id: user._id, name: user.name, role: user.role } };
+  }
 }

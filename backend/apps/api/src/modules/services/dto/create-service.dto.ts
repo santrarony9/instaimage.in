@@ -74,6 +74,10 @@ export class CreateServiceDto {
 
   @IsString()
   @IsOptional()
+  deliveryMethod?: string;
+
+  @IsString()
+  @IsOptional()
   creatorId?: string;
 
   @IsBoolean()

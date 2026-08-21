@@ -25,6 +25,7 @@ function BookingFlow() {
       const extraHours = searchParams.get('extraHours');
       const flexibleHours = searchParams.get('flexibleHours');
       const addons = searchParams.get('addons');
+      const type = searchParams.get('type');
       
       const extraHoursBooked = mode === 'fixed' 
         ? (extraHours ? parseInt(extraHours) : 0)
@@ -33,11 +34,25 @@ function BookingFlow() {
       updateData({
         serviceId,
         pricingMode: mode,
+        deliveryMethod: type === 'REMOTE' ? 'REMOTE' : 'ON_SPOT',
         extraHoursBooked,
         addonNames: addons ? addons.split(',') : [],
       });
       
-      setStep(4);
+      // If it's a remote service, we can pre-fill location and skip to DateTime
+      if (type === 'REMOTE') {
+        updateData({
+          location: {
+            address: 'Remote',
+            city: 'Remote',
+            pincode: '000000',
+            landmark: 'Remote Post-Production'
+          }
+        });
+        setStep(5);
+      } else {
+        setStep(4);
+      }
     }
   }, [searchParams, updateData, setStep]);
 

@@ -39,7 +39,7 @@ export class UsersService {
   }
 
   async updateRole(id: string, role: string) {
-    if (!['ADMIN', 'CUSTOMER', 'PHOTOGRAPHER'].includes(role)) {
+    if (!['ADMIN', 'CUSTOMER', 'SELLER'].includes(role)) {
       throw new BadRequestException('Invalid role');
     }
     return this.usersRepository.findOneAndUpdate({ _id: id }, { role });
