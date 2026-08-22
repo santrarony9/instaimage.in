@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuthStore } from '@/hooks/use-auth-store';
 import { Search, User, Menu, X } from 'lucide-react';
 
@@ -15,8 +16,15 @@ export function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex items-center space-x-8">
-            <Link href="/" className="text-2xl font-black text-black tracking-tighter uppercase">
-              InstaImage
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="InstaImage Logo" 
+                width={180} 
+                height={50} 
+                priority 
+                className="h-10 w-auto"
+              />
             </Link>
             
             {/* Minimalist Desktop Nav */}

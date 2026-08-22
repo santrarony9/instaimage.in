@@ -11,10 +11,10 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  // Use internal Docker DNS for server-side fetch, or fallback to public tunnel if running locally
-  const SERVER_API_URL = process.env.SERVER_API_URL || 'http://api:3000/v1';
+  // Use internal Docker DNS for server-side fetch, or fallback to public API if running locally
+  const SERVER_API_URL = process.env.SERVER_API_URL || (process.env.NODE_ENV === 'development' ? 'https://api.instaimage.in/api/v1' : 'http://api:3000/v1');
   // Use relative path for client-side images so Nginx can proxy it, regardless of domain
-  const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
+  const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
   
   let services: any[] = [];
   

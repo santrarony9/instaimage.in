@@ -8,8 +8,13 @@ export const metadata = {
   description: 'From high-fashion photography to industry-standard cinematic video production, we have the tools and talent to execute your vision. Browse and filter our services.',
 };
 
-export default async function ServicesPage() {
-  const SERVER_API_URL = process.env.SERVER_API_URL || 'http://api:3000/v1';
+export default async function ServicesPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const SERVER_API_URL = process.env.SERVER_API_URL || (process.env.NODE_ENV === 'development' ? 'https://api.instaimage.in/api/v1' : 'http://api:3000/v1');
+  const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
   let services = [];
 
   try {
