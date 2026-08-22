@@ -1,31 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 export default function ServicesClient({ initialServices }: { initialServices: any[] }) {
   const [services] = useState<any[]>(initialServices);
   const loading = false;
 
+  const searchParams = useSearchParams();
+  const initialCategoryParam = searchParams.get('category');
+  
+  const activeServices = services.filter(s => s.isActive !== false);
+  const availableCategories = Array.from(new Set(activeServices.map(s => s.category).filter(Boolean))) as string[];
+  
+  const initialCategory = initialCategoryParam 
+    ? availableCategories.find(c => c.toLowerCase() === initialCategoryParam.toLowerCase()) || initialCategoryParam
+    : null;
+
   // Filters state
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
-
-  const activeServices = services.filter(s => s.isActive !== false);
   
   // Extract unique values for filters
-  const categories = Array.from(new Set(activeServices.map(s => s.category).filter(Boolean))) as string[];
+  const categories = availableCategories;
   const locations = Array.from(new Set(activeServices.flatMap(s => s.locations || []).filter(Boolean))) as string[];
   const occasions = Array.from(new Set(activeServices.flatMap(s => s.occasions || []).filter(Boolean))) as string[];
 
   // Filter logic
   const filteredServices = activeServices.filter(s => {
-    if (selectedCategories.length > 0 && !selectedCategories.includes(s.category)) return false;
+    if (selectedCategories.length > 0) {
+      const match = selectedCategories.some(cat => 
+        s.category?.toLowerCase() === cat.toLowerCase()
+      );
+      if (!match) return false;
+    }
     if (selectedLocations.length > 0 && (!s.locations || !selectedLocations.some(l => s.locations.includes(l)))) return false;
     if (selectedOccasions.length > 0 && (!s.occasions || !selectedOccasions.some(o => s.occasions.includes(o)))) return false;
     return true;

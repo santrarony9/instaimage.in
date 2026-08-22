@@ -172,6 +172,12 @@ export class Booking extends AbstractDocument {
 
   @Prop()
   invoiceUrl?: string;
+
+  @Prop()
+  deliveryLink?: string; // For Google Drive / high-res link
+
+  @Prop({ type: [{ url: String, filename: String, isWishlisted: Boolean }], default: [] })
+  gallery?: Array<{ url: string; filename: string; isWishlisted: boolean }>;
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);

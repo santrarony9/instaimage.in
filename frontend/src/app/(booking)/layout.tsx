@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   robots: {
@@ -15,10 +16,17 @@ export default function BookingLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 py-4 sticky top-0 z-50">
+      <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 py-4 sticky top-0 z-[999]">
         <div className="max-w-4xl mx-auto px-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-black text-black tracking-tighter uppercase">
-            InstaImage
+          <Link href="/" className="flex items-center">
+            <Image 
+              src="/logo.png" 
+              alt="InstaImage Logo" 
+              width={180} 
+              height={50} 
+              priority 
+              className="h-8 w-auto"
+            />
           </Link>
           <div className="flex items-center space-x-6 text-sm font-semibold text-gray-500">
             <span className="flex items-center space-x-2">

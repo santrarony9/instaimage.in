@@ -59,8 +59,8 @@ export function Navbar() {
                   </div>
                 </div>
               ) : (
-                <Link href="/login" className="text-sm font-semibold text-gray-600 hover:text-black transition">
-                  Login
+                <Link href="/register" className="text-sm font-semibold text-gray-600 hover:text-black transition">
+                  Sign up
                 </Link>
               )}
             </div>
@@ -93,7 +93,7 @@ export function Navbar() {
                 <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="text-lg font-bold text-red-600 text-left">Sign out</button>
               </>
             ) : (
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Login / Sign up</Link>
+              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Sign up</Link>
             )}
             
             <Link href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="bg-black text-white px-6 py-3 rounded-full text-center font-bold mt-4 shadow-sm">

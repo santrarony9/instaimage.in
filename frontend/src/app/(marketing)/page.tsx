@@ -17,26 +17,36 @@ export default async function HomePage() {
   const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
   
   let services: any[] = [];
+  let categories: any[] = [];
   
   try {
-    const res = await fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } });
-    if (res.ok) {
-      const data = await res.json();
+    const [resServices, resCategories] = await Promise.all([
+      fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } }),
+      fetch(`${SERVER_API_URL}/categories?isTrending=true`, { next: { revalidate: 60 } })
+    ]);
+    
+    if (resServices.ok) {
+      const data = await resServices.json();
       services = Array.isArray(data) ? data : (data.data || []);
     }
+    if (resCategories.ok) {
+      const data = await resCategories.json();
+      categories = Array.isArray(data) ? data : (data.data || []);
+    }
   } catch (e) {
-    console.error('Failed to fetch services:', e);
+    console.error('Failed to fetch data:', e);
   }
 
   // Filter out inactive
   services = services.filter(s => s.isActive !== false);
+  categories = categories.filter(c => c.isActive !== false);
 
   // E-commerce logic
-  // Newly Added: Sort by createdAt (assuming _id timestamp or createdAt exists, we just reverse the list for now if no dates)
-  const newlyAdded = [...services].reverse().slice(0, 4);
+  // Newly Added
+  const newlyAdded = [...services].reverse().slice(0, 6);
   
-  // Trending: Mock by picking the ones with highest basePrice, or just a slice of the middle
-  const trending = [...services].sort((a, b) => (b.basePrice || 0) - (a.basePrice || 0)).slice(0, 4);
+  // Popular Services: renamed from Trending to avoid confusion
+  const popularServices = [...services].sort((a, b) => (b.basePrice || 0) - (a.basePrice || 0)).slice(0, 6);
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
@@ -71,31 +81,40 @@ export default async function HomePage() {
 
       <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         
-        {/* Trending Section */}
-        <div className="mb-12">
+        {/* Trending Categories Section */}
+        {categories.length > 0 && (
+          <div className="mb-12">
+            <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+              <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-gray-900">🔥 Trending Services</h2>
+              <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {categories.slice(0, 8).map((category: any) => (
+                <Link key={category._id} href={`/services?category=${category.slug}`} className="bg-gray-900 h-32 md:h-40 rounded-xl overflow-hidden relative group cursor-pointer block">
+                  {category.image ? (
+                    <Image fill sizes="(max-width: 768px) 50vw, 25vw" src={category.image} className="object-cover opacity-60 group-hover:scale-105 transition duration-700" alt={category.name} />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-indigo-900 opacity-80" />
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <h3 className="text-white text-lg md:text-2xl font-black tracking-widest uppercase text-center px-2">{category.name}</h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Popular Services Section (previously called trending services) */}
+        <div className="mb-12 mt-12">
           <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-gray-900">🔥 Trending Services</h2>
+            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-gray-900">⭐ Popular Packages</h2>
             <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {trending.map(service => <ServiceCard key={service._id} service={service} badge="Trending" API_URL={PUBLIC_API_URL} />)}
-          </div>
-        </div>
-
-        {/* Categories Banner */}
-        <div className="grid grid-cols-2 gap-3 md:gap-6 mb-12">
-          <div className="bg-gray-900 h-32 md:h-48 rounded-xl overflow-hidden relative group cursor-pointer">
-            <Image fill sizes="(max-width: 768px) 50vw, 33vw" src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop" className="object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Wedding Photography Services" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <h3 className="text-white text-xl md:text-3xl font-black tracking-widest uppercase">Weddings</h3>
-            </div>
-          </div>
-          <div className="bg-gray-900 h-32 md:h-48 rounded-xl overflow-hidden relative group cursor-pointer">
-            <Image fill sizes="(max-width: 768px) 50vw, 33vw" src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop" className="object-cover opacity-60 group-hover:scale-105 transition duration-700" alt="Corporate Photography Services" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <h3 className="text-white text-xl md:text-3xl font-black tracking-widest uppercase">Corporate</h3>
-            </div>
+            {popularServices.map(service => <ServiceCard key={service._id} service={service} badge="Popular" API_URL={PUBLIC_API_URL} />)}
           </div>
         </div>
 
