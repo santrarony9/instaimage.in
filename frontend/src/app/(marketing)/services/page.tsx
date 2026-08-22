@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ItemListJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import ServicesClient from './ServicesClient';
 
@@ -43,7 +44,9 @@ export default async function ServicesPage({
         name="InstaImage Photography Services" 
         description="Browse our professional photography and videography services." 
       />
-      <ServicesClient initialServices={services} />
+      <Suspense fallback={<div className="p-20 text-center text-gray-500">Loading services...</div>}>
+        <ServicesClient initialServices={services} />
+      </Suspense>
     </>
   );
 }
