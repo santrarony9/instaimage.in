@@ -21,6 +21,12 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetchApi('/auth/register', {
         method: 'POST',

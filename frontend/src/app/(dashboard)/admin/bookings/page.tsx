@@ -55,6 +55,7 @@ export default function BookingsManagementPage() {
   }, []);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
+    if (!window.confirm(`Change booking status to ${newStatus}?`)) return;
     try {
       await fetchApi(`/bookings/${id}/status`, {
         method: 'PATCH',
@@ -69,6 +70,10 @@ export default function BookingsManagementPage() {
 
   const handleAssignSeller = async (bookingId: string, sellerId: string) => {
     if (!sellerId) return;
+    if (!window.confirm('Are you sure you want to assign this seller?')) {
+      loadData(); // reset UI
+      return;
+    }
     try {
       await fetchApi(`/bookings/${bookingId}/assign`, {
         method: 'PATCH',

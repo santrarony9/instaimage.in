@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { WebSiteJsonLd } from '@/components/seo/JsonLd';
+import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 export const dynamic = 'force-dynamic';
@@ -65,11 +66,17 @@ export default async function HomePage() {
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
       <WebSiteJsonLd />
+      {services.length === 0 && (
+        <div className="bg-red-50 p-4 m-4 text-red-800 text-center rounded-lg border border-red-200">
+          <p className="font-bold">Services temporarily unavailable.</p>
+          <p className="text-sm">We are currently updating our catalog. Please check back in a few minutes.</p>
+        </div>
+      )}
       {/* Quick Commerce Search Header */}
       <div className="bg-white border-b border-gray-100 pt-8 pb-10">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-6">What do you want to shoot today?</h1>
-          <div className="relative max-w-2xl mx-auto">
+          <div className="sticky top-0 z-30 bg-white py-2 md:py-0 md:relative max-w-2xl mx-auto shadow-sm md:shadow-none">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
@@ -97,12 +104,44 @@ export default async function HomePage() {
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition-transform">
                     <span className="text-xl">📸</span>
                   </div>
-                  <h3 className="text-gray-800 text-[10px] md:text-xs font-bold leading-tight">{category.name}</h3>
+                  <h3 className="text-gray-800 text-xs sm:text-sm font-bold leading-tight">{category.name}</h3>
                 </Link>
               ))}
             </div>
           </div>
         )}
+
+        {/* Blockbuster Deal Section */}
+        <div className="mb-12 mt-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 md:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+          {/* Decorative shapes */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-yellow-400 opacity-20 rounded-full blur-3xl"></div>
+          
+          <div className="flex-1 relative z-10">
+            <div className="inline-block px-3 py-1 bg-yellow-400 text-yellow-900 text-xs font-black uppercase tracking-wider rounded-full mb-4 shadow-sm">
+              Limited Time Combo
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight">THE BLOCKBUSTER DEAL</h2>
+            <p className="text-blue-50 mb-6 text-sm md:text-base max-w-lg leading-relaxed">
+              The ultimate mega-package. Everything you need for a massive event, wedding, or complete brand overhaul in one single combo.
+            </p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+              {['Premium Photography', 'Cinematic Videography', 'Drone Aerial Coverage', '3x Same-Day Reels', 'Advanced Color Grading', 'Full Lighting Setup', 'Dedicated Director'].map((svc, i) => (
+                <li key={i} className="flex items-center text-sm font-medium text-white/90">
+                  <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center mr-3 text-xs shadow-sm">✓</span>
+                  {svc}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-white text-gray-900 p-6 md:p-8 rounded-2xl w-full md:w-auto text-center shadow-2xl flex flex-col items-center relative z-10">
+            <span className="text-gray-400 line-through text-lg mb-1 font-semibold">₹1,49,999</span>
+            <span className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">₹89,999</span>
+            <Link href="/services" className="w-full bg-gray-900 text-white px-8 py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-black transition-colors shadow-lg">
+              Book Combo
+            </Link>
+          </div>
+        </div>
 
         {/* Popular Services Section (previously called trending services) */}
         <div className="mb-12 mt-12">
@@ -138,13 +177,20 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
     ? service.images[0]
     : null;
 
+  let fullImageUrl = imageUrl;
+  if (imageUrl && imageUrl.startsWith('/')) {
+    // API_URL is typically something like 'https://api.instaimage.in/api/v1'
+    const baseApi = API_URL.replace('/api/v1', '');
+    fullImageUrl = `${baseApi}${imageUrl}`;
+  }
+
   return (
     <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
       
       <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
-        {imageUrl ? (
+        {fullImageUrl ? (
           <Image 
-            src={imageUrl}
+            src={fullImageUrl}
             alt={service.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -174,9 +220,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
           </div>
           
           {/* ADD Button Quick Commerce Style */}
-          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
-            ADD
-          </div>
+          <AddToCartButton service={service} />
         </div>
       </div>
     </Link>

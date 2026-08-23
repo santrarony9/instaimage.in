@@ -39,7 +39,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
   const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'C';
 
-  const NavContent = () => (
+  const renderNavContent = () => (
     <div className="flex flex-col h-full bg-white border-r w-64">
       <div className="p-4 border-b flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
@@ -59,7 +59,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
                 <link.icon className={`h-5 w-5 ${isActive ? 'text-indigo-600' : 'text-gray-400'}`} />
@@ -84,7 +84,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
-        <NavContent />
+        {renderNavContent()}
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -92,7 +92,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setIsMobileMenuOpen(false)}></div>
           <div className="fixed inset-y-0 left-0 flex flex-col z-40">
-            <NavContent />
+            {renderNavContent()}
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
                 type="button"

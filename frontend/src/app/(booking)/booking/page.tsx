@@ -10,17 +10,20 @@ import { Step7Payment } from '@/components/booking/Step7Payment';
 import { Step8Confirmation } from '@/components/booking/Step8Confirmation';
 
 import { Suspense } from 'react';
+import { useCartStore } from '@/hooks/use-cart-store';
 
 function BookingFlow() {
   const currentStep = useBookingStore((state) => state.currentStep);
   const updateData = useBookingStore((state) => state.updateData);
   const setStep = useBookingStore((state) => state.setStep);
+  const cartItems = useCartStore((state) => state.items);
   
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const serviceId = searchParams.get('serviceId');
     if (serviceId) {
+      // Legacy URL-param based flow
       const mode = searchParams.get('mode') as 'fixed' | 'flexible' || 'fixed';
       const extraHours = searchParams.get('extraHours');
       const flexibleHours = searchParams.get('flexibleHours');
@@ -39,7 +42,6 @@ function BookingFlow() {
         addonNames: addons ? addons.split(',') : [],
       });
       
-      // If it's a remote service, we can pre-fill location and skip to DateTime
       if (type === 'REMOTE') {
         updateData({
           location: {
@@ -53,8 +55,36 @@ function BookingFlow() {
       } else {
         setStep(4);
       }
+    } else {
+      // Cart-based flow: read from cart store
+      // using standard import in the file
+      if (cartItems.length > 0) {
+        // Use the first cart item for now (multi-item checkout comes later)
+        const firstItem = cartItems[0];
+        updateData({
+          serviceId: firstItem.serviceId,
+          pricingMode: firstItem.pricingMode,
+          deliveryMethod: firstItem.deliveryMethod,
+          extraHoursBooked: firstItem.extraHoursBooked,
+          addonNames: firstItem.addonNames,
+        });
+        
+        if (firstItem.deliveryMethod === 'REMOTE') {
+          updateData({
+            location: {
+              address: 'Remote',
+              city: 'Remote',
+              pincode: '000000',
+              landmark: 'Remote Post-Production'
+            }
+          });
+          setStep(5);
+        } else {
+          setStep(4);
+        }
+      }
     }
-  }, [searchParams, updateData, setStep]);
+  }, [searchParams, updateData, setStep, cartItems]);
 
   return (
     <div className="bg-white p-4 md:p-6 rounded-xl shadow-lg border border-gray-100 mb-4 max-w-2xl mx-auto mt-2">

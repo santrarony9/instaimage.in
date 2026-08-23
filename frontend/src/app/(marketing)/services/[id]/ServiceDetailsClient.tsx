@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useCartStore } from '@/hooks/use-cart-store';
 
 export default function ServiceDetailsClient({ initialService }: { initialService: any }) {
   const router = useRouter();
+  const addItem = useCartStore((state) => state.addItem);
   const [service] = useState<any>(initialService);
 
   // User Selection State
@@ -39,9 +41,14 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
   
   // Helpers
-  const mainImage = service.images && service.images.length > 0 
+  let mainImage = service.images && service.images.length > 0 
     ? service.images[activeImageIndex] || service.images[0]
     : 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop';
+  
+  if (mainImage.startsWith('/')) {
+    const baseApi = API_URL.replace('/api/v1', '');
+    mainImage = `${baseApi}${mainImage}`;
+  }
 
   const toggleAddon = (addonName: string) => {
     setSelectedAddons(prev => 
@@ -61,19 +68,39 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
     basePrice += (service.extraHourPrice * extraHours);
   }
 
-  let addonsCost = (service.addons || [])
+  const addonsCost = (service.addons || [])
     .filter((a: any) => selectedAddons.includes(a.name))
     .reduce((sum: number, a: any) => sum + Number(a.price), 0);
-  let totalPrice = basePrice + addonsCost;
+  const totalPrice = basePrice + addonsCost;
+
+
+  const handleAddToCart = () => {
+    addItem({
+      serviceId: service._id,
+      serviceName: service.name,
+      serviceImage: service.images?.[0],
+      pricingMode,
+      deliveryMethod: service.deliveryMethod === 'REMOTE' ? 'REMOTE' : 'ON_SPOT',
+      addonNames: selectedAddons,
+      extraHoursBooked: extraHours,
+      basePrice: totalPrice,
+    });
+  };
 
   const handleCheckout = () => {
-    // Pass selected details via URL or state
-    let search = `?serviceId=${service._id}&mode=${pricingMode}`;
-    if (extraHours > 0) search += `&extraHours=${extraHours}`;
-    if (selectedAddons.length > 0) search += `&addons=${encodeURIComponent(selectedAddons.join(','))}`;
-    if (service.deliveryMethod === 'REMOTE') search += `&type=REMOTE`;
-    
-    router.push(`/booking${search}`);
+    // If they click Book Now, maybe we just clear the cart and add this one item to cart, then go to booking
+    // OR we pass via URL as before for a single item checkout. We'll use cart store now for single checkout too.
+    addItem({
+      serviceId: service._id,
+      serviceName: service.name,
+      serviceImage: service.images?.[0],
+      pricingMode,
+      deliveryMethod: service.deliveryMethod === 'REMOTE' ? 'REMOTE' : 'ON_SPOT',
+      addonNames: selectedAddons,
+      extraHoursBooked: extraHours,
+      basePrice: totalPrice,
+    });
+    router.push(`/booking`);
   };
 
   return (
@@ -90,9 +117,9 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
             
             {/* Thumbnails */}
             {service.images && service.images.length > 1 && (
-              <div className="flex gap-4 mb-12 overflow-x-auto pb-2">
+              <div className="flex gap-4 mb-12 overflow-x-auto pb-2 snap-x hide-scrollbar">
                 {service.images.map((img: string, idx: number) => {
-                  const url = img;
+                  const url = img.startsWith('/') ? `${API_URL.replace('/api/v1', '')}${img}` : img;
                   return (
                     <div 
                       key={idx} 
@@ -116,7 +143,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
             )}
 
             {/* Tabs Section */}
-            <div className="border-b border-gray-200 mb-8">
+            <div className="border-b border-gray-200 mb-8 overflow-x-auto whitespace-nowrap hide-scrollbar">
               <div className="flex space-x-8">
                 {['details', 'delivery', 'process'].map(tab => (
                   <button 
@@ -164,7 +191,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
               {/* Pricing Mode Selector */}
               <div className="mb-8 border-t border-gray-100 pt-6">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Pricing Type</h3>
-                <div className={`grid gap-3 mb-6 ${service.deliveryMethod === 'REMOTE' || !service.flexiblePrice ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                <div className={`grid gap-3 mb-6 ${service.deliveryMethod === 'REMOTE' || !service.flexiblePrice ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
                   <label 
                     className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                     onClick={() => setPricingMode('fixed')}
@@ -246,12 +273,20 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                 </div>
               )}
 
-              <button 
-                onClick={handleCheckout}
-                className="w-full bg-black text-white py-4 rounded font-bold uppercase tracking-widest text-sm hover:bg-gray-800 transition"
-              >
-                Proceed to Booking
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button 
+                  onClick={handleAddToCart}
+                  className="flex-1 bg-white text-black border-2 border-black py-4 rounded font-bold uppercase tracking-widest text-sm hover:bg-gray-50 transition"
+                >
+                  Add to Cart
+                </button>
+                <button 
+                  onClick={handleCheckout}
+                  className="flex-1 bg-black text-white py-4 rounded font-bold uppercase tracking-widest text-sm hover:bg-gray-800 transition"
+                >
+                  Book Now
+                </button>
+              </div>
               <p className="text-center text-xs text-gray-500 mt-4 mb-8">
                 {service.deliveryMethod === 'REMOTE' ? 'Project details and turnaround on the next step.' : 'Date & Time selection on the next step.'}
               </p>
@@ -263,7 +298,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                   Have questions before you book? Drop us a quick "Hi" on WhatsApp and one of our production experts will reach out to you within 2 hours.
                 </p>
                 <a 
-                  href="https://wa.me/918240508915?text=Hi!%20I%20have%20some%20questions%20about%20your%20services."
+                  href={`https://wa.me/918240508915?text=${encodeURIComponent(`Hi! I have some questions about your ${service.name} service.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center bg-[#25D366] text-white py-3.5 rounded font-bold uppercase tracking-widest text-sm hover:bg-[#1ebe57] transition shadow-sm"
@@ -313,12 +348,20 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
           <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-0.5">{pricingMode}</div>
           <div className="text-xl font-black text-gray-900">₹{totalPrice.toLocaleString()}</div>
         </div>
-        <button 
-          onClick={handleCheckout}
-          className="bg-blue-600 text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider text-sm hover:bg-blue-700 transition shadow-md"
-        >
-          Book Now
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={handleAddToCart}
+            className="bg-white text-black border border-black px-4 py-3 rounded-md font-bold uppercase tracking-wider text-xs hover:bg-gray-50 transition shadow-sm"
+          >
+            Add to Cart
+          </button>
+          <button 
+            onClick={handleCheckout}
+            className="bg-blue-600 text-white px-6 py-3 rounded-md font-bold uppercase tracking-wider text-sm hover:bg-blue-700 transition shadow-md"
+          >
+            Book Now
+          </button>
+        </div>
       </div>
     </div>
   );

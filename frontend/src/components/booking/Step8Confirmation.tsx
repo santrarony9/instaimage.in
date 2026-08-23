@@ -5,8 +5,11 @@ import { useBookingStore } from '@/hooks/use-booking-store';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { useCartStore } from '@/hooks/use-cart-store';
+
 export function Step8Confirmation() {
   const { data, prevStep, submitBooking, reset } = useBookingStore();
+  const clearCart = useCartStore((state) => state.clearCart);
   const router = useRouter();
   
   const [loading, setLoading] = useState(false);
@@ -28,6 +31,9 @@ export function Step8Confirmation() {
 
   const handleDone = () => {
     reset();
+    try {
+      clearCart();
+    } catch (e) {}
     router.push('/customer');
   };
 
@@ -153,18 +159,18 @@ export function Step8Confirmation() {
         </p>
       </div>
 
-      <div className="flex justify-between mt-6">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6">
         <button
           onClick={prevStep}
           disabled={loading}
-          className="px-6 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="w-full sm:w-auto px-6 py-3 sm:py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
           Back
         </button>
         <button
           onClick={handleConfirm}
           disabled={loading}
-          className="px-8 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center disabled:opacity-50"
+          className="w-full sm:w-auto justify-center px-8 py-3 sm:py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center disabled:opacity-50"
         >
           {loading ? 'Processing...' : 'Confirm & Book'}
         </button>

@@ -1,21 +1,26 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBookingStore } from '@/hooks/use-booking-store';
 
 const TIME_SLOTS = [
   "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30",
   "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30",
   "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
-  "18:00", "18:30", "19:00", "19:30", "20:00"
+  "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30",
+  "22:00", "22:30", "23:00", "23:30"
 ];
 
 export function Step5DateTime() {
   const { data, updateData, nextStep, prevStep } = useBookingStore();
   
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split('T')[0];
+  const [minDate, setMinDate] = useState('');
+
+  useEffect(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setMinDate(tomorrow.toISOString().split('T')[0]);
+  }, []);
 
   const [date, setDate] = useState(data.scheduledDate || '');
   const [startTime, setStartTime] = useState(data.startTime || '10:00');
@@ -168,23 +173,22 @@ export function Step5DateTime() {
 
       </div>
 
-      <div className="flex justify-between mt-6">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6">
         <button
           onClick={() => {
             if (data.deliveryMethod === 'REMOTE') {
-              // Remote services skip location (Step 4), so go back to wherever they came from, or we can just push to service details
               window.history.back();
             } else {
               prevStep();
             }
           }}
-          className="px-6 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="w-full sm:w-auto px-6 py-3 sm:py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleNext}
-          className="px-6 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+          className="w-full sm:w-auto px-6 py-3 sm:py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           Next Step
         </button>

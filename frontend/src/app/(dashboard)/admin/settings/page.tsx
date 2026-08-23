@@ -18,10 +18,6 @@ export default function SettingsPage() {
   // Offices State
   const [offices, setOffices] = useState<any[]>([]);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
   const loadSettings = async () => {
     try {
       setLoading(true);
@@ -45,6 +41,10 @@ export default function SettingsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
 
   const handleSaveTravelConfig = async () => {
     try {

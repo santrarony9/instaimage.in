@@ -42,6 +42,11 @@ export default function UsersPage() {
   }, [search]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
+    if (!window.confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+      // User cancelled, refetch to reset UI state
+      fetchUsers(search);
+      return;
+    }
     try {
       await fetchApi(`/users/${userId}/role`, {
         method: 'PATCH',

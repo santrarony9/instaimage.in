@@ -24,7 +24,7 @@ export function Step4Location() {
   const handleNext = () => {
     const newErrors: Record<string, string> = {};
     if (!address.trim()) newErrors.address = 'Address is required';
-    if (!pincode.trim() || pincode.length !== 6) newErrors.pincode = 'Valid 6-digit pincode is required';
+    if (!pincode.trim() || !/^\d{6}$/.test(pincode)) newErrors.pincode = 'Valid 6-digit pincode is required';
     if (!city.trim()) newErrors.city = 'City is required';
 
     if (Object.keys(newErrors).length > 0) {
@@ -32,7 +32,16 @@ export function Step4Location() {
       return;
     }
 
-    updateData({ location: { address, landmark, pincode, city, coordinates } as any });
+    updateData({ 
+      location: { 
+        ...(data.location as any || {}),
+        address, 
+        landmark, 
+        pincode, 
+        city, 
+        coordinates 
+      } 
+    });
     nextStep();
   };
 
@@ -80,8 +89,10 @@ export function Step4Location() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
             <input
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={pincode}
-              onChange={(e) => setPincode(e.target.value)}
+              onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
               className="w-full px-4 py-1.5 border rounded-lg focus:ring-black focus:border-black"
               placeholder="e.g. 400001"
               maxLength={6}
@@ -102,16 +113,16 @@ export function Step4Location() {
         </div>
       </div>
 
-      <div className="flex justify-between mt-6">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6">
         <button
           onClick={prevStep}
-          className="px-6 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="w-full sm:w-auto px-6 py-3 sm:py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleNext}
-          className="px-6 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+          className="w-full sm:w-auto px-6 py-3 sm:py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           Next Step
         </button>

@@ -1,14 +1,25 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuthStore } from '@/hooks/use-auth-store';
-import { Search, User, Menu, X } from 'lucide-react';
+import { useCartStore } from '@/hooks/use-cart-store';
+import { Search, User, Menu, X, ShoppingCart } from 'lucide-react';
+import { CartSidebar } from '@/components/cart/CartSidebar';
 
 export function Navbar() {
   const { user, logout } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Need to handle hydration mismatch for zustand persist
+  const [mounted, setMounted] = useState(false);
+  const { items: cartItems, setSidebarOpen } = useCartStore();
+  
+  useEffect(() => {
+    // eslint-disable-next-line
+    setMounted(true);
+  }, []);
 
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
@@ -41,8 +52,21 @@ export function Navbar() {
               <Search className="h-5 w-5" />
             </button>
 
+            {/* Cart Button */}
+            <button 
+              onClick={() => setSidebarOpen(true)}
+              className="relative p-2 text-gray-500 hover:text-black transition flex items-center justify-center min-h-[44px] min-w-[44px]"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {mounted && cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                  {cartItems.length}
+                </span>
+              )}
+            </button>
+
             <div className="hidden md:flex items-center h-20">
-              {user ? (
+              {mounted && user ? (
                 <div className="relative group cursor-pointer h-full flex items-center px-2">
                   <div className="flex items-center space-x-2 text-gray-600 group-hover:text-black transition font-semibold text-sm">
                     <User className="h-5 w-5" />
@@ -58,11 +82,11 @@ export function Navbar() {
                     </div>
                   </div>
                 </div>
-              ) : (
+              ) : mounted ? (
                 <Link href="/register" className="text-sm font-semibold text-gray-600 hover:text-black transition">
                   Sign up
                 </Link>
-              )}
+              ) : null}
             </div>
 
             <Link href="/booking" className="hidden sm:inline-flex bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-800 transition shadow-sm">
@@ -84,7 +108,17 @@ export function Navbar() {
             <Link href="/portfolio" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Portfolio</Link>
             <Link href="/sellers" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Sellers</Link>
             
-            {user ? (
+            <button 
+              onClick={() => { setSidebarOpen(true); setIsMobileMenuOpen(false); }} 
+              className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2 text-left flex items-center justify-between"
+            >
+              <span>View Cart</span>
+              {mounted && cartItems.length > 0 && (
+                <span className="bg-blue-600 text-white text-xs font-bold h-5 w-5 rounded-full flex items-center justify-center">{cartItems.length}</span>
+              )}
+            </button>
+
+            {mounted && user ? (
               <>
                 <Link href="/customer" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">My Bookings</Link>
                 {user?.role === 'ADMIN' && (
@@ -92,9 +126,9 @@ export function Navbar() {
                 )}
                 <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="text-lg font-bold text-red-600 text-left">Sign out</button>
               </>
-            ) : (
+            ) : mounted ? (
               <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Sign up</Link>
-            )}
+            ) : null}
             
             <Link href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="bg-black text-white px-6 py-3 rounded-full text-center font-bold mt-4 shadow-sm">
               Book Now
@@ -102,6 +136,8 @@ export function Navbar() {
           </nav>
         </div>
       )}
+
+      <CartSidebar />
     </header>
   );
 }

@@ -22,7 +22,7 @@ export default function PhotographerLayout({ children }: { children: React.React
 
   const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'P';
 
-  const NavContent = () => (
+  const renderNavContent = () => (
     <div className="flex flex-col h-full bg-white border-r w-64">
       <div className="p-4 border-b flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">
@@ -66,7 +66,7 @@ export default function PhotographerLayout({ children }: { children: React.React
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
-        <NavContent />
+        {renderNavContent()}
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -74,7 +74,7 @@ export default function PhotographerLayout({ children }: { children: React.React
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setIsMobileMenuOpen(false)}></div>
           <div className="fixed inset-y-0 left-0 flex flex-col z-40">
-            <NavContent />
+            {renderNavContent()}
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
                 type="button"

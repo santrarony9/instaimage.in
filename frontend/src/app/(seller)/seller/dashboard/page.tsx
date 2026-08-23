@@ -21,14 +21,6 @@ export default function SellerDashboard() {
   });
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    if (!token || user?.role !== 'SELLER') {
-      router.push('/seller/login');
-      return;
-    }
-    loadData();
-  }, [token, user, router]);
-
   const loadData = async () => {
     setLoading(true);
     try {
@@ -45,6 +37,14 @@ export default function SellerDashboard() {
     }
   };
 
+  useEffect(() => {
+    if (!token || user?.role !== 'SELLER') {
+      router.push('/seller/login');
+      return;
+    }
+    loadData();
+    // eslint-disable-next-line
+  }, [token, user, router]);
   const updateJobStatus = async (jobId: string, status: string) => {
     try {
       await fetchApi(`/bookings/${jobId}/seller-status`, {

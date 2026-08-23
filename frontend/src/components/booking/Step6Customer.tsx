@@ -50,12 +50,12 @@ export function Step6Customer() {
         </div>
       )}
 
-      <div className="flex justify-between mt-6 pt-6 border-t">
-        <button onClick={prevStep} className="text-gray-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition font-medium">Back</button>
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6 pt-6 border-t">
+        <button onClick={prevStep} className="w-full sm:w-auto text-gray-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition font-medium border sm:border-0 border-gray-300">Back</button>
         <button 
           onClick={nextStep} 
           disabled={!user}
-          className="disabled:opacity-50 disabled:cursor-not-allowed bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition font-medium shadow-md shadow-black/10"
+          className="w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition font-medium shadow-md shadow-black/10"
         >
           Continue to Payment
         </button>

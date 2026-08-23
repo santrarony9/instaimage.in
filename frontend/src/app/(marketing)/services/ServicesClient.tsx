@@ -62,7 +62,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
     setter((prev: string[]) => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
   };
 
-  const FilterSection = () => (
+  const renderFilterSection = () => (
     <div className="flex flex-col">
       {categories.length > 0 && (
         <div className="flex flex-col border-b border-gray-100">
@@ -148,7 +148,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
               </button>
             </div>
             <div className="p-4 pb-24">
-              <FilterSection />
+              {renderFilterSection()}
             </div>
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100">
               <button onClick={() => setShowMobileFilters(false)} className="w-full bg-blue-600 text-white py-3 rounded-md font-bold uppercase tracking-widest">
@@ -162,7 +162,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block w-64 flex-shrink-0">
             <div className="sticky top-24 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-              <FilterSection />
+              {renderFilterSection()}
             </div>
           </div>
 

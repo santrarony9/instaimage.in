@@ -37,14 +37,25 @@ export function Step7Payment() {
   }, [data]);
 
   const handlePayNow = async () => {
-    setIsProcessing(true);
-    await submitBooking();
-    setIsProcessing(false);
+    // Only proceed to confirmation step — actual submission happens in Step8
     nextStep();
   };
 
   if (isLoadingPrice) {
     return <div className="p-8 text-center text-gray-500 animate-pulse">Calculating your final price...</div>;
+  }
+
+  if (!pricingInfo) {
+    return (
+      <div className="p-8 text-center">
+        <div className="text-red-500 font-bold mb-2">Failed to calculate price</div>
+        <p className="text-gray-500 text-sm mb-4">We couldn&apos;t fetch pricing. Please check your internet connection and try again.</p>
+        <div className="flex justify-center gap-3">
+          <button onClick={prevStep} className="text-gray-600 px-6 py-2 rounded-md hover:bg-gray-100 transition">Back</button>
+          <button onClick={() => window.location.reload()} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">Retry</button>
+        </div>
+      </div>
+    );
   }
 
   const p = pricingInfo?.pricing;
@@ -105,9 +116,9 @@ export function Step7Payment() {
         <p className="text-xs text-gray-500 mt-2">Remaining balance (₹{p?.balanceDue}) will be collected after the event.</p>
       </div>
 
-      <div className="flex justify-between mt-6">
-        <button onClick={prevStep} className="text-gray-600 px-6 py-1.5 rounded-md hover:bg-gray-100 transition" disabled={isProcessing}>Back</button>
-        <button onClick={handlePayNow} className="bg-black text-white px-6 py-1.5 rounded-md hover:bg-gray-800 transition" disabled={isProcessing}>
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6">
+        <button onClick={prevStep} className="w-full sm:w-auto text-gray-600 px-6 py-3 sm:py-1.5 border border-gray-300 sm:border-0 rounded-md hover:bg-gray-100 transition" disabled={isProcessing}>Back</button>
+        <button onClick={handlePayNow} className="w-full sm:w-auto bg-black text-white px-6 py-3 sm:py-1.5 rounded-md hover:bg-gray-800 transition" disabled={isProcessing}>
           {isProcessing ? 'Processing...' : 'Pay Now'}
         </button>
       </div>
