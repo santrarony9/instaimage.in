@@ -6,48 +6,75 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { extname } from 'path';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 @Controller('uploads')
 export class UploadsController {
+  private s3: S3Client;
+
+  constructor() {
+    this.s3 = new S3Client({
+      endpoint: process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com',
+      region: process.env.B2_REGION || 'eu-central-003',
+      credentials: {
+        accessKeyId: process.env.B2_KEY_ID || 'f87ad6faa8b3',
+        secretAccessKey: process.env.B2_APPLICATION_KEY || '0031697847c74883ae60204a0d5fd410f394a59adf',
+      },
+    });
+  }
+
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          // Generate a unique filename using timestamp and a random string
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
-        // Only allow image and video files
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|mp4|webm)$/)) {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|mp4|webm|zip|pdf|rar)$/)) {
           return cb(
-            new BadRequestException('Only image and video files are allowed!'),
+            new BadRequestException('Invalid file type!'),
             false,
           );
         }
         cb(null, true);
       },
       limits: {
-        fileSize: 50 * 1024 * 1024, // 50MB limit
+        fileSize: 100 * 1024 * 1024, // 100MB limit
       },
     }),
   )
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('No file uploaded or invalid file type');
     }
-    // Return the public URL path
-    return {
-      url: `/uploads/${file.filename}`,
-      originalName: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-    };
+
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const filename = `${uniqueSuffix}${extname(file.originalname)}`;
+    const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
+
+    try {
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: filename,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        }),
+      );
+
+      // Construct public URL
+      const endpoint = process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com';
+      const fileUrl = `${endpoint}/${bucketName}/${filename}`;
+
+      return {
+        url: fileUrl,
+        originalName: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+      };
+    } catch (error) {
+      console.error('B2 Upload Error:', error);
+      throw new BadRequestException('Failed to upload file to Backblaze B2');
+    }
   }
 }
