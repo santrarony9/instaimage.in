@@ -35,8 +35,12 @@ export class ServicesService {
     return this.servicesRepository.find({ creatorId });
   }
 
-  async findOne(id: string) {
-    return this.servicesRepository.findOne({ _id: id });
+  async findOne(idOrSlug: string) {
+    if (Types.ObjectId.isValid(idOrSlug)) {
+      const service = await this.servicesRepository.findOne({ _id: idOrSlug });
+      if (service) return service;
+    }
+    return this.servicesRepository.findOne({ slug: idOrSlug });
   }
 
   // Admin: approve a service

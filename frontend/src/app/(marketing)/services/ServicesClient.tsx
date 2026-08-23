@@ -193,7 +193,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                   {filteredServices.map((service) => (
-                    <Link href={`/services/${service._id}`} key={service._id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-green-600">
+                    <Link href={`/services/${service.slug || service._id}`} key={service._id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-green-600">
                       
                       <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
                         {service.images && service.images.length > 0 ? (

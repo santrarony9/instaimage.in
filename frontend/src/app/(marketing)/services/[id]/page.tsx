@@ -6,12 +6,23 @@ import { ServiceJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 const SERVER_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
 const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://instaimage.in/api/v1';
 
-async function getService(id: string) {
+async function getService(idOrSlug: string) {
   try {
-    const res = await fetch(`${SERVER_API_URL}/services/${id}`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.data || data;
+    // First try the direct ID lookup (will fail with 400 if it's a slug, but works for old links)
+    if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
+      const res = await fetch(`${SERVER_API_URL}/services/${idOrSlug}`, { next: { revalidate: 60 } });
+      if (res.ok) {
+        const data = await res.json();
+        return data.data || data;
+      }
+    }
+    
+    // Fallback: Fetch all services and find by slug
+    const allRes = await fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } });
+    if (!allRes.ok) return null;
+    const allData = await allRes.json();
+    const services = Array.isArray(allData) ? allData : (allData.data || []);
+    return services.find((s: any) => s.slug === idOrSlug || s._id === idOrSlug) || null;
   } catch (e) {
     return null;
   }
