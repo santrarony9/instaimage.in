@@ -35,7 +35,7 @@ export function Step1Services() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6 text-gray-900">Select a Service</h2>
+      <h2 className="text-xl font-bold mb-4 text-gray-900">Select a Service</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {services.map((service) => (
           <div 

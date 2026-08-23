@@ -52,7 +52,7 @@ export function Step7Payment() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6 text-gray-900">Review & Payment</h2>
+      <h2 className="text-xl font-bold mb-4 text-gray-900">Review & Payment</h2>
       
       <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8 space-y-3 text-sm">
         <h3 className="font-bold text-gray-800 text-base border-b pb-2 mb-4">Invoice Summary</h3>
@@ -106,8 +106,8 @@ export function Step7Payment() {
       </div>
 
       <div className="flex justify-between mt-6">
-        <button onClick={prevStep} className="text-gray-600 px-6 py-2 rounded-md hover:bg-gray-100 transition" disabled={isProcessing}>Back</button>
-        <button onClick={handlePayNow} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition" disabled={isProcessing}>
+        <button onClick={prevStep} className="text-gray-600 px-6 py-1.5 rounded-md hover:bg-gray-100 transition" disabled={isProcessing}>Back</button>
+        <button onClick={handlePayNow} className="bg-black text-white px-6 py-1.5 rounded-md hover:bg-gray-800 transition" disabled={isProcessing}>
           {isProcessing ? 'Processing...' : 'Pay Now'}
         </button>
       </div>

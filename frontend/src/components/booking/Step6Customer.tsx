@@ -20,7 +20,7 @@ export function Step6Customer() {
             <User className="w-8 h-8" />
           </div>
           <h3 className="text-xl font-bold mb-2">Account Required</h3>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
+          <p className="text-gray-500 mb-4 max-w-md mx-auto">
             Please sign in or create a free account to secure your booking. Don't worry, your progress is saved!
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -33,7 +33,7 @@ export function Step6Customer() {
           </div>
         </div>
       ) : (
-        <div className="bg-green-50 p-6 rounded-2xl border border-green-100 flex items-start space-x-4 mb-6">
+        <div className="bg-green-50 p-6 rounded-2xl border border-green-100 flex items-start space-x-4 mb-4">
           <div className="bg-green-100 text-green-600 p-2 rounded-full mt-1">
             <ShieldCheck className="w-6 h-6" />
           </div>
@@ -50,7 +50,7 @@ export function Step6Customer() {
         </div>
       )}
 
-      <div className="flex justify-between mt-8 pt-6 border-t">
+      <div className="flex justify-between mt-6 pt-6 border-t">
         <button onClick={prevStep} className="text-gray-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition font-medium">Back</button>
         <button 
           onClick={nextStep} 

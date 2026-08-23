@@ -37,11 +37,11 @@ export function Step8Confirmation() {
 
     return (
       <div className="max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
-        <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+        <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
           ✓
         </div>
         <h2 className="text-3xl font-bold mb-2">Booking Confirmed!</h2>
-        <p className="text-gray-600 mb-6">Your booking ID is <span className="font-bold">{booking?.bookingId}</span></p>
+        <p className="text-gray-600 mb-4">Your booking ID is <span className="font-bold">{booking?.bookingId}</span></p>
         
         <div className="bg-gray-50 p-6 rounded-lg text-left mb-8">
           <h3 className="font-semibold text-lg mb-4 border-b pb-2">Pricing Details</h3>
@@ -114,16 +114,16 @@ export function Step8Confirmation() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-      <h2 className="text-2xl font-bold mb-6">Review & Confirm</h2>
+    <div className="">
+      <h2 className="text-xl font-bold mb-4">Review & Confirm</h2>
       
       {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg">
+        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
           {error}
         </div>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="p-4 border rounded-lg">
           <h3 className="font-semibold text-gray-900 mb-2 border-b pb-2">Booking Summary</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -153,18 +153,18 @@ export function Step8Confirmation() {
         </p>
       </div>
 
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between mt-6">
         <button
           onClick={prevStep}
           disabled={loading}
-          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="px-6 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
           Back
         </button>
         <button
           onClick={handleConfirm}
           disabled={loading}
-          className="px-8 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center disabled:opacity-50"
+          className="px-8 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center disabled:opacity-50"
         >
           {loading ? 'Processing...' : 'Confirm & Book'}
         </button>

@@ -57,10 +57,10 @@ function BookingFlow() {
   }, [searchParams, updateData, setStep]);
 
   return (
-    <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm border mb-8">
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-500">Step {currentStep - 3} of 5</span>
+    <div className="bg-white p-4 md:p-6 rounded-xl shadow-lg border border-gray-100 mb-4 max-w-2xl mx-auto mt-2">
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Step {currentStep - 3} of 5</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div className="bg-black h-2 rounded-full transition-all duration-300" style={{ width: `${((currentStep - 3) / 5) * 100}%` }}></div>

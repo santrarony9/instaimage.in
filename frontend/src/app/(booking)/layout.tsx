@@ -36,7 +36,7 @@ export default function BookingLayout({
           </div>
         </div>
       </header>
-      <main className="flex-grow flex flex-col pt-8">
+      <main className="flex-grow flex flex-col pt-4 md:pt-6 pb-4">
         <div className="max-w-3xl mx-auto w-full px-4">
           {children}
         </div>
