@@ -270,29 +270,66 @@ export default function ServicesManagementPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {data.map(item => (
-                <tr key={item._id}>
-                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                    <div>{item.name}</div>
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="text-xs text-gray-400 mt-1">{item.tags.join(', ')}</div>
-                    )}
+                <tr key={item._id} className="hover:bg-gray-50 transition-colors duration-150">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      {item.coverImage ? (
+                        <img src={item.coverImage} alt="" className="h-12 w-12 rounded-lg object-cover mr-4 shadow-sm border border-gray-100" />
+                      ) : (
+                        <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 mr-4 shadow-sm border border-gray-100">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-bold text-gray-900">{item.name}</div>
+                        <div className="flex gap-2 mt-1">
+                          {item.deliveryMethod === 'REMOTE' ? (
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">Remote</span>
+                          ) : (
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">On-Site</span>
+                          )}
+                          {item.tags && item.tags.length > 0 && (
+                            <span className="text-[10px] text-gray-500 truncate max-w-[150px]">{item.tags[0]}{item.tags.length > 1 ? ` +${item.tags.length - 1}` : ''}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.category || '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">₹{item.basePrice}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      {item.category || 'Uncategorized'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="font-medium text-gray-900">₹{item.basePrice?.toLocaleString()}</div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.addons?.length || 0} options
+                    <div className="flex items-center text-gray-500">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                      {item.addons?.length || 0}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => handleToggleActive(item._id, item.isActive)}
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                      className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border transition-colors ${
+                        item.isActive 
+                          ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' 
+                          : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                      }`}
                     >
-                      {item.isActive ? 'Active' : 'Inactive'}
+                      {item.isActive ? 'Active' : 'Hidden'}
                     </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onClick={() => openModal(item)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                    <button onClick={() => handleDelete(item._id)} className="text-red-600 hover:text-red-900">Delete</button>
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => openModal(item)} className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-1.5 rounded-md transition-colors" title="Edit">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                      </button>
+                      <button onClick={() => handleDelete(item._id)} className="text-red-600 hover:text-red-900 bg-red-50 p-1.5 rounded-md transition-colors" title="Delete">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -340,7 +377,7 @@ export default function ServicesManagementPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Fixed Time Price (₹)</label>
-                    <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 4000 for 45 mins" />
+                    <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4000" />
                   </div>
                   {formData.deliveryMethod !== 'REMOTE' && (
                     <>
