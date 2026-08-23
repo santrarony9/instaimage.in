@@ -95,6 +95,9 @@ export class Service extends AbstractDocument {
   @Prop({ type: Types.ObjectId, ref: 'Category' })
   categoryId?: Types.ObjectId;
 
+  @Prop()
+  category?: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Subcategory' })
   subcategoryId?: Types.ObjectId;
 

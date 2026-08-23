@@ -432,9 +432,29 @@ export default function ServicesManagementPage() {
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-4">
                 <div className="flex justify-between items-center border-b border-blue-200 pb-2">
                   <h4 className="font-semibold text-blue-900">3. Extra Options & Add-ons</h4>
-                  <button type="button" onClick={handleAddAddon} className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                    + Add Option
-                  </button>
+                  <div className="flex gap-2">
+                    <select 
+                      className="text-sm border rounded px-2 py-1 bg-white max-w-[200px]"
+                      onChange={(e) => {
+                        if (!e.target.value) return;
+                        const selectedService = data.find(s => s._id === e.target.value);
+                        if (selectedService) {
+                          const addons = formData.addons ? [...formData.addons] : [];
+                          addons.push({ name: selectedService.name, price: selectedService.basePrice });
+                          setFormData({ ...formData, addons });
+                        }
+                        e.target.value = ""; // Reset after selection
+                      }}
+                    >
+                      <option value="">+ Add from Services</option>
+                      {data.map(s => (
+                        <option key={s._id} value={s._id}>{s.name} (₹{s.basePrice})</option>
+                      ))}
+                    </select>
+                    <button type="button" onClick={handleAddAddon} className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                      + Custom Option
+                    </button>
+                  </div>
                 </div>
                 
                 {formData.addons && formData.addons.length > 0 ? (
