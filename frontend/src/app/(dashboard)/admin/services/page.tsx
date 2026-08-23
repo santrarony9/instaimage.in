@@ -405,7 +405,39 @@ export default function ServicesManagementPage() {
                     <textarea rows={3} value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Category</label>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-sm font-medium text-gray-700">Category</label>
+                      <button 
+                        type="button" 
+                        onClick={async () => {
+                          const name = window.prompt("Enter new category name:");
+                          if (!name) return;
+                          try {
+                            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                            const newCat = await fetchApi('/categories', {
+                              method: 'POST',
+                              body: JSON.stringify({ name, slug, description: name, isActive: true })
+                            });
+                            toast.success("Category created!");
+                            const catsRes = await fetchApi('/categories/admin').catch(() => ({ data: [] }));
+                            const cats = catsRes.data || catsRes || [];
+                            setCategories(Array.isArray(cats) ? cats : []);
+                            
+                            // Auto-select the newly created category
+                            setFormData({
+                              ...formData,
+                              category: newCat.name || name,
+                              categoryId: newCat._id || null
+                            });
+                          } catch (err: any) {
+                            toast.error(err.message || "Failed to create category");
+                          }
+                        }}
+                        className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                      >
+                        + Create New
+                      </button>
+                    </div>
                     <select 
                       value={formData.category || ''} 
                       onChange={e => {
