@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -16,6 +16,21 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   
   const [activeTab, setActiveTab] = useState<'details' | 'delivery' | 'process'>('details');
+  const [allServices, setAllServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
+    fetch(`${API_URL}/services`)
+      .then(res => res.json())
+      .then(data => {
+        const services = Array.isArray(data) ? data : (data.data || []);
+        setAllServices(services);
+      })
+      .catch(err => console.error("Failed to fetch related services:", err));
+  }, []);
+
+  const relatedServices = allServices.filter(s => s.category === service.category && s._id !== service._id).slice(0, 4);
+  const popularServices = allServices.filter(s => s._id !== service._id && !relatedServices.find(rs => rs._id === s._id)).slice(0, 4);
 
   if (!service) {
     return <div className="min-h-screen flex items-center justify-center text-xl">Service not found.</div>;
@@ -262,6 +277,33 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
           </div>
 
         </div>
+
+        {/* Related Services */}
+        {relatedServices.length > 0 && (
+          <div className="mt-16 pt-12 border-t border-gray-200">
+            <h2 className="text-xl font-black text-gray-900 mb-6">Related Services</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+              {relatedServices.map(s => (
+                <ServiceCard key={s._id} service={s} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Popular Services */}
+        {popularServices.length > 0 && (
+          <div className="mt-12 pt-12 border-t border-gray-200">
+            <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center">
+              <span className="text-yellow-400 mr-2">⭐</span> Popular Packages
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+              {popularServices.map(s => (
+                <ServiceCard key={s._id} service={s} />
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
       {/* Mobile Sticky Footer */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50 flex items-center justify-between shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
@@ -271,11 +313,48 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
         </div>
         <button 
           onClick={handleCheckout}
-          className="bg-[#2874f0] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider text-sm hover:bg-blue-700 transition shadow-md"
+          className="bg-blue-600 text-white px-8 py-3 rounded-md font-bold uppercase tracking-wider text-sm hover:bg-blue-700 transition shadow-md"
         >
           Book Now
         </button>
       </div>
     </div>
+  );
+}
+
+function ServiceCard({ service }: { service: any }) {
+  const imageUrl = service.images && service.images.length > 0
+    ? (service.images[0].startsWith('http') ? service.images[0] : `${process.env.NEXT_PUBLIC_API_URL ? '' : 'https://instaimage.in'}${service.images[0]}`)
+    : null;
+    
+  return (
+    <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
+      <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
+        {imageUrl ? (
+          <img src={imageUrl} alt={service.name} className="object-cover rounded-t-xl group-hover:scale-105 transition duration-500" style={{ position: 'absolute', height: '100%', width: '100%', left: 0, top: 0 }} />
+        ) : (
+          <span className="text-4xl text-gray-300">📸</span>
+        )}
+        {service.deliveryMethod && (
+          <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
+          </div>
+        )}
+      </div>
+      <div className="p-3 md:p-4 flex flex-col flex-grow bg-white">
+        <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
+        <p className="text-[11px] text-gray-500 mb-4">{service.category || 'Service'}</p>
+        
+        <div className="mt-auto flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+          </div>
+          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            ADD
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
