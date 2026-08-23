@@ -28,6 +28,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { EmailModule } from './modules/email/email.module';
+import { BannersModule } from './modules/banners/banners.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { EmailModule } from './modules/email/email.module';
     NotificationsModule,
     AuditLogsModule,
     SettingsModule,
+    BannersModule,
   ],
   controllers: [ApiController],
   providers: [ApiService],

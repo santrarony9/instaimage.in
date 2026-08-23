@@ -10,6 +10,7 @@ const links = [
   { href: '/admin/bookings', label: 'Bookings' },
   { href: '/admin/categories', label: 'Categories' },
   { href: '/admin/services', label: 'Catalog' },
+  { href: '/admin/banners', label: 'Banners & Combos' },
   { href: '/admin/coupons', label: 'Coupons' },
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/sellers', label: 'Sellers' },

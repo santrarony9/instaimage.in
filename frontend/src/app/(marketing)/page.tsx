@@ -19,13 +19,21 @@ export default async function HomePage() {
   
   let services: any[] = [];
   let categories: any[] = [];
+  let banners: any[] = [];
   
   try {
-    const resServices = await fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } });
+    const [resServices, resBanners] = await Promise.all([
+      fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } }),
+      fetch(`${SERVER_API_URL}/banners?activeOnly=true`, { next: { revalidate: 60 } }).catch(() => null)
+    ]);
     
     if (resServices.ok) {
       const data = await resServices.json();
       services = Array.isArray(data) ? data : (data.data || []);
+    }
+    if (resBanners && resBanners.ok) {
+      const data = await resBanners.json();
+      banners = Array.isArray(data) ? data : (data.data || []);
     }
   } catch (e) {
     console.error('Failed to fetch data:', e);
@@ -111,52 +119,65 @@ export default async function HomePage() {
           </div>
         )}
 
-        {/* Blockbuster Deal Section */}
-        <div className="mb-12 mt-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-4 md:p-8 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-          
-          <div className="flex-1 w-full relative z-10">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-yellow-400 text-yellow-900 text-xs font-black uppercase tracking-wider px-2 py-1 rounded shadow-sm">
-                Blockbuster Deal
-              </span>
-              <span className="text-blue-100 text-sm font-semibold">6 Services Combo</span>
-            </div>
-            <h2 className="text-2xl md:text-4xl font-black mb-4 leading-tight text-white">The Ultimate Wedding & Event Package</h2>
+        {/* Dynamic Banners Section */}
+        {banners && banners.length > 0 && banners.map((banner, index) => (
+          <div key={banner._id || index} className={`mb-12 mt-4 rounded-2xl p-4 md:p-8 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden ${index % 2 === 0 ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-gradient-to-r from-indigo-600 to-blue-500'}`}>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
             
-            {/* Quick Commerce style horizontally scrollable included items */}
-            <div className="flex gap-3 overflow-x-auto pb-4 snap-x hide-scrollbar">
-              {[
-                { name: 'Photography', icon: '📸' },
-                { name: 'Videography', icon: '🎥' },
-                { name: 'Drone Aerial', icon: '🚁' },
-                { name: 'Same-Day Reels', icon: '📱' },
-                { name: 'Color Grading', icon: '✨' },
-                { name: 'Director', icon: '🎬' },
-              ].map((item, i) => (
-                <div key={i} className="flex-shrink-0 w-24 bg-white/10 rounded-xl p-3 flex flex-col items-center justify-center text-center border border-white/20 snap-center backdrop-blur-sm">
-                  <div className="text-3xl mb-2">{item.icon}</div>
-                  <span className="text-[10px] md:text-xs font-bold leading-tight">{item.name}</span>
+            <div className="flex-1 w-full relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="bg-yellow-400 text-yellow-900 text-xs font-black uppercase tracking-wider px-2 py-1 rounded shadow-sm">
+                  {banner.badgeText || 'COMBO DEAL'}
+                </span>
+                <span className="text-blue-100 text-sm font-semibold">{banner.subtitle || `${banner.services?.length || 0} Services Combo`}</span>
+              </div>
+              <h2 className="text-2xl md:text-4xl font-black mb-4 leading-tight text-white">{banner.title}</h2>
+              
+              {/* Quick Commerce style horizontally scrollable included items with REAL images */}
+              {banner.services && banner.services.length > 0 && (
+                <div className="flex gap-3 overflow-x-auto pb-4 snap-x hide-scrollbar">
+                  {banner.services.map((service: any, i: number) => {
+                    let src = '';
+                    if (service.images && service.images.length > 0) {
+                      const raw = service.images[0];
+                      src = raw.startsWith('/') ? `https://api.instaimage.in${raw}` : raw;
+                    }
+                    return (
+                      <Link href={`/services/${service.slug || service._id}`} key={i} className="flex-shrink-0 w-28 bg-white rounded-xl overflow-hidden flex flex-col shadow-sm border border-white/20 snap-center group hover:scale-105 transition-transform duration-300">
+                        <div className="h-20 w-full bg-gray-100 relative">
+                          {src ? (
+                            <img src={src} alt={service.name} className="w-full h-full object-cover" loading="lazy" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xl">📸</div>
+                          )}
+                        </div>
+                        <div className="p-2 bg-white flex-1 flex flex-col justify-between">
+                          <span className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2 mb-1">{service.name}</span>
+                          <span className="text-xs font-black text-gray-900">₹{service.basePrice?.toLocaleString('en-IN') || 0}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              ))}
+              )}
             </div>
-          </div>
 
-          <div className="bg-white p-5 md:p-6 rounded-2xl w-full lg:w-auto min-w-[280px] shadow-2xl flex flex-col relative z-10">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-gray-500 font-bold text-sm">Total Value</span>
-              <span className="text-gray-400 line-through text-sm font-semibold">₹1,49,999</span>
+            <div className="bg-white p-5 md:p-6 rounded-2xl w-full lg:w-auto min-w-[280px] shadow-2xl flex flex-col relative z-10">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-gray-500 font-bold text-sm">Total Value</span>
+                <span className="text-gray-400 line-through text-sm font-semibold">₹{banner.originalPrice?.toLocaleString('en-IN') || 0}</span>
+              </div>
+              <div className="flex justify-between items-end mb-6">
+                <span className="text-gray-900 font-black text-sm">Combo Price</span>
+                <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">₹{banner.comboPrice?.toLocaleString('en-IN') || 0}</span>
+              </div>
+              <Link href={banner.redirectUrl || "/services"} className="w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                {banner.type === 'COMBO' ? 'ADD COMBO' : 'EXPLORE'}
+              </Link>
             </div>
-            <div className="flex justify-between items-end mb-6">
-              <span className="text-gray-900 font-black text-sm">Combo Price</span>
-              <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">₹89,999</span>
-            </div>
-            <Link href="/services" className="w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-              ADD COMBO
-            </Link>
           </div>
-        </div>
+        ))}
 
         {/* Popular Services Section (previously called trending services) */}
         <div className="mb-12 mt-12">
