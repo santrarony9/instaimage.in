@@ -75,12 +75,16 @@ export function Step7Payment() {
           </div>
         ))}
 
-        {p?.deliveryCharge > 0 && (
-          <div className="flex justify-between">
+        {(p?.deliveryCharge > 0 || p?.travelDistanceKm > 0) && (
+          <div className="flex justify-between items-center">
             <span className="text-gray-600">
               Travel Charge {p.travelDistanceKm ? `(${p.travelDistanceKm} km)` : ''}
             </span>
-            <span className="font-medium text-gray-900">₹{p.deliveryCharge}</span>
+            {p.deliveryCharge > 0 ? (
+              <span className="font-medium text-gray-900">₹{p.deliveryCharge}</span>
+            ) : (
+              <span className="font-bold text-green-600 uppercase text-xs px-2 py-0.5 bg-green-50 rounded border border-green-200">Free (Offer)</span>
+            )}
           </div>
         )}
 

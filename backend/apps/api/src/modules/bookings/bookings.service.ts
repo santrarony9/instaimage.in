@@ -89,7 +89,7 @@ export class BookingsService {
       // 3. Create Payment Order Mock
       const paymentOrder = await this.paymentsService.createPaymentOrder(
         bookingId,
-        advancePaid,
+        pricing.advancePaid,
         'INR',
       );
 

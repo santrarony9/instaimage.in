@@ -15,7 +15,7 @@ export class SettingsService {
 
   async getAllSettings() {
     const settings = await this.settingsRepository.model.find({});
-    return settings.reduce((acc, curr) => {
+    return settings.reduce((acc: Record<string, any>, curr) => {
       acc[curr.key] = curr.value;
       return acc;
     }, {});
