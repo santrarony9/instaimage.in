@@ -67,6 +67,9 @@ export class PricingDetails {
   nearestOfficeName?: string;
 
   @Prop({ required: true, min: 0, default: 0 })
+  deliveryDiscount: number;
+
+  @Prop({ required: true, min: 0, default: 0 })
   discount: number;
 
   @Prop({ required: true, min: 0 })

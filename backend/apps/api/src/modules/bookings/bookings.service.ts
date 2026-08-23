@@ -334,6 +334,12 @@ export class BookingsService {
       await this.calculateTravelCharge(createBookingDto.location?.coordinates);
     let discount = 0;
 
+    const travelConfig = await this.settingsService.getSetting('travelChargeConfig');
+    let deliveryDiscount = 0;
+    if (travelConfig?.isFreeOfferActive) {
+      deliveryDiscount = deliveryCharge;
+    }
+
     if (createBookingDto.appliedCouponId) {
       const coupon = await this.couponsService.findOne(createBookingDto.appliedCouponId);
       if (coupon && coupon.isActive) {
@@ -346,7 +352,8 @@ export class BookingsService {
       }
     }
 
-    const totalPrice = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge - discount;
+    const totalDiscount = discount + deliveryDiscount;
+    const totalPrice = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge - totalDiscount;
     const advancePaid = totalPrice * 0.2;
     const balanceDue = totalPrice - advancePaid;
 
@@ -355,7 +362,7 @@ export class BookingsService {
 
     const pricing: PricingDetails = {
       basePrice, addonsPrice, extraHoursPrice, surcharges, surchargesPrice,
-      deliveryCharge, discount, totalPrice, platformFee, sellerPayout,
+      deliveryCharge, deliveryDiscount, discount, totalPrice, platformFee, sellerPayout,
       advancePaid, balanceDue, travelDistanceKm, nearestOfficeName,
     };
 

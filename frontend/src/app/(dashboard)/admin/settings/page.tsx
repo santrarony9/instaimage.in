@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const [perKmRate, setPerKmRate] = useState(15);
   const [freeRadiusKm, setFreeRadiusKm] = useState(5);
   const [defaultFlatCharge, setDefaultFlatCharge] = useState(500);
+  const [isFreeOfferActive, setIsFreeOfferActive] = useState(false);
 
   // Offices State
   const [offices, setOffices] = useState<any[]>([]);
@@ -31,6 +32,7 @@ export default function SettingsPage() {
         setPerKmRate(config.perKmRate || 15);
         setFreeRadiusKm(config.freeRadiusKm || 5);
         setDefaultFlatCharge(config.defaultFlatCharge || 500);
+        setIsFreeOfferActive(config.isFreeOfferActive || false);
       }
 
       const locations = allSettings['officeLocations'];
@@ -50,7 +52,7 @@ export default function SettingsPage() {
       await fetchApi('/settings/travelChargeConfig', {
         method: 'PUT',
         body: JSON.stringify({
-          value: { perKmRate, freeRadiusKm, defaultFlatCharge }
+          value: { perKmRate, freeRadiusKm, defaultFlatCharge, isFreeOfferActive }
         })
       });
       toast.success('Travel charge config saved!');
@@ -151,6 +153,21 @@ export default function SettingsPage() {
               title="Used if GPS coordinates are missing"
             />
           </div>
+        </div>
+        <div className="mb-6 flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            id="isFreeOfferActive"
+            checked={isFreeOfferActive}
+            onChange={e => setIsFreeOfferActive(e.target.checked)}
+            className="w-4 h-4 text-indigo-600 rounded border-gray-300"
+          />
+          <label htmlFor="isFreeOfferActive" className="text-sm font-medium text-gray-800">
+            Activate Free Travel Offer
+            <span className="text-gray-500 font-normal block text-xs">
+              If active, travel charge will be calculated but added as a 100% discount on the invoice.
+            </span>
+          </label>
         </div>
         <button 
           onClick={handleSaveTravelConfig} 
