@@ -43,10 +43,10 @@ export default function ServicesClient({ initialServices }: { initialServices: a
     if (indexB === -1) return -1;
     return indexA - indexB;
   });
-  const locations = Array.from(new Set(activeServices.flatMap(s => s.locations || []).filter(Boolean))) as string[];
+  const locations = ["Kolkata", "Remote"]; // Hardcoded main regions as requested by user
   const occasions = Array.from(new Set(activeServices.flatMap(s => s.occasions || []).filter(Boolean))) as string[];
 
-  const effectiveCategory = selectedCategories.length > 0 ? selectedCategories[0] : (categories.length > 0 ? categories[0] : null);
+  const effectiveCategory = selectedCategories.length > 0 ? selectedCategories[0] : null;
 
   // Filter logic
   const filteredServices = activeServices.filter(s => {
@@ -66,6 +66,17 @@ export default function ServicesClient({ initialServices }: { initialServices: a
     <div className="flex flex-col">
       {categories.length > 0 && (
         <div className="flex flex-col border-b border-gray-100">
+          <button 
+            onClick={() => setSelectedCategories([])}
+            className={`text-left px-4 py-4 border-l-4 transition-colors flex items-center justify-between ${!effectiveCategory ? 'border-blue-600 bg-blue-50 text-blue-800 font-bold' : 'border-transparent text-gray-600 hover:bg-gray-50'}`}
+          >
+            <div className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${!effectiveCategory ? 'bg-blue-200' : 'bg-gray-100'}`}>
+                <span className="text-xs">🌟</span>
+              </div>
+              <span className="text-sm">All Services</span>
+            </div>
+          </button>
           {categories.map(cat => (
             <button 
               key={cat} 

@@ -6,9 +6,7 @@ import { useToast, ToastContainer } from '@/components/ui/toast';
 import ImageUpload from '@/components/ui/ImageUpload';
 
 const PREDEFINED_LOCATIONS = [
-  "Kolkata", "Salt Lake", "New Town", "Rajarhat", "Park Street", "Ballygunge", "Gariahat", 
-  "Alipore", "Behala", "Tollygunge", "Jadavpur", "Dum Dum", "Lake Town", "Shyambazar", 
-  "Esplanade", "New Market", "Kasba", "Mukundapur", "Garia", "Barasat", "Madhyamgram", "Howrah", "Hooghly"
+  "Kolkata", "Remote"
 ];
 
 const PREDEFINED_OCCASIONS = [
