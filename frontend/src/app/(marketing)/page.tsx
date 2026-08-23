@@ -76,7 +76,7 @@ export default async function HomePage() {
       <div className="bg-white border-b border-gray-100 pt-8 pb-10">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-6">What do you want to shoot today?</h1>
-          <div className="sticky top-0 z-30 bg-white py-2 md:py-0 md:relative max-w-2xl mx-auto shadow-sm md:shadow-none">
+          <div className="sticky top-[80px] z-30 bg-white py-2 md:py-0 md:relative max-w-2xl mx-auto shadow-sm md:shadow-none">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
@@ -112,33 +112,48 @@ export default async function HomePage() {
         )}
 
         {/* Blockbuster Deal Section */}
-        <div className="mb-12 mt-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 md:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          {/* Decorative shapes */}
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-yellow-400 opacity-20 rounded-full blur-3xl"></div>
+        <div className="mb-12 mt-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-4 md:p-8 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
           
-          <div className="flex-1 relative z-10">
-            <div className="inline-block px-3 py-1 bg-yellow-400 text-yellow-900 text-xs font-black uppercase tracking-wider rounded-full mb-4 shadow-sm">
-              Limited Time Combo
+          <div className="flex-1 w-full relative z-10">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-yellow-400 text-yellow-900 text-xs font-black uppercase tracking-wider px-2 py-1 rounded shadow-sm">
+                Blockbuster Deal
+              </span>
+              <span className="text-blue-100 text-sm font-semibold">6 Services Combo</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-black mb-4 leading-tight">THE BLOCKBUSTER DEAL</h2>
-            <p className="text-blue-50 mb-6 text-sm md:text-base max-w-lg leading-relaxed">
-              The ultimate mega-package. Everything you need for a massive event, wedding, or complete brand overhaul in one single combo.
-            </p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-              {['Premium Photography', 'Cinematic Videography', 'Drone Aerial Coverage', '3x Same-Day Reels', 'Advanced Color Grading', 'Full Lighting Setup', 'Dedicated Director'].map((svc, i) => (
-                <li key={i} className="flex items-center text-sm font-medium text-white/90">
-                  <span className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center mr-3 text-xs shadow-sm">✓</span>
-                  {svc}
-                </li>
+            <h2 className="text-2xl md:text-4xl font-black mb-4 leading-tight text-white">The Ultimate Wedding & Event Package</h2>
+            
+            {/* Quick Commerce style horizontally scrollable included items */}
+            <div className="flex gap-3 overflow-x-auto pb-4 snap-x hide-scrollbar">
+              {[
+                { name: 'Photography', icon: '📸' },
+                { name: 'Videography', icon: '🎥' },
+                { name: 'Drone Aerial', icon: '🚁' },
+                { name: 'Same-Day Reels', icon: '📱' },
+                { name: 'Color Grading', icon: '✨' },
+                { name: 'Director', icon: '🎬' },
+              ].map((item, i) => (
+                <div key={i} className="flex-shrink-0 w-24 bg-white/10 rounded-xl p-3 flex flex-col items-center justify-center text-center border border-white/20 snap-center backdrop-blur-sm">
+                  <div className="text-3xl mb-2">{item.icon}</div>
+                  <span className="text-[10px] md:text-xs font-bold leading-tight">{item.name}</span>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
-          <div className="bg-white text-gray-900 p-6 md:p-8 rounded-2xl w-full md:w-auto text-center shadow-2xl flex flex-col items-center relative z-10">
-            <span className="text-gray-400 line-through text-lg mb-1 font-semibold">₹1,49,999</span>
-            <span className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">₹89,999</span>
-            <Link href="/services" className="w-full bg-gray-900 text-white px-8 py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-black transition-colors shadow-lg">
-              Book Combo
+
+          <div className="bg-white p-5 md:p-6 rounded-2xl w-full lg:w-auto min-w-[280px] shadow-2xl flex flex-col relative z-10">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-gray-500 font-bold text-sm">Total Value</span>
+              <span className="text-gray-400 line-through text-sm font-semibold">₹1,49,999</span>
+            </div>
+            <div className="flex justify-between items-end mb-6">
+              <span className="text-gray-900 font-black text-sm">Combo Price</span>
+              <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">₹89,999</span>
+            </div>
+            <Link href="/services" className="w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+              ADD COMBO
             </Link>
           </div>
         </div>
