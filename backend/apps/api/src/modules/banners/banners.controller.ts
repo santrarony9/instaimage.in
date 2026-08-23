@@ -7,6 +7,8 @@ import { RolesGuard } from '@app/auth/guards/roles.guard';
 import { Roles } from '@app/auth/decorators/roles.decorator';
 import { Role } from '@app/auth/interfaces/rbac.interface';
 
+import { Public } from '@app/auth/decorators/public.decorator';
+
 @Controller('banners')
 export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
@@ -18,11 +20,13 @@ export class BannersController {
     return this.bannersService.create(createBannerDto);
   }
 
+  @Public()
   @Get()
   findAll(@Query('activeOnly') activeOnly?: string) {
     return this.bannersService.findAll(activeOnly === 'true');
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.bannersService.findOne(id);

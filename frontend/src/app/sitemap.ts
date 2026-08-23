@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // During build, it needs the absolute API URL
   let dynamicRoutes: MetadataRoute.Sitemap = [];
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/v1'; // Default for local dev/build
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1'; // Default for production
     const res = await fetch(`${apiUrl}/services`, { next: { revalidate: 3600 } }); // revalidate every hour
     if (res.ok) {
       const data = await res.json();

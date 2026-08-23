@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { Roles, Role, JwtAuthGuard, RolesGuard } from '@app/auth';
+import { Roles, Role, JwtAuthGuard, RolesGuard, Public } from '@app/auth';
 
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  @Public()
   @Get()
   findAll(@Query() query: any) {
     return this.categoriesService.findAll(query);
@@ -18,11 +19,13 @@ export class CategoriesController {
     return this.categoriesService.findAllAdmin();
   }
 
+  @Public()
   @Get('slug/:slug')
   findBySlug(@Param('slug') slug: string) {
     return this.categoriesService.findBySlug(slug);
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(id);

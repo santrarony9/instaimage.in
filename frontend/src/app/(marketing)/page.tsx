@@ -6,7 +6,7 @@ import { AddToCartButton } from '@/components/cart/AddToCartButton';
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export const metadata = {
-  title: 'All Photography Services in One Place — Book Trusted Photographers',
+  title: 'All Photography Services in One Place - Book Trusted Photographers',
   description: 'InstaImage is the premier platform to book premium photography, videography, and drone services on-demand in Kolkata. Trusted and quick with a strong infrastructure.',
 };
 

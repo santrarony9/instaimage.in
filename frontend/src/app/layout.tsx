@@ -19,8 +19,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://instaimage.in"),
   title: {
-    template: "%s | InstaImage — Photography Services",
-    default: "InstaImage — All Photography Related Services In One Place",
+    template: "%s | InstaImage - Photography Services",
+    default: "InstaImage - All Photography Related Services In One Place",
   },
   description: "Trusted and quick photography services with a fully strong infrastructure. Book premium photography, videography, and drone services on-demand in Kolkata.",
   keywords: ["photography", "videography", "wedding photography", "event photography", "InstaImage", "Kolkata photography"],
