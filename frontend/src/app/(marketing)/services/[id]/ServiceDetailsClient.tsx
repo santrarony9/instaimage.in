@@ -13,6 +13,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   const [flexibleHours, setFlexibleHours] = useState<number>(2); // Default to 2 hours for flexible
   const [extraHours, setExtraHours] = useState<number>(0);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]); // Storing addon names
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   
   const [activeTab, setActiveTab] = useState<'details' | 'delivery' | 'process'>('details');
 
@@ -24,7 +25,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   
   // Helpers
   const mainImage = service.images && service.images.length > 0 
-    ? service.images[0]
+    ? service.images[activeImageIndex] || service.images[0]
     : 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop';
 
   const toggleAddon = (addonName: string) => {
@@ -37,11 +38,12 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   let basePrice = 0;
   if (pricingMode === 'fixed') {
     basePrice = service.basePrice;
-    if (service.extraHourPrice && extraHours > 0) {
-      basePrice += (service.extraHourPrice * extraHours);
-    }
   } else if (pricingMode === 'flexible' && service.flexiblePrice) {
     basePrice = service.flexiblePrice;
+  }
+
+  if (service.extraHourPrice && extraHours > 0) {
+    basePrice += (service.extraHourPrice * extraHours);
   }
 
   let addonsCost = (service.addons || [])
@@ -52,7 +54,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   const handleCheckout = () => {
     // Pass selected details via URL or state
     let search = `?serviceId=${service._id}&mode=${pricingMode}`;
-    if (pricingMode === 'fixed' && extraHours > 0) search += `&extraHours=${extraHours}`;
+    if (extraHours > 0) search += `&extraHours=${extraHours}`;
     if (selectedAddons.length > 0) search += `&addons=${encodeURIComponent(selectedAddons.join(','))}`;
     if (service.deliveryMethod === 'REMOTE') search += `&type=REMOTE`;
     
@@ -77,7 +79,11 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                 {service.images.map((img: string, idx: number) => {
                   const url = img;
                   return (
-                    <div key={idx} className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border-2 hover:border-black border-transparent transition">
+                    <div 
+                      key={idx} 
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border-2 transition ${activeImageIndex === idx ? 'border-black' : 'hover:border-gray-400 border-transparent'}`}
+                    >
                       <img src={url} alt={`${service.name} ${idx}`} className="w-full h-full object-cover" />
                     </div>
                   );
@@ -183,7 +189,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
               </div>
 
               {/* Time Configuration based on Mode */}
-              {pricingMode === 'fixed' && service.deliveryMethod !== 'REMOTE' && (
+              {service.deliveryMethod !== 'REMOTE' && (
                 <div className="mb-8 border-t border-gray-100 pt-6">
                   <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Need More Time?</h3>
                   {service.extraHourPrice ? (
