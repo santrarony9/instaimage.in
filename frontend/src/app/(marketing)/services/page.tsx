@@ -14,7 +14,7 @@ export default async function ServicesPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const SERVER_API_URL = process.env.SERVER_API_URL || (process.env.NODE_ENV === 'development' ? 'https://api.instaimage.in/api/v1' : 'http://api:3000/v1');
+  const SERVER_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
   const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
   let services = [];
 
