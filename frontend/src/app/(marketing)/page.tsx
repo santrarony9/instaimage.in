@@ -20,18 +20,11 @@ export default async function HomePage() {
   let categories: any[] = [];
   
   try {
-    const [resServices, resCategories] = await Promise.all([
-      fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } }),
-      fetch(`${SERVER_API_URL}/categories?isTrending=true`, { next: { revalidate: 60 } })
-    ]);
+    const resServices = await fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } });
     
     if (resServices.ok) {
       const data = await resServices.json();
       services = Array.isArray(data) ? data : (data.data || []);
-    }
-    if (resCategories.ok) {
-      const data = await resCategories.json();
-      categories = Array.isArray(data) ? data : (data.data || []);
     }
   } catch (e) {
     console.error('Failed to fetch data:', e);
@@ -39,7 +32,28 @@ export default async function HomePage() {
 
   // Filter out inactive
   services = services.filter(s => s.isActive !== false);
-  categories = categories.filter(c => c.isActive !== false);
+  
+  // Extract categories dynamically from services (like ServicesClient does)
+  const categoryOrder = [
+    'Photography',
+    'Videography',
+    'Event Management',
+    'Post Production'
+  ];
+  
+  const extractedCategories = Array.from(new Set(services.map(s => s.category).filter(Boolean))) as string[];
+  categories = extractedCategories.sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a);
+    const indexB = categoryOrder.indexOf(b);
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  }).map(cat => ({
+    _id: cat,
+    name: cat,
+    slug: cat.toLowerCase().replace(/\s+/g, '-')
+  }));
 
   // E-commerce logic
   // Newly Added
