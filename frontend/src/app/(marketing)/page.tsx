@@ -194,22 +194,21 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
 
   let fullImageUrl = imageUrl;
   if (imageUrl && imageUrl.startsWith('/')) {
-    // API_URL is typically something like 'https://api.instaimage.in/api/v1'
-    const baseApi = API_URL.replace('/api/v1', '');
-    fullImageUrl = `${baseApi}${imageUrl}`;
+    // /uploads/xxx → https://api.instaimage.in/uploads/xxx
+    fullImageUrl = `https://api.instaimage.in${imageUrl}`;
   }
+  // If it's already a full URL (Backblaze S3 etc), use as-is
 
   return (
     <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
       
-      <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
+      <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
         {fullImageUrl ? (
-          <Image 
+          <img 
             src={fullImageUrl}
             alt={service.name}
-            fill
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-            className="object-cover rounded-t-xl group-hover:scale-105 transition duration-500"
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -217,24 +216,20 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
           </div>
         )}
         
-        {/* Quick Commerce Style Badge */}
-        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+        {/* Badge */}
+        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center">
           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
         </div>
       </div>
       
-      <div className="p-3 md:p-4 flex flex-col flex-grow bg-white">
-        <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
+      <div className="p-3 flex flex-col flex-grow bg-white">
+        <h3 className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
         
-        <p className="text-[11px] text-gray-500 mb-4">{service.category}</p>
+        <p className="text-[10px] sm:text-[11px] text-gray-500 mb-2">{service.category}</p>
         
         <div className="mt-auto flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
-          </div>
-          
-          {/* ADD Button Quick Commerce Style */}
+          <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
           <AddToCartButton service={service} />
         </div>
       </div>

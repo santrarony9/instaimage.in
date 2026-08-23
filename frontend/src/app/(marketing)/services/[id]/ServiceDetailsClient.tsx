@@ -46,8 +46,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
     : 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop';
   
   if (mainImage.startsWith('/')) {
-    const baseApi = API_URL.replace('/api/v1', '');
-    mainImage = `${baseApi}${mainImage}`;
+    mainImage = `https://api.instaimage.in${mainImage}`;
   }
 
   const toggleAddon = (addonName: string) => {
@@ -104,7 +103,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   };
 
   return (
-    <div className="bg-white min-h-screen pb-32">
+    <div className="bg-white min-h-screen pb-40 lg:pb-12">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col lg:flex-row gap-12">
           
@@ -119,7 +118,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
             {service.images && service.images.length > 1 && (
               <div className="flex gap-4 mb-12 overflow-x-auto pb-2 snap-x hide-scrollbar">
                 {service.images.map((img: string, idx: number) => {
-                  const url = img.startsWith('/') ? `${API_URL.replace('/api/v1', '')}${img}` : img;
+                  const url = img.startsWith('/') ? `https://api.instaimage.in${img}` : img;
                   return (
                     <div 
                       key={idx} 
@@ -368,34 +367,40 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
 }
 
 function ServiceCard({ service }: { service: any }) {
-  const imageUrl = service.images && service.images.length > 0
-    ? (service.images[0].startsWith('http') ? service.images[0] : `${process.env.NEXT_PUBLIC_API_URL ? '' : 'https://instaimage.in'}${service.images[0]}`)
-    : null;
+  let imageUrl: string | null = null;
+  if (service.images && service.images.length > 0) {
+    const raw = service.images[0];
+    if (raw.startsWith('http')) {
+      imageUrl = raw;
+    } else if (raw.startsWith('/')) {
+      imageUrl = `https://api.instaimage.in${raw}`;
+    }
+  }
     
   return (
     <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
-      <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
+      <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
         {imageUrl ? (
-          <img src={imageUrl} alt={service.name} className="object-cover rounded-t-xl group-hover:scale-105 transition duration-500" style={{ position: 'absolute', height: '100%', width: '100%', left: 0, top: 0 }} />
+          <img src={imageUrl} alt={service.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
         ) : (
-          <span className="text-4xl text-gray-300">📸</span>
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-4xl text-gray-300">📸</span>
+          </div>
         )}
         {service.deliveryMethod && (
-          <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+          <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center">
             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
           </div>
         )}
       </div>
-      <div className="p-3 md:p-4 flex flex-col flex-grow bg-white">
-        <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
-        <p className="text-[11px] text-gray-500 mb-4">{service.category || 'Service'}</p>
+      <div className="p-3 flex flex-col flex-grow bg-white">
+        <h3 className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
+        <p className="text-[10px] sm:text-[11px] text-gray-500 mb-2">{service.category || 'Service'}</p>
         
         <div className="mt-auto flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
-          </div>
-          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
+          <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
             ADD
           </div>
         </div>

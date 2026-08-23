@@ -195,40 +195,39 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                   {filteredServices.map((service) => (
                     <Link href={`/services/${service.slug || service._id}`} key={service._id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
                       
-                      <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
-                        {service.images && service.images.length > 0 ? (
-                          <Image 
-                            src={service.images[0]}
-                            alt={service.name}
-                            fill
-                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                            className="object-cover rounded-t-xl group-hover:scale-105 transition duration-500"
-                          />
-                        ) : (
+                      <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
+                        {service.images && service.images.length > 0 ? (() => {
+                          const raw = service.images[0];
+                          const src = raw.startsWith('/') ? `https://api.instaimage.in${raw}` : raw;
+                          return (
+                            <img 
+                              src={src}
+                              alt={service.name}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                            />
+                          );
+                        })() : (
                           <div className="w-full h-full flex items-center justify-center text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                           </div>
                         )}
                         
-                        {/* Quick Commerce Style Badge */}
-                        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+                        {/* Badge */}
+                        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center">
                           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                           {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
                         </div>
                       </div>
                       
-                      <div className="p-3 md:p-4 flex flex-col flex-grow bg-white">
-                        <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
+                      <div className="p-3 flex flex-col flex-grow bg-white">
+                        <h3 className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
                         
-                        <p className="text-[11px] text-gray-500 mb-4">{service.category}</p>
+                        <p className="text-[10px] sm:text-[11px] text-gray-500 mb-2">{service.category}</p>
                         
                         <div className="mt-auto flex items-center justify-between">
-                          <div className="flex flex-col">
-                            <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
-                          </div>
-                          
-                          {/* ADD Button Quick Commerce Style */}
-                          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                          <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+                          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
                             ADD
                           </div>
                         </div>

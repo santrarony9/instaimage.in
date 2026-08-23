@@ -73,10 +73,12 @@ export function CartSidebar() {
           ) : (
             items.map((item) => (
               <div key={item.id} className="flex gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 relative group">
-                <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 relative">
-                  {item.serviceImage ? (
-                    <Image src={item.serviceImage} alt={item.serviceName} fill className="object-cover" />
-                  ) : (
+                <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                  {item.serviceImage ? (() => {
+                    const raw = item.serviceImage;
+                    const src = raw.startsWith('/') ? `https://api.instaimage.in${raw}` : raw;
+                    return <img src={src} alt={item.serviceName} className="w-full h-full object-cover" />;
+                  })() : (
                     <div className="w-full h-full flex items-center justify-center text-2xl">📸</div>
                   )}
                 </div>
