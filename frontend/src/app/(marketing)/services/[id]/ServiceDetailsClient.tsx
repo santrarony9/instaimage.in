@@ -166,28 +166,30 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                 <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Pricing Type</h3>
                 <div className={`grid gap-3 mb-6 ${service.deliveryMethod === 'REMOTE' || !service.flexiblePrice ? 'grid-cols-1' : 'grid-cols-2'}`}>
                   <label 
-                    className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                    className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                     onClick={() => setPricingMode('fixed')}
                   >
-                    <span className="font-bold text-gray-900">Fixed Package</span>
-                    <span className="text-xs text-gray-500">₹{service.basePrice} flat rate</span>
+                    <span className="font-bold text-gray-900">Fixed Timing</span>
+                    <span className="text-xs text-gray-500 text-center">
+                      ₹{service.basePrice?.toLocaleString()} {service.duration ? `for ${service.duration} ${service.durationUnit?.toLowerCase() || 'hours'}` : 'flat rate'}
+                    </span>
                   </label>
                   
-                  {service.deliveryMethod !== 'REMOTE' && service.flexiblePrice && (
+                  {service.deliveryMethod !== 'REMOTE' && service.flexiblePrice > 0 && (
                     <label 
-                      className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'flexible' ? 'border-black bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                      className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'flexible' ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                       onClick={() => setPricingMode('flexible')}
                     >
                       <span className="font-bold text-gray-900">Flexible Timing</span>
-                      <span className="text-xs text-gray-500">₹{service.flexiblePrice} base price</span>
+                      <span className="text-xs text-gray-500">₹{service.flexiblePrice?.toLocaleString()} base price</span>
                     </label>
                   )}
                 </div>
                 
                 {service.flexiblePrice && pricingMode === 'flexible' && (
                   <div className="p-4 border border-gray-200 rounded-md bg-blue-50 text-blue-800 text-sm space-y-2">
-                    <p><strong>Flexible Timing vs. Fixed Package:</strong></p>
-                    <p>If you select a <strong>Fixed Package</strong>, the booking duration is strict and cannot be extended after booking.</p>
+                    <p><strong>Flexible Timing vs. Fixed Timing:</strong></p>
+                    <p>If you select <strong>Fixed Timing</strong>, the booking duration is strict and cannot be extended after booking.</p>
                     <p>By selecting <strong>Flexible Timing</strong>, you reserve the photographer with no back-to-back bookings. This means if you decide you need them for an extra 2 hours (or more) on the day of the event, it is entirely possible! You can simply extend on the spot and pay the photographer directly in cash for any extra time used.</p>
                   </div>
                 )}
