@@ -137,7 +137,7 @@ export default async function HomePage() {
 // Reusable Professional Product Card Component
 function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string, API_URL: string }) {
   const imageUrl = service.images && service.images.length > 0 
-    ? (service.images[0].startsWith('http') ? service.images[0] : `${API_URL}${service.images[0]}`)
+    ? service.images[0]
     : null;
 
   return (

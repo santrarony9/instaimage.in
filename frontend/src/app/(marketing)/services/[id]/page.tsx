@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   const imageUrl = service.images && service.images.length > 0 
-    ? (service.images[0].startsWith('http') ? service.images[0] : `${PUBLIC_API_URL}${service.images[0]}`)
+    ? (service.images[0].startsWith('http') ? service.images[0] : `https://instaimage.in${service.images[0]}`)
     : 'https://instaimage.in/og-image.jpg';
 
   return {

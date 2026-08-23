@@ -195,7 +195,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                       <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
                         {service.images && service.images.length > 0 ? (
                           <Image 
-                            src={service.images[0].startsWith('http') ? service.images[0] : `${API_URL}${service.images[0]}`}
+                            src={service.images[0]}
                             alt={service.name}
                             fill
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"

@@ -24,7 +24,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   
   // Helpers
   const mainImage = service.images && service.images.length > 0 
-    ? (service.images[0].startsWith('http') ? service.images[0] : `${API_URL}${service.images[0]}`)
+    ? service.images[0]
     : 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop';
 
   const toggleAddon = (addonName: string) => {
@@ -75,7 +75,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
             {service.images && service.images.length > 1 && (
               <div className="flex gap-4 mb-12 overflow-x-auto pb-2">
                 {service.images.map((img: string, idx: number) => {
-                  const url = img.startsWith('http') ? img : `${API_URL}${img}`;
+                  const url = img;
                   return (
                     <div key={idx} className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border-2 hover:border-black border-transparent transition">
                       <img src={url} alt={`${service.name} ${idx}`} className="w-full h-full object-cover" />
