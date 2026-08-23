@@ -4,7 +4,6 @@ import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
 export const revalidate = 60; // Revalidate every 60 seconds
-export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'All Photography Services in One Place — Book Trusted Photographers',

@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
 
 export async function fetchApi(endpoint: string, options?: RequestInit) {
   const url = `${API_BASE_URL}${endpoint}`;
