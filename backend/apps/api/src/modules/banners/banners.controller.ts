@@ -7,7 +7,7 @@ import { RolesGuard } from '@app/auth/guards/roles.guard';
 import { Roles } from '@app/auth/decorators/roles.decorator';
 import { Role } from '@app/auth/interfaces/rbac.interface';
 
-import { Public } from '@app/auth/decorators/public.decorator';
+import { Public } from '@app/auth';
 
 @Controller('banners')
 export class BannersController {
