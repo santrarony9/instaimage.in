@@ -73,11 +73,11 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                 // If it's already selected, don't deselect (quick commerce behavior)
                 setSelectedCategories([cat]);
               }}
-              className={`text-left px-4 py-4 border-l-4 transition-colors flex items-center justify-between ${effectiveCategory === cat ? 'border-green-600 bg-green-50 text-green-800 font-bold' : 'border-transparent text-gray-600 hover:bg-gray-50'}`}
+              className={`text-left px-4 py-4 border-l-4 transition-colors flex items-center justify-between ${effectiveCategory === cat ? 'border-blue-600 bg-blue-50 text-blue-800 font-bold' : 'border-transparent text-gray-600 hover:bg-gray-50'}`}
             >
               <div className="flex items-center">
                 {/* Dummy placeholder icon circle */}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${effectiveCategory === cat ? 'bg-green-200' : 'bg-gray-100'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${effectiveCategory === cat ? 'bg-blue-200' : 'bg-gray-100'}`}>
                   <span className="text-xs">📸</span>
                 </div>
                 <span className="text-sm">{cat}</span>
@@ -94,7 +94,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
             {locations.map(loc => (
               <label key={loc} className="flex items-center space-x-3 cursor-pointer group">
                 <input type="checkbox" className="hidden" checked={selectedLocations.includes(loc)} onChange={() => toggleFilter(setSelectedLocations, loc)} />
-                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedLocations.includes(loc) ? 'bg-green-600 border-green-600' : 'border-gray-300 group-hover:border-green-600'}`}>
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedLocations.includes(loc) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-blue-600'}`}>
                   {selectedLocations.includes(loc) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                 </div>
                 <span className="text-sm text-gray-700 font-medium group-hover:text-black">{loc}</span>
@@ -111,7 +111,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
             {occasions.map(occ => (
               <label key={occ} className="flex items-center space-x-3 cursor-pointer group">
                 <input type="checkbox" className="hidden" checked={selectedOccasions.includes(occ)} onChange={() => toggleFilter(setSelectedOccasions, occ)} />
-                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedOccasions.includes(occ) ? 'bg-green-600 border-green-600' : 'border-gray-300 group-hover:border-green-600'}`}>
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedOccasions.includes(occ) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-blue-600'}`}>
                   {selectedOccasions.includes(occ) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                 </div>
                 <span className="text-sm text-gray-700 font-medium group-hover:text-black">{occ}</span>
@@ -151,7 +151,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
               <FilterSection />
             </div>
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100">
-              <button onClick={() => setShowMobileFilters(false)} className="w-full bg-green-600 text-white py-3 rounded-md font-bold uppercase tracking-widest">
+              <button onClick={() => setShowMobileFilters(false)} className="w-full bg-blue-600 text-white py-3 rounded-md font-bold uppercase tracking-widest">
                 Apply Filters ({filteredServices.length})
               </button>
             </div>
@@ -181,7 +181,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                 <p className="text-gray-500 text-sm">Try adjusting your filters to see more results.</p>
                 <button 
                   onClick={() => { setSelectedCategories([]); setSelectedLocations([]); setSelectedOccasions([]); }}
-                  className="mt-4 text-green-600 font-bold hover:underline"
+                  className="mt-4 text-blue-600 font-bold hover:underline"
                 >
                   Clear all filters
                 </button>
@@ -193,7 +193,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                   {filteredServices.map((service) => (
-                    <Link href={`/services/${service.slug || service._id}`} key={service._id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-green-600">
+                    <Link href={`/services/${service.slug || service._id}`} key={service._id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
                       
                       <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
                         {service.images && service.images.length > 0 ? (
@@ -211,7 +211,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                         )}
                         
                         {/* Quick Commerce Style Badge */}
-                        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-green-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+                        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
                           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                           {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
                         </div>
@@ -228,7 +228,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                           </div>
                           
                           {/* ADD Button Quick Commerce Style */}
-                          <div className="border border-green-600 text-green-700 bg-green-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-green-600 group-hover:text-white transition-colors">
+                          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
                             ADD
                           </div>
                         </div>

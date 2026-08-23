@@ -76,7 +76,7 @@ export default async function HomePage() {
             <input 
               type="text" 
               placeholder="Search for photography, videography, podcast..." 
-              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-colors"
+              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-colors"
             />
           </div>
         </div>
@@ -93,7 +93,7 @@ export default async function HomePage() {
             
             <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
               {categories.slice(0, 8).map((category: any) => (
-                <Link key={category._id} href={`/services?category=${category.name}`} className="bg-green-50 aspect-square rounded-2xl flex flex-col items-center justify-center p-2 text-center group hover:bg-green-100 transition-colors border border-green-100/50">
+                <Link key={category._id} href={`/services?category=${category.name}`} className="bg-blue-50 aspect-square rounded-2xl flex flex-col items-center justify-center p-2 text-center group hover:bg-blue-100 transition-colors border border-blue-100/50">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition-transform">
                     <span className="text-xl">📸</span>
                   </div>
@@ -108,7 +108,7 @@ export default async function HomePage() {
         <div className="mb-12 mt-12">
           <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
             <h2 className="text-lg md:text-xl font-bold text-gray-900">⭐ Popular Packages</h2>
-            <Link href="/services" className="text-green-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
+            <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
@@ -139,7 +139,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
     : null;
 
   return (
-    <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-green-600">
+    <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
       
       <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
         {imageUrl ? (
@@ -157,7 +157,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
         )}
         
         {/* Quick Commerce Style Badge */}
-        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-green-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-blue-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
         </div>
@@ -174,7 +174,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
           </div>
           
           {/* ADD Button Quick Commerce Style */}
-          <div className="border border-green-600 text-green-700 bg-green-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-green-600 group-hover:text-white transition-colors">
+          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
             ADD
           </div>
         </div>
