@@ -23,6 +23,7 @@ export default function ServicesManagementPage() {
   const { toast } = useToast();
   const [data, setData] = useState<any[]>([]);
   const [pendingData, setPendingData] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -31,14 +32,18 @@ export default function ServicesManagementPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [allRes, pendingRes] = await Promise.all([
+      const [allRes, pendingRes, categoriesRes] = await Promise.all([
         fetchApi('/services/admin/all'),
         fetchApi('/services/pending'),
+        fetchApi('/categories/admin').catch(() => ({ data: [] }))
       ]);
       const allServices = allRes.data || allRes || [];
       const pending = pendingRes.data || pendingRes || [];
+      const cats = categoriesRes.data || categoriesRes || [];
+      
       setData(allServices.filter((s: any) => s.isApproved));
       setPendingData(pending);
+      setCategories(Array.isArray(cats) ? cats : []);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -401,7 +406,23 @@ export default function ServicesManagementPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Category</label>
-                    <input type="text" value={formData.category || ''} onChange={e => setFormData({ ...formData, category: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. Wedding, Birthday" />
+                    <select 
+                      value={formData.category || ''} 
+                      onChange={e => {
+                        const selectedCat = categories.find(c => c.name === e.target.value);
+                        setFormData({ 
+                          ...formData, 
+                          category: selectedCat ? selectedCat.name : '',
+                          categoryId: selectedCat ? selectedCat._id : null
+                        });
+                      }} 
+                      className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                    >
+                      <option value="">-- Select Category --</option>
+                      {categories.map(cat => (
+                        <option key={cat._id} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Tags (comma separated)</label>
