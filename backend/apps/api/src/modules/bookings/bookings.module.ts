@@ -13,6 +13,7 @@ import { PaymentsModule } from '../payments/payments.module';
 import { AvailabilityModule } from '../availability/availability.module';
 import { SellersModule } from '../sellers/sellers.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { SettingsModule } from '../settings/settings.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     AvailabilityModule,
     SellersModule,
     NotificationsModule,
+    SettingsModule,
   ],
   controllers: [BookingsController],
   providers: [BookingsService, BookingsRepository],

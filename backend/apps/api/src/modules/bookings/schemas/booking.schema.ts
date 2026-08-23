@@ -60,6 +60,12 @@ export class PricingDetails {
   @Prop({ required: true, min: 0, default: 0 })
   deliveryCharge: number;
 
+  @Prop()
+  travelDistanceKm?: number;
+
+  @Prop()
+  nearestOfficeName?: string;
+
   @Prop({ required: true, min: 0, default: 0 })
   discount: number;
 

@@ -23,6 +23,12 @@ interface AuthenticatedRequest extends ExpressRequest {
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
+  @Post('calculate-price')
+  @Public()
+  calculatePrice(@Body() createBookingDto: CreateBookingDto) {
+    return this.bookingsService.calculateFullPrice(createBookingDto);
+  }
+
   @Post()
   @Roles(Role.CUSTOMER)
   create(

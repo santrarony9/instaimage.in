@@ -15,6 +15,7 @@ const links = [
   { href: '/admin/sellers', label: 'Sellers' },
   { href: '/admin/payouts', label: 'Payouts' },
   { href: '/admin/zones', label: 'Service Zones' },
+  { href: '/admin/settings', label: 'Settings' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

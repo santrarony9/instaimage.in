@@ -23,6 +23,8 @@ import { SellersService } from '../sellers/sellers.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { EmailService } from '../email/email.service';
 
+import { SettingsService } from '../settings/settings.service';
+
 @Injectable()
 export class BookingsService {
   private readonly logger = new Logger(BookingsService.name);
@@ -37,6 +39,7 @@ export class BookingsService {
     private readonly SellersService: SellersService,
     private readonly notificationsService: NotificationsService,
     private readonly emailService: EmailService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
@@ -58,106 +61,7 @@ export class BookingsService {
     );
 
     try {
-      // 1. Calculate pricing
-      const service = await this.servicesService.findOne(
-        createBookingDto.serviceId,
-      );
-      if (!service) throw new NotFoundException('Service not found');
-
-      let basePrice = 0;
-      let extraHoursPrice = 0;
-
-      if (createBookingDto.pricingMode === 'fixed') {
-        basePrice = service.basePrice;
-        if (
-          createBookingDto.extraHoursBooked &&
-          createBookingDto.extraHoursBooked > 0
-        ) {
-          if (!service.extraHourPrice)
-            throw new BadRequestException(
-              'This service does not allow extra fixed hours.',
-            );
-          extraHoursPrice =
-            createBookingDto.extraHoursBooked * service.extraHourPrice;
-        }
-      } else if (createBookingDto.pricingMode === 'flexible') {
-        if (!service.flexiblePrice)
-          throw new BadRequestException(
-            'This service does not allow flexible pricing.',
-          );
-        basePrice = service.flexiblePrice;
-      }
-
-      let addonsPrice = 0;
-      const matchedAddons: Array<{ name: string; price: number }> = [];
-
-      if (
-        createBookingDto.addonNames &&
-        createBookingDto.addonNames.length > 0 &&
-        service.addons
-      ) {
-        for (const addonName of createBookingDto.addonNames) {
-          const addonObj = service.addons.find((a) => a.name === addonName);
-          if (addonObj) {
-            addonsPrice += addonObj.price;
-            matchedAddons.push({ name: addonObj.name, price: addonObj.price });
-          }
-        }
-      }
-
-      const surchargesPrice = 0;
-      const surcharges: Array<{
-        name: string;
-        amount: number;
-        reason?: string;
-      }> = [];
-
-      const deliveryCharge = 500;
-      let discount = 0;
-
-      if (createBookingDto.appliedCouponId) {
-        const coupon = await this.couponsService.findOne(
-          createBookingDto.appliedCouponId,
-        );
-        if (coupon && coupon.isActive) {
-          if (coupon.discountType === 'PERCENTAGE') {
-            discount = (basePrice + addonsPrice) * (coupon.discountValue / 100);
-            if (coupon.maxDiscount && discount > coupon.maxDiscount) {
-              discount = coupon.maxDiscount;
-            }
-          } else {
-            discount = coupon.discountValue;
-          }
-        }
-      }
-
-      const totalPrice =
-        basePrice +
-        addonsPrice +
-        extraHoursPrice +
-        surchargesPrice +
-        deliveryCharge -
-        discount;
-      const advancePaid = totalPrice * 0.2; // 20% advance
-      const balanceDue = totalPrice - advancePaid;
-
-      const platformFee = totalPrice * 0.10; // 10% platform commission
-      const sellerPayout = totalPrice * 0.90; // 90% goes to seller
-
-      const pricing: PricingDetails = {
-        basePrice,
-        addonsPrice,
-        extraHoursPrice,
-        surcharges,
-        surchargesPrice,
-        deliveryCharge,
-        discount,
-        totalPrice,
-        platformFee,
-        sellerPayout,
-        advancePaid,
-        balanceDue,
-      };
+      const { pricing, matchedAddons } = await this.calculateFullPrice(createBookingDto);
 
       // 2. Create Booking Record
       const booking = await this.bookingsRepository.create({
@@ -340,5 +244,121 @@ export class BookingsService {
     }
 
     return this.bookingsRepository.update(bookingId, { status });
+  }
+
+  async calculateTravelCharge(clientCoordinates: number[] | undefined | null) {
+    let deliveryCharge = 500;
+    let travelDistanceKm = 0;
+    let nearestOfficeName = undefined;
+
+    const officeLocations = await this.settingsService.getSetting('officeLocations') || [];
+    const travelConfig = await this.settingsService.getSetting('travelChargeConfig') || {
+      perKmRate: 15,
+      freeRadiusKm: 5,
+      defaultFlatCharge: 500
+    };
+
+    if (clientCoordinates && clientCoordinates.length === 2 && officeLocations.length > 0) {
+      const [lng2, lat2] = clientCoordinates;
+      let minDistance = Infinity;
+
+      for (const office of officeLocations) {
+        if (office.coordinates && office.coordinates.length === 2) {
+          const [lng1, lat1] = office.coordinates;
+          const R = 6371; // Earth's radius in km
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLon = (lng2 - lng1) * Math.PI / 180;
+          const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const d = R * c; // Distance in km
+
+          if (d < minDistance) {
+            minDistance = d;
+            nearestOfficeName = office.name;
+          }
+        }
+      }
+
+      if (minDistance !== Infinity) {
+        travelDistanceKm = parseFloat(minDistance.toFixed(2));
+        const billableDistance = Math.max(0, travelDistanceKm - travelConfig.freeRadiusKm);
+        deliveryCharge = Math.ceil(billableDistance * 2 * travelConfig.perKmRate); // * 2 for round trip
+      } else {
+        deliveryCharge = travelConfig.defaultFlatCharge || 500;
+      }
+    } else {
+      deliveryCharge = travelConfig.defaultFlatCharge || 500;
+    }
+
+    return { deliveryCharge, travelDistanceKm, nearestOfficeName };
+  }
+
+  async calculateFullPrice(createBookingDto: CreateBookingDto) {
+    const service = await this.servicesService.findOne(createBookingDto.serviceId);
+    if (!service) throw new NotFoundException('Service not found');
+
+    let basePrice = 0;
+    let extraHoursPrice = 0;
+
+    if (createBookingDto.pricingMode === 'fixed') {
+      basePrice = service.basePrice;
+      if (createBookingDto.extraHoursBooked && createBookingDto.extraHoursBooked > 0) {
+        if (!service.extraHourPrice) throw new BadRequestException('This service does not allow extra fixed hours.');
+        extraHoursPrice = createBookingDto.extraHoursBooked * service.extraHourPrice;
+      }
+    } else if (createBookingDto.pricingMode === 'flexible') {
+      if (!service.flexiblePrice) throw new BadRequestException('This service does not allow flexible pricing.');
+      basePrice = service.flexiblePrice;
+    }
+
+    let addonsPrice = 0;
+    const matchedAddons: Array<{ name: string; price: number }> = [];
+
+    if (createBookingDto.addonNames && createBookingDto.addonNames.length > 0 && service.addons) {
+      for (const addonName of createBookingDto.addonNames) {
+        const addonObj = service.addons.find((a) => a.name === addonName);
+        if (addonObj) {
+          addonsPrice += addonObj.price;
+          matchedAddons.push({ name: addonObj.name, price: addonObj.price });
+        }
+      }
+    }
+
+    const surchargesPrice = 0;
+    const surcharges: Array<{ name: string; amount: number; reason?: string }> = [];
+
+    const { deliveryCharge, travelDistanceKm, nearestOfficeName } = 
+      await this.calculateTravelCharge(createBookingDto.location?.coordinates);
+    let discount = 0;
+
+    if (createBookingDto.appliedCouponId) {
+      const coupon = await this.couponsService.findOne(createBookingDto.appliedCouponId);
+      if (coupon && coupon.isActive) {
+        if (coupon.discountType === 'PERCENTAGE') {
+          discount = (basePrice + addonsPrice) * (coupon.discountValue / 100);
+          if (coupon.maxDiscount && discount > coupon.maxDiscount) discount = coupon.maxDiscount;
+        } else {
+          discount = coupon.discountValue;
+        }
+      }
+    }
+
+    const totalPrice = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge - discount;
+    const advancePaid = totalPrice * 0.2;
+    const balanceDue = totalPrice - advancePaid;
+
+    const platformFee = totalPrice * 0.10;
+    const sellerPayout = totalPrice * 0.90;
+
+    const pricing: PricingDetails = {
+      basePrice, addonsPrice, extraHoursPrice, surcharges, surchargesPrice,
+      deliveryCharge, discount, totalPrice, platformFee, sellerPayout,
+      advancePaid, balanceDue, travelDistanceKm, nearestOfficeName,
+    };
+
+    return { pricing, matchedAddons };
   }
 }
