@@ -28,7 +28,21 @@ export default function ServicesClient({ initialServices }: { initialServices: a
   const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
   
   // Extract unique values for filters
-  const categories = availableCategories;
+  const categoryOrder = [
+    'Photography',
+    'Videography',
+    'Event Management',
+    'Post Production'
+  ];
+  
+  const categories = availableCategories.sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a);
+    const indexB = categoryOrder.indexOf(b);
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1; // Unknown at bottom
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
   const locations = Array.from(new Set(activeServices.flatMap(s => s.locations || []).filter(Boolean))) as string[];
   const occasions = Array.from(new Set(activeServices.flatMap(s => s.occasions || []).filter(Boolean))) as string[];
 
