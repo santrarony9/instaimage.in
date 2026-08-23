@@ -46,13 +46,12 @@ export default function ServicesClient({ initialServices }: { initialServices: a
   const locations = Array.from(new Set(activeServices.flatMap(s => s.locations || []).filter(Boolean))) as string[];
   const occasions = Array.from(new Set(activeServices.flatMap(s => s.occasions || []).filter(Boolean))) as string[];
 
+  const effectiveCategory = selectedCategories.length > 0 ? selectedCategories[0] : (categories.length > 0 ? categories[0] : null);
+
   // Filter logic
   const filteredServices = activeServices.filter(s => {
-    if (selectedCategories.length > 0) {
-      const match = selectedCategories.some(cat => 
-        s.category?.toLowerCase() === cat.toLowerCase()
-      );
-      if (!match) return false;
+    if (effectiveCategory && s.category?.toLowerCase() !== effectiveCategory.toLowerCase()) {
+      return false;
     }
     if (selectedLocations.length > 0 && (!s.locations || !selectedLocations.some(l => s.locations.includes(l)))) return false;
     if (selectedOccasions.length > 0 && (!s.occasions || !selectedOccasions.some(o => s.occasions.includes(o)))) return false;
@@ -64,33 +63,39 @@ export default function ServicesClient({ initialServices }: { initialServices: a
   };
 
   const FilterSection = () => (
-    <div className="space-y-8">
+    <div className="flex flex-col">
       {categories.length > 0 && (
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Categories</h3>
-          <div className="space-y-2">
-            {categories.map(cat => (
-              <label key={cat} className="flex items-center space-x-3 cursor-pointer group">
-                <input type="checkbox" className="hidden" checked={selectedCategories.includes(cat)} onChange={() => toggleFilter(setSelectedCategories, cat)} />
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedCategories.includes(cat) ? 'bg-[#2874f0] border-[#2874f0]' : 'border-gray-300 group-hover:border-[#2874f0]'}`}>
-                  {selectedCategories.includes(cat) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+        <div className="flex flex-col border-b border-gray-100">
+          {categories.map(cat => (
+            <button 
+              key={cat} 
+              onClick={() => {
+                // If it's already selected, don't deselect (quick commerce behavior)
+                setSelectedCategories([cat]);
+              }}
+              className={`text-left px-4 py-4 border-l-4 transition-colors flex items-center justify-between ${effectiveCategory === cat ? 'border-green-600 bg-green-50 text-green-800 font-bold' : 'border-transparent text-gray-600 hover:bg-gray-50'}`}
+            >
+              <div className="flex items-center">
+                {/* Dummy placeholder icon circle */}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${effectiveCategory === cat ? 'bg-green-200' : 'bg-gray-100'}`}>
+                  <span className="text-xs">📸</span>
                 </div>
-                <span className="text-sm text-gray-700 font-medium group-hover:text-black">{cat}</span>
-              </label>
-            ))}
-          </div>
+                <span className="text-sm">{cat}</span>
+              </div>
+            </button>
+          ))}
         </div>
       )}
 
       {locations.length > 0 && (
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Locations</h3>
+        <div className="p-4 border-b border-gray-100">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Locations</h3>
           <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
             {locations.map(loc => (
               <label key={loc} className="flex items-center space-x-3 cursor-pointer group">
                 <input type="checkbox" className="hidden" checked={selectedLocations.includes(loc)} onChange={() => toggleFilter(setSelectedLocations, loc)} />
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedLocations.includes(loc) ? 'bg-[#2874f0] border-[#2874f0]' : 'border-gray-300 group-hover:border-[#2874f0]'}`}>
-                  {selectedLocations.includes(loc) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedLocations.includes(loc) ? 'bg-green-600 border-green-600' : 'border-gray-300 group-hover:border-green-600'}`}>
+                  {selectedLocations.includes(loc) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                 </div>
                 <span className="text-sm text-gray-700 font-medium group-hover:text-black">{loc}</span>
               </label>
@@ -100,14 +105,14 @@ export default function ServicesClient({ initialServices }: { initialServices: a
       )}
 
       {occasions.length > 0 && (
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Occasions</h3>
+        <div className="p-4">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Occasions</h3>
           <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
             {occasions.map(occ => (
               <label key={occ} className="flex items-center space-x-3 cursor-pointer group">
                 <input type="checkbox" className="hidden" checked={selectedOccasions.includes(occ)} onChange={() => toggleFilter(setSelectedOccasions, occ)} />
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedOccasions.includes(occ) ? 'bg-[#2874f0] border-[#2874f0]' : 'border-gray-300 group-hover:border-[#2874f0]'}`}>
-                  {selectedOccasions.includes(occ) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedOccasions.includes(occ) ? 'bg-green-600 border-green-600' : 'border-gray-300 group-hover:border-green-600'}`}>
+                  {selectedOccasions.includes(occ) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                 </div>
                 <span className="text-sm text-gray-700 font-medium group-hover:text-black">{occ}</span>
               </label>
@@ -119,14 +124,8 @@ export default function ServicesClient({ initialServices }: { initialServices: a
   );
 
   return (
-    <div className="bg-white min-h-screen">
-      {/* Cinematic Header */}
-      <div className="bg-black text-white py-16 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-4">Production <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Services</span></h1>
-        <p className="text-gray-400 text-base max-w-2xl mx-auto">From high-fashion photography to industry-standard cinematic video production, we have the tools and talent to execute your vision.</p>
-      </div>
-
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
         {/* Mobile Filter Toggle */}
         <div className="lg:hidden mb-6 flex justify-between items-center border-b border-gray-100 pb-4">
           <h2 className="font-bold text-lg">{filteredServices.length} Services Found</h2>
@@ -152,7 +151,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
               <FilterSection />
             </div>
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100">
-              <button onClick={() => setShowMobileFilters(false)} className="w-full bg-[#2874f0] text-white py-3 rounded-md font-bold uppercase tracking-widest">
+              <button onClick={() => setShowMobileFilters(false)} className="w-full bg-green-600 text-white py-3 rounded-md font-bold uppercase tracking-widest">
                 Apply Filters ({filteredServices.length})
               </button>
             </div>
@@ -162,18 +161,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block w-64 flex-shrink-0">
-            <div className="sticky top-28 bg-white border border-gray-100 rounded-lg p-6 shadow-sm">
-              <div className="flex justify-between items-end mb-6 border-b border-gray-100 pb-4">
-                <h2 className="text-lg font-black uppercase tracking-widest">Filters</h2>
-                {(selectedCategories.length > 0 || selectedLocations.length > 0 || selectedOccasions.length > 0) && (
-                  <button 
-                    onClick={() => { setSelectedCategories([]); setSelectedLocations([]); setSelectedOccasions([]); }}
-                    className="text-xs font-bold text-red-500 hover:underline uppercase"
-                  >
-                    Clear All
-                  </button>
-                )}
-              </div>
+            <div className="sticky top-24 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
               <FilterSection />
             </div>
           </div>
@@ -193,7 +181,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                 <p className="text-gray-500 text-sm">Try adjusting your filters to see more results.</p>
                 <button 
                   onClick={() => { setSelectedCategories([]); setSelectedLocations([]); setSelectedOccasions([]); }}
-                  className="mt-4 text-[#2874f0] font-bold hover:underline"
+                  className="mt-4 text-green-600 font-bold hover:underline"
                 >
                   Clear all filters
                 </button>
@@ -205,45 +193,43 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                   {filteredServices.map((service) => (
-                    <Link href={`/services/${service._id}`} key={service._id} className="group bg-white rounded-md overflow-hidden border border-gray-200 hover:border-black transition-all duration-300 flex flex-col relative shadow-sm hover:shadow-lg">
-                      <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
+                    <Link href={`/services/${service._id}`} key={service._id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-green-600">
+                      
+                      <div className="w-full aspect-square bg-gray-50 overflow-hidden relative p-4 flex items-center justify-center">
                         {service.images && service.images.length > 0 ? (
                           <Image 
                             src={service.images[0]}
                             alt={service.name}
                             fill
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                            className="object-cover group-hover:scale-110 transition duration-700"
+                            className="object-cover rounded-t-xl group-hover:scale-105 transition duration-500"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-300">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-500"></div>
+                        
+                        {/* Quick Commerce Style Badge */}
+                        <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-green-700 shadow-sm flex items-center shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
+                        </div>
                       </div>
-                      <div className="p-3 md:p-4 flex flex-col flex-grow">
-                        {service.category && (
-                          <span className="text-[9px] md:text-[10px] font-bold text-[#2874f0] uppercase tracking-widest mb-1.5">{service.category}</span>
-                        )}
-                        <h3 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2 leading-snug mb-1 uppercase tracking-tight">{service.name}</h3>
+                      
+                      <div className="p-3 md:p-4 flex flex-col flex-grow bg-white">
+                        <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
                         
-                        {service.tags && service.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            {service.tags.slice(0, 3).map((tag: string, idx: number) => (
-                              <span key={idx} className="text-[9px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">{tag}</span>
-                            ))}
-                          </div>
-                        )}
+                        <p className="text-[11px] text-gray-500 mb-4">{service.category}</p>
                         
-                        <p className="text-[11px] md:text-xs text-gray-500 line-clamp-1 mb-3 font-medium">{service.description}</p>
-                        <div className="mt-auto border-t border-gray-100 pt-3 flex items-center justify-between">
+                        <div className="mt-auto flex items-center justify-between">
                           <div className="flex flex-col">
-                            <span className="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Starts At</span>
-                            <span className="text-sm md:text-base font-black text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+                            <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
                           </div>
-                          <div className="text-[10px] font-bold uppercase tracking-wider text-black group-hover:text-blue-600 transition-colors flex items-center">
-                            View <span className="ml-1 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all">➔</span>
+                          
+                          {/* ADD Button Quick Commerce Style */}
+                          <div className="border border-green-600 text-green-700 bg-green-50 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide group-hover:bg-green-600 group-hover:text-white transition-colors">
+                            ADD
                           </div>
                         </div>
                       </div>
