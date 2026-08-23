@@ -35,10 +35,10 @@ export default function BannersManagementPage() {
     try {
       const [bannersRes, servicesRes] = await Promise.all([
         fetchApi('/banners'),
-        fetchApi('/services')
+        fetchApi('/services/admin/all')
       ]);
-      setBanners(bannersRes || bannersRes.data || []);
-      setServices(servicesRes.data || servicesRes || []);
+      setBanners(Array.isArray(bannersRes) ? bannersRes : (bannersRes.data || []));
+      setServices(Array.isArray(servicesRes) ? servicesRes : (servicesRes.data || []));
     } catch (error: any) {
       toast.error(error.message || 'Failed to load banners');
     } finally {
