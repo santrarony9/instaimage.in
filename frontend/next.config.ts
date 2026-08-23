@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
         source: '/api/:path*',
         destination: 'https://api.instaimage.in/:path*',
       },
+      {
+        source: '/uploads/:path*',
+        destination: 'https://api.instaimage.in/uploads/:path*',
+      },
     ];
   },
 };

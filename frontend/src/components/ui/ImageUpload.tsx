@@ -65,7 +65,7 @@ export default function ImageUpload({ images = [], onChange, maxImages = 5 }: Im
         {images.map((img, index) => (
           <div key={index} className="relative w-24 h-24 border rounded overflow-hidden group">
             <img 
-              src={img.startsWith('http') ? img : `${API_URL}${img}`} 
+              src={img} 
               alt="Uploaded" 
               className="w-full h-full object-cover"
             />
