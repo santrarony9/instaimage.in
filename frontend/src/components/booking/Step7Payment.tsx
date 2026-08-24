@@ -21,6 +21,7 @@ export function Step7Payment() {
           extraHoursBooked: data.extraHoursBooked || 0,
           location: data.location,
           appliedCouponId: data.appliedCouponId,
+          isExpressDelivery: data.isExpressDelivery || false,
         };
         const res = await fetchApi('/bookings/calculate-price', {
           method: 'POST',
@@ -65,6 +66,46 @@ export function Step7Payment() {
     <div>
       <h2 className="text-xl font-bold mb-4 text-gray-900">Review & Payment</h2>
       
+      <div className="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm mb-6 flex items-center justify-between">
+        <div>
+          <h4 className="font-bold text-gray-900">⚡ Express Delivery (24 Hours)</h4>
+          <p className="text-sm text-gray-500">Get your edited photos/videos delivered within 24 hours.</p>
+        </div>
+        <button
+          onClick={() => {
+            useBookingStore.getState().updateData({ isExpressDelivery: !data.isExpressDelivery });
+          }}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${data.isExpressDelivery ? 'bg-indigo-600' : 'bg-gray-200'}`}
+        >
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.isExpressDelivery ? 'translate-x-6' : 'translate-x-1'}`} />
+        </button>
+      </div>
+
+      {pricingInfo?.unselectedAddons && pricingInfo.unselectedAddons.length > 0 && (
+        <div className="mb-6">
+          <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">Last-Minute Add-ons</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {pricingInfo.unselectedAddons.map((addon: any) => (
+              <div key={addon.name} className="flex items-center justify-between p-3 border rounded-lg hover:border-black transition">
+                <div>
+                  <p className="font-semibold text-sm">{addon.name}</p>
+                  <p className="text-gray-500 text-xs">+₹{addon.price}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const currentAddons = data.addonNames || [];
+                    useBookingStore.getState().updateData({ addonNames: [...currentAddons, addon.name] });
+                  }}
+                  className="bg-black text-white px-3 py-1 text-xs rounded-full hover:bg-gray-800 transition"
+                >
+                  Add
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8 space-y-3 text-sm">
         <h3 className="font-bold text-gray-800 text-base border-b pb-2 mb-4">Invoice Summary</h3>
         <div className="flex justify-between">
@@ -99,6 +140,13 @@ export function Step7Payment() {
           <div className="flex justify-between items-center text-green-600">
             <span className="font-medium">Free Travel Offer</span>
             <span className="font-bold">-₹{p.deliveryDiscount}</span>
+          </div>
+        )}
+
+        {p?.expressDeliveryFee > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600 font-medium">⚡ Express Delivery Fee</span>
+            <span className="font-medium text-gray-900">₹{p.expressDeliveryFee}</span>
           </div>
         )}
 

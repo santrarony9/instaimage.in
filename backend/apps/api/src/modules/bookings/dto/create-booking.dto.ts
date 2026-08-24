@@ -7,6 +7,7 @@ import {
   ValidateNested,
   IsMongoId,
   IsNumber,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
@@ -80,4 +81,8 @@ export class CreateBookingDto {
   @IsOptional()
   @IsNumber()
   extraHoursBooked?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isExpressDelivery?: boolean;
 }

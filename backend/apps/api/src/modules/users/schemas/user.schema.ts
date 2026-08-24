@@ -21,6 +21,9 @@ export class User extends AbstractDocument {
 
   @Prop()
   resetPasswordExpires?: Date;
+
+  @Prop({ type: [{ address: String, landmark: String, pincode: String, city: String, coordinates: [Number] }], default: [] })
+  savedAddresses: Array<{ address: string; landmark?: string; pincode: string; city: string; coordinates?: number[] }>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

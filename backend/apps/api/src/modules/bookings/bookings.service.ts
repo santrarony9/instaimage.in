@@ -323,13 +323,15 @@ export class BookingsService {
 
     let addonsPrice = 0;
     const matchedAddons: Array<{ name: string; price: number }> = [];
+    const unselectedAddons: Array<{ name: string; price: number }> = [];
 
-    if (createBookingDto.addonNames && createBookingDto.addonNames.length > 0 && service.addons) {
-      for (const addonName of createBookingDto.addonNames) {
-        const addonObj = service.addons.find((a) => a.name === addonName);
-        if (addonObj) {
+    if (service.addons && service.addons.length > 0) {
+      for (const addonObj of service.addons) {
+        if (createBookingDto.addonNames && createBookingDto.addonNames.includes(addonObj.name)) {
           addonsPrice += addonObj.price;
           matchedAddons.push({ name: addonObj.name, price: addonObj.price });
+        } else {
+          unselectedAddons.push({ name: addonObj.name, price: addonObj.price });
         }
       }
     }
@@ -359,8 +361,9 @@ export class BookingsService {
       }
     }
 
+    const expressDeliveryFee = createBookingDto.isExpressDelivery ? 1500 : 0;
     const totalDiscount = discount + deliveryDiscount;
-    const totalPrice = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge - totalDiscount;
+    const totalPrice = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge + expressDeliveryFee - totalDiscount;
     const advancePaid = totalPrice * 0.2;
     const balanceDue = totalPrice - advancePaid;
 
@@ -369,10 +372,10 @@ export class BookingsService {
 
     const pricing: PricingDetails = {
       basePrice, addonsPrice, extraHoursPrice, surcharges, surchargesPrice,
-      deliveryCharge, deliveryDiscount, discount, totalPrice, platformFee, sellerPayout,
+      deliveryCharge, expressDeliveryFee, deliveryDiscount, discount, totalPrice, platformFee, sellerPayout,
       advancePaid, balanceDue, travelDistanceKm, nearestOfficeName,
     };
 
-    return { pricing, matchedAddons };
+    return { pricing, matchedAddons, unselectedAddons };
   }
 }

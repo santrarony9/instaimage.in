@@ -26,6 +26,7 @@ interface BookingData {
   extraHoursBooked?: number;
   appliedCouponId?: string;
   customerNotes?: string;
+  isExpressDelivery?: boolean;
 }
 
 interface BookingState {
@@ -64,6 +65,7 @@ export const useBookingStore = create<BookingState>()(
           location: data.location,
           appliedCouponId: data.appliedCouponId,
           customerNotes: data.customerNotes,
+          isExpressDelivery: data.isExpressDelivery || false,
         };
 
         const { fetchApi } = await import('@/lib/api');

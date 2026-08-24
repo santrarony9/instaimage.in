@@ -20,6 +20,15 @@ export function Step4Location() {
     (data as any).location?.coordinates || null
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    import('@/lib/api').then(({ fetchApi }) => {
+      fetchApi('/users/me/addresses').then((res) => {
+        if (Array.isArray(res)) setSavedAddresses(res);
+      }).catch(() => {});
+    });
+  }, []);
 
   const handleNext = () => {
     const newErrors: Record<string, string> = {};
@@ -42,6 +51,20 @@ export function Step4Location() {
         coordinates 
       } 
     });
+
+    // Save to user profile in background
+    if (address && city) {
+      const isExisting = savedAddresses.some(a => a.address === address);
+      if (!isExisting) {
+        import('@/lib/api').then(({ fetchApi }) => {
+          fetchApi('/users/me/addresses', {
+            method: 'POST',
+            body: JSON.stringify({ address, landmark, pincode, city, coordinates })
+          }).catch(() => {});
+        });
+      }
+    }
+
     nextStep();
   };
 
@@ -49,6 +72,35 @@ export function Step4Location() {
     <div className="">
       <h2 className="text-xl font-bold mb-4">Where is the shoot happening?</h2>
       
+      {savedAddresses.length > 0 && (
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Saved Addresses</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {savedAddresses.map((addr, idx) => (
+              <div 
+                key={idx} 
+                onClick={() => {
+                  setAddress(addr.address || '');
+                  setLandmark(addr.landmark || '');
+                  setPincode(addr.pincode || '');
+                  setCity(addr.city || '');
+                  setCoordinates(addr.coordinates || null);
+                }}
+                className="p-3 border rounded-lg cursor-pointer hover:border-black transition bg-gray-50 text-sm"
+              >
+                <p className="font-semibold">{addr.address.substring(0, 30)}...</p>
+                <p className="text-gray-500">{addr.city}, {addr.pincode}</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center my-4">
+            <div className="flex-1 border-t border-gray-200"></div>
+            <span className="px-3 text-gray-400 text-xs uppercase font-medium">OR ENTER NEW</span>
+            <div className="flex-1 border-t border-gray-200"></div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Pinpoint Location (Optional)</label>

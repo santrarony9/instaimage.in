@@ -42,6 +42,23 @@ export class UsersService {
     return this.usersRepository.findOneAndUpdate({ _id: id }, data);
   }
 
+  async getAddresses(userId: string) {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    return user.savedAddresses || [];
+  }
+
+  async addAddress(userId: string, addressData: any) {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    
+    const addresses = user.savedAddresses || [];
+    addresses.push(addressData);
+    
+    await this.usersRepository.findOneAndUpdate({ _id: userId }, { savedAddresses: addresses });
+    return addresses;
+  }
+
   async updateRole(id: string, role: string) {
     if (!['ADMIN', 'CUSTOMER', 'SELLER'].includes(role)) {
       throw new BadRequestException('Invalid role');

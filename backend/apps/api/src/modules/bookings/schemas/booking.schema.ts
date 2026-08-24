@@ -60,6 +60,9 @@ export class PricingDetails {
   @Prop({ required: true, min: 0, default: 0 })
   deliveryCharge: number;
 
+  @Prop({ required: true, min: 0, default: 0 })
+  expressDeliveryFee: number;
+
   @Prop()
   travelDistanceKm?: number;
 
@@ -138,6 +141,9 @@ export class Booking extends AbstractDocument {
 
   @Prop({ type: LocationDetails, required: true })
   location: LocationDetails;
+
+  @Prop({ required: true, default: false })
+  isExpressDelivery: boolean;
 
   @Prop({ type: PricingDetails, required: true })
   pricing: PricingDetails;
