@@ -66,20 +66,22 @@ export function Step7Payment() {
     <div>
       <h2 className="text-xl font-bold mb-4 text-gray-900">Review & Payment</h2>
       
-      <div className="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm mb-6 flex items-center justify-between">
-        <div>
-          <h4 className="font-bold text-gray-900">⚡ Express Delivery (24 Hours)</h4>
-          <p className="text-sm text-gray-500">Get your edited photos/videos delivered within 24 hours.</p>
+      {pricingInfo?.availableExpressFee > 0 && (
+        <div className="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm mb-6 flex items-center justify-between">
+          <div>
+            <h4 className="font-bold text-gray-900">⚡ Express Delivery (24 Hours)</h4>
+            <p className="text-sm text-gray-500">Get your edited photos/videos delivered within 24 hours for ₹{pricingInfo.availableExpressFee}.</p>
+          </div>
+          <button
+            onClick={() => {
+              useBookingStore.getState().updateData({ isExpressDelivery: !data.isExpressDelivery });
+            }}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${data.isExpressDelivery ? 'bg-indigo-600' : 'bg-gray-200'}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.isExpressDelivery ? 'translate-x-6' : 'translate-x-1'}`} />
+          </button>
         </div>
-        <button
-          onClick={() => {
-            useBookingStore.getState().updateData({ isExpressDelivery: !data.isExpressDelivery });
-          }}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${data.isExpressDelivery ? 'bg-indigo-600' : 'bg-gray-200'}`}
-        >
-          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.isExpressDelivery ? 'translate-x-6' : 'translate-x-1'}`} />
-        </button>
-      </div>
+      )}
 
       {pricingInfo?.unselectedAddons && pricingInfo.unselectedAddons.length > 0 && (
         <div className="mb-6">

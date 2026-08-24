@@ -42,6 +42,10 @@ export class CreateServiceDto {
 
   @IsNumber()
   @IsOptional()
+  expressDeliveryFee?: number;
+
+  @IsNumber()
+  @IsOptional()
   flexiblePrice?: number;
 
   @IsString()

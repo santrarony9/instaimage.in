@@ -49,6 +49,9 @@ export class Service extends AbstractDocument {
   extraHourPrice?: number;
 
   @Prop()
+  expressDeliveryFee?: number;
+
+  @Prop()
   flexiblePrice?: number;
 
   @Prop()

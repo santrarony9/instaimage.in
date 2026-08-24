@@ -361,7 +361,8 @@ export class BookingsService {
       }
     }
 
-    const expressDeliveryFee = createBookingDto.isExpressDelivery ? 1500 : 0;
+    const availableExpressFee = service.expressDeliveryFee || 0;
+    const expressDeliveryFee = createBookingDto.isExpressDelivery ? availableExpressFee : 0;
     const totalDiscount = discount + deliveryDiscount;
     const totalPrice = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge + expressDeliveryFee - totalDiscount;
     const advancePaid = totalPrice * 0.2;
@@ -376,6 +377,6 @@ export class BookingsService {
       advancePaid, balanceDue, travelDistanceKm, nearestOfficeName,
     };
 
-    return { pricing, matchedAddons, unselectedAddons };
+    return { pricing, matchedAddons, unselectedAddons, availableExpressFee };
   }
 }
