@@ -112,10 +112,10 @@ export default async function HomePage() {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
           <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">
-            Premium Photography.<br className="hidden md:block"/> Delivered On-Demand.
+            Professional Photography.<br className="hidden md:block"/> Delivered On-Demand.
           </h1>
           <p className="text-base md:text-lg text-gray-300 max-w-2xl mx-auto mb-8">
-            Book professional photographers, drone pilots, and editors instantly. Get your memories captured and delivered in as little as 24 hours.
+            Book trusted photographers, drone pilots, and editors instantly. Get your memories captured and delivered in as little as 24 hours.
           </p>
           
           <div className="max-w-3xl mx-auto bg-white p-2 rounded-2xl flex items-center shadow-2xl relative z-20 transition-transform focus-within:scale-[1.02]">
