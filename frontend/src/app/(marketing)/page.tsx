@@ -145,7 +145,7 @@ export default async function HomePage() {
                       <Link href={`/services/${service.slug || service._id}`} key={i} className="flex-shrink-0 w-28 bg-white rounded-xl overflow-hidden flex flex-col shadow-sm border border-white/20 snap-center group hover:scale-105 transition-transform duration-300">
                         <div className="h-20 w-full bg-gray-100 relative">
                           {src ? (
-                            <img src={src} alt={service.name} className="w-full h-full object-cover" loading="lazy" />
+                            <Image src={src} alt={service.name} fill sizes="112px" className="object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-xl">📸</div>
                           )}
@@ -224,11 +224,12 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
       
       <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
         {fullImageUrl ? (
-          <img 
+          <Image 
             src={fullImageUrl}
             alt={service.name}
-            loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+            className="object-cover group-hover:scale-105 transition duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300">

@@ -37,7 +37,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('register-creator')
+  @Post('register-seller')
   registerSeller(@Body() registerDto: RegisterDto) {
     return this.authService.registerSeller(registerDto);
   }

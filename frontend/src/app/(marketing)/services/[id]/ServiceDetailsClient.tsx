@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/hooks/use-cart-store';
 
@@ -111,7 +112,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
           <div className="w-full lg:w-7/12">
             {/* Main Image Gallery */}
             <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden mb-6 relative">
-              <img src={mainImage} alt={service.name} className="w-full h-full object-contain" />
+              <Image src={mainImage} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" priority />
             </div>
             
             {/* Thumbnails */}
@@ -123,9 +124,9 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                     <div 
                       key={idx} 
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border-2 transition ${activeImageIndex === idx ? 'border-black' : 'hover:border-gray-400 border-transparent'}`}
+                      className={`w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border-2 transition relative ${activeImageIndex === idx ? 'border-black' : 'hover:border-gray-400 border-transparent'}`}
                     >
-                      <img src={url} alt={`${service.name} ${idx}`} className="w-full h-full object-cover" />
+                      <Image src={url} alt={`${service.name} ${idx}`} fill sizes="96px" className="object-cover" />
                     </div>
                   );
                 })}
@@ -381,7 +382,7 @@ function ServiceCard({ service }: { service: any }) {
     <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
       <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
         {imageUrl ? (
-          <img src={imageUrl} alt={service.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+          <Image src={imageUrl} alt={service.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-4xl text-gray-300">📸</span>

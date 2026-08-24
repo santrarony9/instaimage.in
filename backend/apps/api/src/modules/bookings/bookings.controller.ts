@@ -90,6 +90,15 @@ export class BookingsController {
     return this.bookingsService.updatesellerStatus(id, req.user.sub, status);
   }
 
+  @Patch(':id/delivery-link')
+  @Roles(Role.SELLER, Role.ADMIN)
+  updateDeliveryLink(
+    @Param('id') id: string,
+    @Body('deliveryLink') deliveryLink: string,
+  ) {
+    return this.bookingsService.updateDeliveryLink(id, deliveryLink);
+  }
+
   @Post(':id/surcharge')
   @Roles(Role.ADMIN)
   addSurcharge(

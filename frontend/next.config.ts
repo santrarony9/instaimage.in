@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   turbopack: {},
   output: process.env.VERCEL ? undefined : 'standalone',
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

@@ -246,6 +246,13 @@ export class BookingsService {
     return this.bookingsRepository.update(bookingId, { status });
   }
 
+  async updateDeliveryLink(bookingId: string, deliveryLink: string) {
+    const booking = await this.bookingsRepository.findById(bookingId);
+    if (!booking) throw new NotFoundException('Booking not found');
+
+    return this.bookingsRepository.update(bookingId, { deliveryLink });
+  }
+
   async calculateTravelCharge(clientCoordinates: number[] | undefined | null) {
     let deliveryCharge = 500;
     let travelDistanceKm = 0;

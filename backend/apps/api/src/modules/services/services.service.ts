@@ -60,9 +60,11 @@ export class ServicesService {
   }
 
   async update(id: string, updateServiceDto: UpdateServiceDto) {
+    const data: any = { ...updateServiceDto };
+    if (data.categoryId) data.categoryId = new Types.ObjectId(data.categoryId);
     return this.servicesRepository.findOneAndUpdate(
       { _id: id },
-      updateServiceDto,
+      data,
     );
   }
 

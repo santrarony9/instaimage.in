@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/hooks/use-auth-store';
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
+import Image from 'next/image';
 
 export default function SellerDashboard() {
   const { user, token } = useAuthStore();
@@ -262,7 +263,9 @@ export default function SellerDashboard() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
                 <div className="flex items-center gap-4">
                   {newService.coverImage && (
-                    <img src={newService.coverImage} alt="Cover" className="w-20 h-20 object-cover rounded border" />
+                    <div className="w-20 h-20 relative flex-shrink-0">
+                      <Image src={newService.coverImage} alt="Cover" fill sizes="80px" className="object-cover rounded border" />
+                    </div>
                   )}
                   <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm font-medium text-gray-700 border border-gray-300">
                     {uploading ? 'Uploading...' : 'Choose Image'}
@@ -362,7 +365,7 @@ export default function SellerDashboard() {
                   <tr key={s._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        {s.coverImage && <img src={s.coverImage} alt="" className="w-10 h-10 rounded object-cover" />}
+                        {s.coverImage && <div className="w-10 h-10 relative flex-shrink-0"><Image src={s.coverImage} alt="" fill sizes="40px" className="rounded object-cover" /></div>}
                         <span className="font-medium text-gray-900">{s.name}</span>
                       </div>
                     </td>

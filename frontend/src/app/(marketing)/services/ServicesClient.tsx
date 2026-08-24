@@ -211,11 +211,12 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                           const raw = service.images[0];
                           const src = raw.startsWith('/') ? `https://api.instaimage.in${raw}` : raw;
                           return (
-                            <img 
+                            <Image 
                               src={src}
                               alt={service.name}
-                              loading="lazy"
-                              className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                              className="object-cover group-hover:scale-105 transition duration-500"
                             />
                           );
                         })() : (

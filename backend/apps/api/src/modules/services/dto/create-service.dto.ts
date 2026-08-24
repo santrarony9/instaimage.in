@@ -5,7 +5,19 @@ import {
   IsBoolean,
   IsOptional,
   IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class AddonDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+}
 
 export class CreateServiceDto {
   @IsString()
@@ -51,11 +63,17 @@ export class CreateServiceDto {
 
   @IsArray()
   @IsOptional()
-  addons?: { name: string; price: number }[];
+  @ValidateNested({ each: true })
+  @Type(() => AddonDto)
+  addons?: AddonDto[];
 
   @IsString()
   @IsOptional()
   category?: string;
+
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
 
   @IsArray()
   @IsString({ each: true })
