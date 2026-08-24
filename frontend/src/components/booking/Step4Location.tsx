@@ -80,15 +80,29 @@ export function Step4Location() {
               <div 
                 key={idx} 
                 onClick={() => {
-                  setAddress(addr.address || '');
-                  setLandmark(addr.landmark || '');
-                  setPincode(addr.pincode || '');
-                  setCity(addr.city || '');
-                  setCoordinates(addr.coordinates || null);
+                  const isSelected = address === addr.address && pincode === addr.pincode;
+                  if (isSelected) {
+                    setAddress('');
+                    setLandmark('');
+                    setPincode('');
+                    setCity('');
+                    setCoordinates(null);
+                  } else {
+                    setAddress(addr.address || '');
+                    setLandmark(addr.landmark || '');
+                    setPincode(addr.pincode || '');
+                    setCity(addr.city || '');
+                    setCoordinates(addr.coordinates || null);
+                  }
                 }}
-                className="p-3 border rounded-lg cursor-pointer hover:border-black transition bg-gray-50 text-sm"
+                className={`p-3 border rounded-lg cursor-pointer transition text-sm relative ${address === addr.address && pincode === addr.pincode ? 'border-black bg-white ring-1 ring-black' : 'border-gray-200 bg-gray-50 hover:border-gray-400'}`}
               >
-                <p className="font-semibold">{addr.address ? (addr.address.length > 30 ? `${addr.address.substring(0, 30)}...` : addr.address) : 'Saved Address'}</p>
+                {address === addr.address && pincode === addr.pincode && (
+                  <div className="absolute top-2 right-2 bg-black text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
+                    ✕
+                  </div>
+                )}
+                <p className="font-semibold pr-4">{addr.address ? (addr.address.length > 30 ? `${addr.address.substring(0, 30)}...` : addr.address) : 'Saved Address'}</p>
                 <p className="text-gray-500">{addr.city || ''}{addr.city && addr.pincode ? ', ' : ''}{addr.pincode || ''}</p>
               </div>
             ))}
