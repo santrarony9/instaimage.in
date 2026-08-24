@@ -90,11 +90,11 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
-          <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
+          <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">
             Premium Photography.<br className="hidden md:block"/> Delivered On-Demand.
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10">
+          <p className="text-base md:text-lg text-gray-300 max-w-2xl mx-auto mb-8">
             Book professional photographers, drone pilots, and editors instantly. Get your memories captured and delivered in as little as 24 hours.
           </p>
           
@@ -107,9 +107,9 @@ export default async function HomePage() {
             <input 
               type="text" 
               placeholder="Search for wedding shoots, podcasts, or drone videography..." 
-              className="w-full py-4 bg-transparent border-none text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 text-lg"
+              className="w-full py-3 bg-transparent border-none text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 text-base md:text-lg"
             />
-            <button className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-700 transition">
+            <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition">
               Search
             </button>
           </div>
