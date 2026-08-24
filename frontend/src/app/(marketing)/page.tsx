@@ -79,41 +79,76 @@ export default async function HomePage() {
           <p className="text-sm">We are currently updating our catalog. Please check back in a few minutes.</p>
         </div>
       )}
-      {/* Quick Commerce Search Header */}
-      <div className="bg-white border-b border-gray-100 pt-8 pb-10">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-6">What do you want to shoot today?</h1>
-          <div className="sticky top-[80px] z-30 bg-white py-2 md:py-0 md:relative max-w-2xl mx-auto shadow-sm md:shadow-none">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      {/* Hero Section */}
+      <div className="relative bg-black text-white overflow-hidden">
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+            alt="Photography Background" 
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
+          <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+            Premium Photography.<br className="hidden md:block"/> Delivered On-Demand.
+          </h1>
+          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10">
+            Book professional photographers, drone pilots, and editors instantly. Get your memories captured and delivered in as little as 24 hours.
+          </p>
+          
+          <div className="max-w-3xl mx-auto bg-white p-2 rounded-2xl flex items-center shadow-2xl relative z-20 transition-transform focus-within:scale-[1.02]">
+            <div className="pl-4 pr-2">
+              <svg className="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
             <input 
               type="text" 
-              placeholder="Search for photography, videography, podcast..." 
-              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-colors"
+              placeholder="Search for wedding shoots, podcasts, or drone videography..." 
+              className="w-full py-4 bg-transparent border-none text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 text-lg"
             />
+            <button className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-700 transition">
+              Search
+            </button>
           </div>
         </div>
       </div>
 
       <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         
-        {/* Quick Commerce Category Tiles */}
+        {/* Premium Category Tiles */}
         {categories.length > 0 && (
-          <div className="mb-12">
+          <div className="mb-16 -mt-8 relative z-30">
             <div className="flex justify-between items-end mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-gray-900">Explore Categories</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900">Explore Categories</h2>
             </div>
             
-            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
-              {categories.slice(0, 8).map((category: any) => (
-                <Link key={category._id} href={`/services?category=${category.name}`} className="bg-blue-50 aspect-square rounded-2xl flex flex-col items-center justify-center p-2 text-center group hover:bg-blue-100 transition-colors border border-blue-100/50">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition-transform">
-                    <span className="text-xl">📸</span>
-                  </div>
-                  <h3 className="text-gray-800 text-xs sm:text-sm font-bold leading-tight">{category.name}</h3>
-                </Link>
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {categories.slice(0, 4).map((category: any, idx: number) => {
+                const gradients = [
+                  'from-purple-500 to-indigo-600',
+                  'from-rose-400 to-red-500',
+                  'from-emerald-400 to-teal-500',
+                  'from-amber-400 to-orange-500'
+                ];
+                const emojis = ['📸', '🎥', '🎪', '✂️'];
+                return (
+                  <Link key={category._id} href={`/services?category=${category.name}`} className={`relative bg-gradient-to-br ${gradients[idx % gradients.length]} rounded-2xl p-6 overflow-hidden group shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
+                    <div className="absolute right-0 bottom-0 opacity-20 transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform duration-500 text-8xl">
+                      {emojis[idx % emojis.length]}
+                    </div>
+                    <div className="relative z-10">
+                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 text-2xl">
+                        {emojis[idx % emojis.length]}
+                      </div>
+                      <h3 className="text-white text-lg sm:text-xl font-bold">{category.name}</h3>
+                      <p className="text-white/80 text-sm mt-1 font-medium">Explore &rarr;</p>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}
