@@ -8,6 +8,8 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  phone?: string;
+  isWhatsappVerified?: boolean;
   role: 'ADMIN' | 'CUSTOMER' | 'SELLER';
   createdAt: string;
 }
@@ -121,6 +123,7 @@ export default function UsersPage() {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone / WhatsApp</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined Date</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -129,17 +132,29 @@ export default function UsersPage() {
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">Loading users...</td>
+                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">Loading users...</td>
               </tr>
             ) : users.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">No users found.</td>
+                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">No users found.</td>
               </tr>
             ) : (
               users.map((user) => (
                 <tr key={user._id}>
                   <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{user.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">{user.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                    {user.phone ? (
+                      <span className="flex items-center gap-2">
+                        {user.phone}
+                        {user.isWhatsappVerified && (
+                          <span className="text-green-600" title="WhatsApp Verified">✓</span>
+                        )}
+                      </span>
+                    ) : (
+                      <span className="text-gray-300 italic">Not provided</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
                       {user.role}

@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -7,7 +8,8 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-import { Viewport } from "next";
+const WhatsappVerificationModal = dynamic(() => import("@/components/auth/WhatsappVerificationModal"), { ssr: false });
+
 import { OrganizationJsonLd } from "@/components/seo/JsonLd";
 
 export const viewport: Viewport = {
@@ -70,12 +72,14 @@ export const metadata: Metadata = {
     },
   },
 };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased bg-gray-50 font-sans`}>
         <OrganizationJsonLd />
         {children}
+        <WhatsappVerificationModal />
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ interface User {
   email: string;
   role: string;
   phone?: string;
+  isWhatsappVerified?: boolean;
 }
 
 interface AuthState {
