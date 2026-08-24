@@ -150,6 +150,10 @@ export class BookingsService {
     return this.bookingsRepository.update(id, { status });
   }
 
+  async updateTipAmount(id: string, tipAmount: number) {
+    return this.bookingsRepository.update(id, { tipAmount });
+  }
+
   async addSurcharge(
     id: string,
     surcharge: { name: string; amount: number; reason?: string },

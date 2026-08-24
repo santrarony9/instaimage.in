@@ -1,4 +1,63 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { Review } from './schemas/review.schema';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { BookingsService } from '../bookings/bookings.service';
+import { BookingStatus } from '../bookings/schemas/booking.schema';
 
 @Injectable()
-export class ReviewsService {}
+export class ReviewsService {
+  constructor(
+    @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
+    private readonly bookingsService: BookingsService,
+  ) {}
+
+  async create(createReviewDto: CreateReviewDto, clientId: string) {
+    const booking = await this.bookingsService.getBookingById(createReviewDto.bookingId);
+    
+    if (booking.customerId._id.toString() !== clientId) {
+      throw new BadRequestException('You can only review your own bookings');
+    }
+
+    if (booking.status !== BookingStatus.DELIVERED && booking.status !== BookingStatus.COMPLETED) {
+      throw new BadRequestException('You can only review completed or delivered bookings');
+    }
+
+    const existingReview = await this.reviewModel.findOne({ bookingId: new Types.ObjectId(createReviewDto.bookingId) });
+    if (existingReview) {
+      throw new BadRequestException('You have already reviewed this booking');
+    }
+
+    // Save tip to booking if provided
+    if (createReviewDto.tipAmount && createReviewDto.tipAmount > 0) {
+      await this.bookingsService.updateTipAmount(booking._id.toString(), createReviewDto.tipAmount);
+    }
+
+    const review = new this.reviewModel({
+      bookingId: new Types.ObjectId(createReviewDto.bookingId),
+      clientId: new Types.ObjectId(clientId),
+      sellerId: booking.sellerId ? new Types.ObjectId(booking.sellerId as any) : null,
+      serviceId: booking.serviceId ? new Types.ObjectId(booking.serviceId as any) : null,
+      rating: createReviewDto.rating,
+      reviewText: createReviewDto.reviewText,
+      status: 'APPROVED', // Auto-approve for now
+    });
+
+    return review.save();
+  }
+
+  async getReviewsForService(serviceId: string) {
+    return this.reviewModel
+      .find({ serviceId: new Types.ObjectId(serviceId), status: 'APPROVED' })
+      .populate('clientId', 'name')
+      .sort({ createdAt: -1 });
+  }
+
+  async getReviewsForSeller(sellerId: string) {
+    return this.reviewModel
+      .find({ sellerId: new Types.ObjectId(sellerId), status: 'APPROVED' })
+      .populate('clientId', 'name')
+      .sort({ createdAt: -1 });
+  }
+}

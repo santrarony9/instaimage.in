@@ -89,6 +89,9 @@ export class PricingDetails {
 
   @Prop({ required: true, min: 0 })
   balanceDue: number;
+
+  @Prop({ min: 0, default: 0 })
+  tipAmount?: number;
 }
 
 @Schema({ timestamps: true, collection: 'bookings' })
