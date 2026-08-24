@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Review } from './schemas/review.schema';
@@ -16,7 +16,9 @@ export class ReviewsService {
   async create(createReviewDto: CreateReviewDto, clientId: string) {
     const booking = await this.bookingsService.getBookingById(createReviewDto.bookingId);
     
-    if (booking.customerId._id.toString() !== clientId) {
+    // Safely extract customerId whether populated or not
+    const bookingCustomerId = (booking.customerId as any)?._id?.toString() || booking.customerId?.toString();
+    if (bookingCustomerId !== clientId) {
       throw new BadRequestException('You can only review your own bookings');
     }
 
@@ -34,11 +36,19 @@ export class ReviewsService {
       await this.bookingsService.updateTipAmount(booking._id.toString(), createReviewDto.tipAmount);
     }
 
+    // Safely extract ObjectIds from potentially populated fields
+    const sellerId = booking.sellerId 
+      ? new Types.ObjectId((booking.sellerId as any)?._id?.toString() || booking.sellerId.toString()) 
+      : null;
+    const serviceId = booking.serviceId 
+      ? new Types.ObjectId((booking.serviceId as any)?._id?.toString() || booking.serviceId.toString()) 
+      : null;
+
     const review = new this.reviewModel({
       bookingId: new Types.ObjectId(createReviewDto.bookingId),
       clientId: new Types.ObjectId(clientId),
-      sellerId: booking.sellerId ? new Types.ObjectId(booking.sellerId as any) : null,
-      serviceId: booking.serviceId ? new Types.ObjectId(booking.serviceId as any) : null,
+      sellerId,
+      serviceId,
       rating: createReviewDto.rating,
       reviewText: createReviewDto.reviewText,
       status: 'APPROVED', // Auto-approve for now
@@ -48,6 +58,7 @@ export class ReviewsService {
   }
 
   async getReviewsForService(serviceId: string) {
+    if (!Types.ObjectId.isValid(serviceId)) return [];
     return this.reviewModel
       .find({ serviceId: new Types.ObjectId(serviceId), status: 'APPROVED' })
       .populate('clientId', 'name')
@@ -55,6 +66,7 @@ export class ReviewsService {
   }
 
   async getReviewsForSeller(sellerId: string) {
+    if (!Types.ObjectId.isValid(sellerId)) return [];
     return this.reviewModel
       .find({ sellerId: new Types.ObjectId(sellerId), status: 'APPROVED' })
       .populate('clientId', 'name')

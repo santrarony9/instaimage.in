@@ -33,8 +33,8 @@ export default async function PortfolioPage() {
     console.error('Failed to fetch services for portfolio:', e);
   }
 
-  // Shuffle array for a diverse portfolio look
-  portfolioItems = portfolioItems.sort(() => Math.random() - 0.5);
+  // Sort array deterministically for a diverse portfolio look (avoid impure Math.random during render)
+  portfolioItems = portfolioItems.sort((a: any, b: any) => (a.url || '').localeCompare(b.url || ''));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

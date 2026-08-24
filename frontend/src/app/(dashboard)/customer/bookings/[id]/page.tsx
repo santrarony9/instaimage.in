@@ -49,13 +49,21 @@ export default function BookingDetailPage() {
         })
       });
       setReviewSubmitted(true);
-      setTimeout(() => setShowFeedbackModal(false), 2000);
-    } catch (err) {
+      setTimeout(() => closeFeedbackModal(), 2000);
+    } catch (err: any) {
       console.error(err);
-      alert('Failed to submit review');
+      alert(err.message || 'Failed to submit review');
     } finally {
       setIsSubmittingReview(false);
     }
+  };
+
+  const closeFeedbackModal = () => {
+    setShowFeedbackModal(false);
+    setRating(0);
+    setReviewText('');
+    setTipAmount(0);
+    setReviewSubmitted(false);
   };
 
   if (loading) {
@@ -278,7 +286,7 @@ export default function BookingDetailPage() {
       {showFeedbackModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowFeedbackModal(false)}></div>
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => closeFeedbackModal()}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               {reviewSubmitted ? (
@@ -353,7 +361,7 @@ export default function BookingDetailPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setShowFeedbackModal(false)}
+                      onClick={() => closeFeedbackModal()}
                       className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     >
                       Cancel

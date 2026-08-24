@@ -1,7 +1,8 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
 
 export async function fetchApi(endpoint: string, options?: RequestInit) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${API_BASE_URL.replace(/\/$/, '')}${cleanEndpoint}`;
   
   // Get token directly from localStorage (Zustand persist key is 'auth-storage')
   let token = null;
@@ -19,8 +20,8 @@ export async function fetchApi(endpoint: string, options?: RequestInit) {
     ...(options?.headers as Record<string, string> || {}),
   };
 
-  // Only set Content-Type to JSON if we are not sending FormData
-  if (!(options?.body instanceof FormData)) {
+  // Only set Content-Type to JSON if we have a body and it's not FormData
+  if (options?.body && !(options.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
 
@@ -32,7 +33,8 @@ export async function fetchApi(endpoint: string, options?: RequestInit) {
     const response = await fetch(url, { ...options, headers });
     
     if (!response.ok) {
-      if (response.status === 401 && typeof window !== 'undefined') {
+      // Only redirect on 401 if we HAD a token and we're not already on the login page
+      if (response.status === 401 && typeof window !== 'undefined' && token && !window.location.pathname.startsWith('/login')) {
         localStorage.removeItem('auth-storage');
         window.location.href = '/login';
       }
@@ -44,7 +46,11 @@ export async function fetchApi(endpoint: string, options?: RequestInit) {
       throw new Error(errorMessage || `API error: ${response.status} ${response.statusText}`);
     }
     
-    return await response.json();
+    // Handle 204 No Content
+    if (response.status === 204) return null;
+    
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   } catch (error) {
     console.error(`API Fetch Error [${endpoint}]:`, error);
     throw error;

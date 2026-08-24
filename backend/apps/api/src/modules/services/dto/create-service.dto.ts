@@ -44,6 +44,26 @@ export class CreateServiceDto {
   @IsOptional()
   duration?: number;
 
+  @IsString()
+  @IsOptional()
+  durationUnit?: string;
+
+  @IsString()
+  @IsOptional()
+  priceType?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  featured?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  popular?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  newService?: boolean;
+
   @IsNumber()
   @IsOptional()
   expressDeliveryFee?: number;

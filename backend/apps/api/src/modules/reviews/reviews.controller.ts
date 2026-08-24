@@ -1,7 +1,6 @@
-import { Controller, Post, Body, Req, UseGuards, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Req, Get, Param } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { Roles, Role, Public } from '@app/auth';
 
 @Controller('reviews')

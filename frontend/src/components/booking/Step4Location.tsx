@@ -88,8 +88,8 @@ export function Step4Location() {
                 }}
                 className="p-3 border rounded-lg cursor-pointer hover:border-black transition bg-gray-50 text-sm"
               >
-                <p className="font-semibold">{addr.address.substring(0, 30)}...</p>
-                <p className="text-gray-500">{addr.city}, {addr.pincode}</p>
+                <p className="font-semibold">{addr.address ? (addr.address.length > 30 ? `${addr.address.substring(0, 30)}...` : addr.address) : 'Saved Address'}</p>
+                <p className="text-gray-500">{addr.city || ''}{addr.city && addr.pincode ? ', ' : ''}{addr.pincode || ''}</p>
               </div>
             ))}
           </div>
