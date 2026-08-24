@@ -105,6 +105,7 @@ export function Step4Location() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Pinpoint Location (Optional)</label>
           <MapSelector 
+            key={coordinates ? `${coordinates[0]}-${coordinates[1]}` : 'default'}
             defaultPosition={coordinates ? [coordinates[1], coordinates[0]] : undefined}
             onLocationSelect={(lat, lng) => setCoordinates([lng, lat])}
           />
