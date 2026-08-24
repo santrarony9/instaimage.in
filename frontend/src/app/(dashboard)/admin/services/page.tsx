@@ -127,6 +127,7 @@ export default function ServicesManagementPage() {
     if (payload.basePrice) payload.basePrice = Number(payload.basePrice);
     if (payload.extraHourPrice) payload.extraHourPrice = Number(payload.extraHourPrice);
     if (payload.flexiblePrice) payload.flexiblePrice = Number(payload.flexiblePrice);
+    if (payload.duration) payload.duration = Number(payload.duration);
 
     // Validate addons
     if (payload.addons) {
@@ -386,6 +387,10 @@ export default function ServicesManagementPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Fixed Time Price (₹)</label>
                     <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4000" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Duration (Hours)</label>
+                    <input required type="number" step="0.5" value={formData.duration || ''} onChange={e => setFormData({ ...formData, duration: Number(e.target.value) })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4" />
                   </div>
                   {formData.deliveryMethod !== 'REMOTE' && (
                     <>
