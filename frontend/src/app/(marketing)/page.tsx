@@ -64,11 +64,31 @@ export default async function HomePage() {
   }));
 
   // E-commerce logic
-  // Newly Added
-  const newlyAdded = [...services].reverse().slice(0, 6);
+  // Newly Added: sort by newest first (createdAt descending)
+  const newlyAdded = [...services]
+    .sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    })
+    .slice(0, 6);
   
-  // Popular Services: renamed from Trending to avoid confusion
-  const popularServices = [...services].sort((a, b) => (b.basePrice || 0) - (a.basePrice || 0)).slice(0, 6);
+  // Popular Services: prioritize 'popular' flag, then sort by highest review count/rating
+  const popularServices = [...services]
+    .sort((a, b) => {
+      if (a.popular && !b.popular) return -1;
+      if (!a.popular && b.popular) return 1;
+      
+      const scoreA = (a.rating || 0) * (a.reviewCount || 1);
+      const scoreB = (b.rating || 0) * (b.reviewCount || 1);
+      
+      // Fallback to random/stable if no ratings
+      if (scoreA === 0 && scoreB === 0) {
+        return (a.basePrice || 0) - (b.basePrice || 0); // cheaper first as fallback
+      }
+      return scoreB - scoreA;
+    })
+    .slice(0, 6);
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
