@@ -43,7 +43,7 @@ export function Navbar() {
             <nav className="hidden md:flex space-x-6">
               <Link href="/services" className="text-sm font-semibold text-gray-600 hover:text-black transition">Services</Link>
               <Link href="/portfolio" className="text-sm font-semibold text-gray-600 hover:text-black transition">Portfolio</Link>
-              <Link href="/sellers" className="text-sm font-semibold text-gray-600 hover:text-black transition">Sellers</Link>
+              <Link href="/seller/login" className="text-sm font-semibold text-gray-600 hover:text-black transition">Sellers</Link>
             </nav>
           </div>
 
@@ -107,7 +107,7 @@ export function Navbar() {
           <nav className="flex flex-col space-y-4">
             <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Services</Link>
             <Link href="/portfolio" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Portfolio</Link>
-            <Link href="/sellers" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Sellers</Link>
+            <Link href="/seller/login" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Sellers</Link>
             
             <button 
               onClick={() => { setSidebarOpen(true); setIsMobileMenuOpen(false); }} 
