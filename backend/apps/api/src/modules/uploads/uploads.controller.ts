@@ -9,7 +9,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { extname } from 'path';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -106,6 +106,36 @@ export class UploadsController {
     }
   }
 
+  @Public()
+  @Get('gallery')
+  async getGallery() {
+    try {
+      const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
+      const endpoint = process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com';
+      
+      const command = new ListObjectsV2Command({
+        Bucket: bucketName,
+        MaxKeys: 1000,
+      });
+      
+      const response = await this.s3.send(command);
+      
+      if (!response.Contents) return [];
+      
+      const sorted = response.Contents.sort((a, b) => {
+        return (b.LastModified?.getTime() || 0) - (a.LastModified?.getTime() || 0);
+      });
+      
+      const images = sorted
+        .filter(item => item.Key && item.Key.match(/\.(jpg|jpeg|png|webp|gif)$/i))
+        .map(item => `${endpoint}/${bucketName}/${item.Key}`);
+        
+      return { success: true, data: images };
+    } catch (e) {
+      console.error('Failed to list gallery:', e);
+      return { success: false, data: [] };
+    }
+  }
   @Public()
   @Get('fix-old-images')
   async fixOldImages() {

@@ -28,30 +28,26 @@ export default function ServicesManagementPage() {
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
 
-  const allGalleryImages = Array.from(new Set(
-    [...data, ...pendingData].flatMap(s => {
-      const imgs = [];
-      if (s.coverImage) imgs.push(s.coverImage);
-      if (s.images && Array.isArray(s.images)) imgs.push(...s.images);
-      return imgs;
-    })
-  )).filter(Boolean);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [allRes, pendingRes, categoriesRes] = await Promise.all([
+      const [allRes, pendingRes, categoriesRes, galleryRes] = await Promise.all([
         fetchApi('/services/admin/all'),
         fetchApi('/services/pending'),
-        fetchApi('/categories/admin').catch(() => ({ data: [] }))
+        fetchApi('/categories/admin').catch(() => ({ data: [] })),
+        fetchApi('/uploads/gallery').catch(() => ({ data: [] }))
       ]);
       const allServices = allRes.data || allRes || [];
       const pending = pendingRes.data || pendingRes || [];
       const cats = categoriesRes.data || categoriesRes || [];
+      const bucketImages = galleryRes.data || [];
       
       setData(allServices.filter((s: any) => s.isApproved));
       setPendingData(pending);
       setCategories(Array.isArray(cats) ? cats : []);
+      setGalleryImages(bucketImages);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -596,7 +592,7 @@ export default function ServicesManagementPage() {
                   <ImageUpload 
                     images={formData.images || []}
                     onChange={(imgs) => setFormData({ ...formData, images: imgs })}
-                    galleryImages={allGalleryImages}
+                    galleryImages={galleryImages}
                   />
                 </div>
                 <div>
