@@ -283,11 +283,9 @@ export default function SellerDashboard() {
                       {uploading ? 'Uploading...' : 'Upload New'}
                       <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                     </label>
-                    {galleryImages.length > 0 && (
-                      <button type="button" onClick={() => setIsGalleryOpen(true)} className="bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded text-sm font-medium text-indigo-700 border border-indigo-200 transition-colors">
-                        Choose from Gallery
-                      </button>
-                    )}
+                    <button type="button" onClick={() => setIsGalleryOpen(true)} className="bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded text-sm font-medium text-indigo-700 border border-indigo-200 transition-colors">
+                      Choose from Gallery
+                    </button>
                   </div>
                 </div>
               </div>

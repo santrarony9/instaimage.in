@@ -29,7 +29,12 @@ export default function ServicesManagementPage() {
   const [formData, setFormData] = useState<any>({});
 
   const allGalleryImages = Array.from(new Set(
-    [...data, ...pendingData].flatMap(s => s.images || [])
+    [...data, ...pendingData].flatMap(s => {
+      const imgs = [];
+      if (s.coverImage) imgs.push(s.coverImage);
+      if (s.images && Array.isArray(s.images)) imgs.push(...s.images);
+      return imgs;
+    })
   )).filter(Boolean);
 
   const loadData = async () => {

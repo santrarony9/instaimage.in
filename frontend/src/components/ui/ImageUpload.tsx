@@ -101,8 +101,7 @@ export default function ImageUpload({ images = [], onChange, maxImages = 5, gall
             />
           </label>
         )}
-        
-        {galleryImages.length > 0 && images.length < maxImages && (
+        {images.length < maxImages && (
           <button 
             type="button" 
             onClick={() => setIsGalleryOpen(true)}
