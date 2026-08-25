@@ -28,6 +28,10 @@ export default function ServicesManagementPage() {
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
 
+  const allGalleryImages = Array.from(new Set(
+    [...data, ...pendingData].flatMap(s => s.images || [])
+  )).filter(Boolean);
+
   const loadData = async () => {
     setIsLoading(true);
     try {
@@ -587,6 +591,7 @@ export default function ServicesManagementPage() {
                   <ImageUpload 
                     images={formData.images || []}
                     onChange={(imgs) => setFormData({ ...formData, images: imgs })}
+                    galleryImages={allGalleryImages}
                   />
                 </div>
                 <div>

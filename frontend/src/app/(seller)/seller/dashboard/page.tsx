@@ -16,11 +16,22 @@ export default function SellerDashboard() {
 
   // New Service Form State
   const [isAddingService, setIsAddingService] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [newService, setNewService] = useState({
     name: '', slug: '', description: '', basePrice: 0, category: 'Photography',
     extraHourPrice: 0, flexiblePrice: 0, coverImage: '', tags: '', locations: '', occasions: '', deliveryMethod: 'ON_SPOT'
   });
   const [uploading, setUploading] = useState(false);
+
+  // Extract previous uploaded images
+  const galleryImages = Array.from(new Set(
+    myServices.flatMap(s => {
+      const imgs = [];
+      if (s.coverImage) imgs.push(s.coverImage);
+      if (s.images && Array.isArray(s.images)) imgs.push(...s.images);
+      return imgs;
+    }).filter(Boolean)
+  ));
 
   const loadData = async () => {
     setLoading(true);
@@ -261,16 +272,23 @@ export default function SellerDashboard() {
               {/* Cover Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   {newService.coverImage && (
                     <div className="w-20 h-20 relative flex-shrink-0">
-                      <Image src={newService.coverImage} alt="Cover" fill sizes="80px" className="object-cover rounded border" />
+                      <Image src={newService.coverImage.startsWith('/') ? `https://api.instaimage.in${newService.coverImage}` : newService.coverImage} alt="Cover" fill sizes="80px" className="object-cover rounded border" />
                     </div>
                   )}
-                  <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm font-medium text-gray-700 border border-gray-300">
-                    {uploading ? 'Uploading...' : 'Choose Image'}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm font-medium text-gray-700 border border-gray-300">
+                      {uploading ? 'Uploading...' : 'Upload New'}
+                      <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                    </label>
+                    {galleryImages.length > 0 && (
+                      <button type="button" onClick={() => setIsGalleryOpen(true)} className="bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded text-sm font-medium text-indigo-700 border border-indigo-200 transition-colors">
+                        Choose from Gallery
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -485,6 +503,52 @@ export default function SellerDashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Gallery Modal */}
+      {isGalleryOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+              <h3 className="text-lg font-bold text-gray-900">Choose from Media Gallery</h3>
+              <button onClick={() => setIsGalleryOpen(false)} className="text-gray-500 hover:text-gray-700">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="p-4 overflow-y-auto flex-1">
+              {galleryImages.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">No previous images found.</div>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                  {galleryImages.map((img, idx) => (
+                    <div 
+                      key={idx} 
+                      onClick={() => {
+                        setNewService({ ...newService, coverImage: img });
+                        setIsGalleryOpen(false);
+                      }}
+                      className="aspect-square relative rounded-lg overflow-hidden border-2 border-transparent hover:border-indigo-500 cursor-pointer shadow-sm group"
+                    >
+                      <Image 
+                        src={img.startsWith('/') ? `https://api.instaimage.in${img}` : img} 
+                        alt={`Gallery image ${idx}`} 
+                        fill 
+                        sizes="150px" 
+                        className="object-cover group-hover:scale-105 transition-transform" 
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+              <button onClick={() => setIsGalleryOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
