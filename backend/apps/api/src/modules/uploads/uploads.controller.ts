@@ -9,6 +9,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { extname } from 'path';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import * as sharp from 'sharp';
 
 @Controller('uploads')
 export class UploadsController {
@@ -48,8 +49,26 @@ export class UploadsController {
       throw new BadRequestException('No file uploaded or invalid file type');
     }
 
+    let fileBuffer = file.buffer;
+    let mimeType = file.mimetype;
+    let fileExt = extname(file.originalname);
+    
+    // Optimize images (exclude gifs as sharp animated webp can sometimes be tricky or large)
+    if (mimeType.startsWith('image/') && !mimeType.includes('gif')) {
+      try {
+        fileBuffer = await sharp(file.buffer)
+          .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 80, effort: 4 })
+          .toBuffer();
+        mimeType = 'image/webp';
+        fileExt = '.webp';
+      } catch (err) {
+        console.error('Sharp optimization failed, falling back to original:', err);
+      }
+    }
+
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const filename = `${uniqueSuffix}${extname(file.originalname)}`;
+    const filename = `${uniqueSuffix}${fileExt}`;
     const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
 
     try {
@@ -57,8 +76,8 @@ export class UploadsController {
         new PutObjectCommand({
           Bucket: bucketName,
           Key: filename,
-          Body: file.buffer,
-          ContentType: file.mimetype,
+          Body: fileBuffer,
+          ContentType: mimeType,
         }),
       );
 
