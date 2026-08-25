@@ -116,8 +116,48 @@ export class UploadsController {
     const endpoint = process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com';
 
     for (const service of services) {
+      let changed = false;
+      
+      // 1. Process coverImage
+      if (service.coverImage && !service.coverImage.endsWith('.webp')) {
+        console.log(`Processing cover image: ${service.coverImage}`);
+        try {
+          let fetchUrl = service.coverImage;
+          if (fetchUrl.startsWith('/')) {
+            fetchUrl = `https://api.instaimage.in${fetchUrl}`;
+          }
+          const response = await fetch(fetchUrl as RequestInfo);
+          if (response.ok) {
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const optimizedBuffer = await sharp(buffer)
+              .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+              .webp({ quality: 80, effort: 4 })
+              .toBuffer();
+              
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const filename = `cover-${uniqueSuffix}.webp`;
+            
+            await this.s3.send(
+              new PutObjectCommand({
+                Bucket: bucketName,
+                Key: filename,
+                Body: optimizedBuffer,
+                ContentType: 'image/webp',
+              }),
+            );
+            
+            service.coverImage = `${endpoint}/${bucketName}/${filename}`;
+            changed = true;
+            count++;
+          }
+        } catch (e) {
+          console.error(`Error processing cover image ${service.coverImage}:`, e);
+        }
+      }
+
+      // 2. Process images array
       if (service.images && service.images.length > 0) {
-        let changed = false;
         const newImages = [];
         
         for (const imgUrl of service.images) {
@@ -175,12 +215,11 @@ export class UploadsController {
             newImages.push(imgUrl);
           }
         }
+        service.images = newImages;
+      }
 
-        if (changed) {
-          service.images = newImages;
-          // Note: using any here since the schema type might complain
-          await (service as any).save();
-        }
+      if (changed) {
+        await (service as any).save();
       }
     }
     
