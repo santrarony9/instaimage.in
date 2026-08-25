@@ -140,7 +140,7 @@ export class BookingsService {
   async findAllBookings() {
     return this.bookingsRepository.model
       .find({ isDeleted: false })
-      .populate('customerId', 'name email')
+      .populate('customerId', 'name email phone isWhatsappVerified')
       .populate('serviceId', 'name')
       .populate('sellerId', 'name bankDetails')
       .sort({ createdAt: -1 });

@@ -110,29 +110,30 @@ export class UploadsController {
   @Get('gallery')
   async getGallery() {
     try {
-      const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
-      const endpoint = process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com';
+      // Fetch all services and banners
+      const services = await this.serviceModel.find({}).lean();
+      const banners = await this.bannerModel.find({}).lean();
       
-      const command = new ListObjectsV2Command({
-        Bucket: bucketName,
-        MaxKeys: 1000,
-      });
+      const imagesSet = new Set<string>();
       
-      const response = await this.s3.send(command);
+      // Extract from services
+      for (const s of services) {
+        if (s.coverImage) imagesSet.add(s.coverImage);
+        if (s.images && Array.isArray(s.images)) {
+          s.images.forEach(img => imagesSet.add(img));
+        }
+      }
       
-      if (!response.Contents) return [];
+      // Extract from banners
+      for (const b of banners) {
+        if (b.backgroundImage) imagesSet.add(b.backgroundImage);
+      }
       
-      const sorted = response.Contents.sort((a, b) => {
-        return (b.LastModified?.getTime() || 0) - (a.LastModified?.getTime() || 0);
-      });
+      const images = Array.from(imagesSet).filter(Boolean);
       
-      const images = sorted
-        .filter(item => item.Key && item.Key.match(/\.(jpg|jpeg|png|webp|gif)$/i))
-        .map(item => `${endpoint}/${bucketName}/${item.Key}`);
-        
       return { success: true, data: images };
     } catch (e) {
-      console.error('Failed to list gallery:', e);
+      console.error('Failed to list gallery from DB:', e);
       return { success: false, data: [] };
     }
   }

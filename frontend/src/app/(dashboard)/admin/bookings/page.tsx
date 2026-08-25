@@ -237,11 +237,63 @@ export default function BookingsManagementPage() {
               <button onClick={() => setIsDetailModalOpen(false)} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-4 text-sm mt-4">
               <div><span className="font-semibold text-gray-600">ID:</span> {selectedBooking._id}</div>
               <div><span className="font-semibold text-gray-600">Customer:</span> {selectedBooking.customerId?.name}</div>
               <div><span className="font-semibold text-gray-600">Service:</span> {selectedBooking.serviceId?.name || 'N/A'}</div>
               <div><span className="font-semibold text-gray-600">Date:</span> {new Date(selectedBooking.scheduledDate).toLocaleDateString()}</div>
+            </div>
+
+            <h4 className="mt-6 mb-2 font-bold text-gray-800 border-b pb-1">Communication Details</h4>
+            <div className="grid grid-cols-2 gap-2 text-sm bg-gray-50 p-4 rounded border border-gray-200">
+              <div><span className="font-semibold text-gray-600">Email:</span> {selectedBooking.customerId?.email || 'N/A'}</div>
+              <div>
+                <span className="font-semibold text-gray-600">Phone:</span> {selectedBooking.customerId?.phone || 'N/A'} 
+                {selectedBooking.customerId?.isWhatsappVerified && (
+                  <span className="ml-2 text-green-600 text-xs font-bold border border-green-600 px-1 rounded bg-green-50">✓ WhatsApp</span>
+                )}
+              </div>
+              <div className="col-span-2 mt-2">
+                <span className="font-semibold text-gray-600 block mb-1">Customer Notes:</span>
+                <p className="p-2 bg-white border rounded text-gray-700 whitespace-pre-wrap">{selectedBooking.customerNotes || 'No notes provided by customer.'}</p>
+              </div>
+            </div>
+
+            <h4 className="mt-6 mb-2 font-bold text-gray-800 border-b pb-1">Delivery & Album Folder</h4>
+            <div className="text-sm bg-blue-50 p-4 rounded border border-blue-100 flex flex-col gap-2">
+              <label className="font-semibold text-blue-900">Google Drive / B2 Folder Link (For Client):</label>
+              <div className="flex gap-2">
+                <input 
+                  type="url" 
+                  placeholder="https://drive.google.com/..." 
+                  defaultValue={selectedBooking.deliveryLink || ''}
+                  id="deliveryLinkInput"
+                  className="flex-grow border rounded p-2 text-sm"
+                />
+                <button 
+                  onClick={async () => {
+                    const link = (document.getElementById('deliveryLinkInput') as HTMLInputElement).value;
+                    try {
+                      await fetchApi(`/bookings/${selectedBooking._id}/delivery-link`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({ deliveryLink: link })
+                      });
+                      toast.success('Delivery link saved successfully!');
+                      loadData();
+                    } catch (e: any) {
+                      toast.error(e.message || 'Failed to save link');
+                    }
+                  }}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Save Link
+                </button>
+              </div>
+              {selectedBooking.deliveryLink && (
+                <a href={selectedBooking.deliveryLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1 mt-1">
+                  Open Current Link ↗
+                </a>
+              )}
             </div>
 
             <h4 className="mt-6 mb-2 font-bold text-gray-800 border-b pb-1">Financial Split (15% / 85%)</h4>
