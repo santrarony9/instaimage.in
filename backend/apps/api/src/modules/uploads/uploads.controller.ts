@@ -4,18 +4,26 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { extname } from 'path';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import * as sharp from 'sharp';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Service } from '../services/schemas/service.schema';
+import { Banner } from '../banners/schemas/banner.schema';
 
 @Controller('uploads')
 export class UploadsController {
   private s3: S3Client;
 
-  constructor() {
+  constructor(
+    @InjectModel(Service.name) private readonly serviceModel: Model<Service>,
+    @InjectModel(Banner.name) private readonly bannerModel: Model<Banner>,
+  ) {
     this.s3 = new S3Client({
       endpoint: process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com',
       region: process.env.B2_REGION || 'eu-central-003',
@@ -95,5 +103,126 @@ export class UploadsController {
       console.error('B2 Upload Error:', error);
       throw new BadRequestException('Failed to upload file to Backblaze B2');
     }
+  }
+
+  @Get('fix-old-images')
+  async fixOldImages() {
+    console.log('Starting legacy image compression job...');
+    const services = await this.serviceModel.find({});
+    let count = 0;
+    const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
+    const endpoint = process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com';
+
+    for (const service of services) {
+      if (service.images && service.images.length > 0) {
+        let changed = false;
+        const newImages = [];
+        
+        for (const imgUrl of service.images) {
+          // Check if it's already a webp
+          if (imgUrl.endsWith('.webp')) {
+            newImages.push(imgUrl);
+            continue;
+          }
+
+          console.log(`Processing image: ${imgUrl}`);
+          try {
+            // Handle relative URLs
+            let fetchUrl = imgUrl;
+            if (imgUrl.startsWith('/')) {
+              fetchUrl = `https://api.instaimage.in${imgUrl}`;
+            }
+
+            // Fetch the image
+            const response = await fetch(fetchUrl);
+            if (!response.ok) {
+              console.error(`Failed to fetch ${fetchUrl}`);
+              newImages.push(imgUrl);
+              continue;
+            }
+
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            // Compress
+            const optimizedBuffer = await sharp(buffer)
+              .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+              .webp({ quality: 80, effort: 4 })
+              .toBuffer();
+
+            // Upload to B2
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const filename = `${uniqueSuffix}.webp`;
+
+            await this.s3.send(
+              new PutObjectCommand({
+                Bucket: bucketName,
+                Key: filename,
+                Body: optimizedBuffer,
+                ContentType: 'image/webp',
+              }),
+            );
+
+            const fileUrl = `${endpoint}/${bucketName}/${filename}`;
+            newImages.push(fileUrl);
+            changed = true;
+            count++;
+            console.log(`Successfully converted to ${fileUrl}`);
+          } catch (e) {
+            console.error(`Error processing ${imgUrl}:`, e);
+            newImages.push(imgUrl);
+          }
+        }
+
+        if (changed) {
+          service.images = newImages;
+          // Note: using any here since the schema type might complain
+          await (service as any).save();
+        }
+      }
+    }
+    
+    // Also fix Banner backgrounds if needed
+    const banners = await this.bannerModel.find({});
+    for (const banner of banners) {
+      if (banner.backgroundImage && !banner.backgroundImage.endsWith('.webp')) {
+        console.log(`Processing banner image: ${banner.backgroundImage}`);
+        try {
+          let fetchUrl = banner.backgroundImage;
+          if (fetchUrl.startsWith('/')) {
+            fetchUrl = `https://api.instaimage.in${fetchUrl}`;
+          }
+          const response = await fetch(fetchUrl);
+          if (response.ok) {
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const optimizedBuffer = await sharp(buffer)
+              .resize(2000, 1000, { fit: 'inside', withoutEnlargement: true })
+              .webp({ quality: 80, effort: 4 })
+              .toBuffer();
+              
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const filename = `banner-${uniqueSuffix}.webp`;
+            
+            await this.s3.send(
+              new PutObjectCommand({
+                Bucket: bucketName,
+                Key: filename,
+                Body: optimizedBuffer,
+                ContentType: 'image/webp',
+              }),
+            );
+            
+            banner.backgroundImage = `${endpoint}/${bucketName}/${filename}`;
+            await (banner as any).save();
+            count++;
+          }
+        } catch (e) {
+          console.error(`Error processing banner ${banner._id}:`, e);
+        }
+      }
+    }
+    
+    return { success: true, message: `Compressed and updated ${count} total images` };
   }
 }
