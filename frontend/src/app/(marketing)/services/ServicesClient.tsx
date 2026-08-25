@@ -207,7 +207,16 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                     <Link href={`/services/${service.slug || service._id}`} key={service._id} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
                       
                       <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
-                        {service.images && service.images.length > 0 ? (() => {
+                        {service.videoUrl ? (
+                          <video 
+                            src={service.videoUrl.startsWith('/') ? `https://api.instaimage.in${service.videoUrl}` : service.videoUrl}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500 absolute inset-0"
+                          />
+                        ) : service.images && service.images.length > 0 ? (() => {
                           const raw = service.images[0];
                           const src = raw.startsWith('/') ? `https://api.instaimage.in${raw}` : raw;
                           return (
@@ -230,6 +239,19 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                           {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
                         </div>
+
+                        {/* Top Right Animated Badges */}
+                        {service.popular && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <div className="bg-gradient-to-r from-red-600 to-orange-500 text-white pl-1.5 pr-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md flex items-center border border-red-400">
+                              <span className="relative flex h-2 w-2 mr-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                              </span>
+                              TRENDING
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="p-3 flex flex-col flex-grow bg-white">

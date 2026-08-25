@@ -42,13 +42,24 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
   
   // Helpers
-  let mainImage = service.images && service.images.length > 0 
-    ? service.images[activeImageIndex] || service.images[0]
-    : 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop';
-  
-  if (mainImage.startsWith('/')) {
-    mainImage = `https://api.instaimage.in${mainImage}`;
+  const mediaList: string[] = [];
+  if (service.videoUrl) mediaList.push(service.videoUrl);
+  if (service.images && service.images.length > 0) {
+    mediaList.push(...service.images);
   }
+  if (mediaList.length === 0) {
+    mediaList.push('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop');
+  }
+
+  // Deduplicate in case videoUrl was also in images
+  const uniqueMediaList = Array.from(new Set(mediaList));
+
+  let activeMedia = uniqueMediaList[activeImageIndex] || uniqueMediaList[0];
+  if (activeMedia.startsWith('/')) {
+    activeMedia = `https://api.instaimage.in${activeMedia}`;
+  }
+
+  const isVideo = (url: string) => /\.(mp4|webm|ogg|mov)$/i.test(url.split('?')[0]);
 
   const toggleAddon = (addonName: string) => {
     setSelectedAddons(prev => 
@@ -110,35 +121,40 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
           
           {/* Left Column: Media & Details */}
           <div className="w-full lg:w-7/12">
-            {/* Main Image Gallery */}
-            <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden mb-6 relative">
-              <Image src={mainImage} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" priority />
+            {/* Main Media Gallery */}
+            <div className="w-full h-[500px] md:h-[600px] bg-black rounded-xl overflow-hidden mb-6 relative flex items-center justify-center shadow-lg">
+              {isVideo(activeMedia) ? (
+                <video src={activeMedia} controls autoPlay loop playsInline className="w-full h-full object-contain" />
+              ) : (
+                <Image src={activeMedia} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" priority />
+              )}
             </div>
             
             {/* Thumbnails */}
-            {service.images && service.images.length > 1 && (
+            {uniqueMediaList.length > 1 && (
               <div className="flex gap-4 mb-12 overflow-x-auto pb-2 snap-x hide-scrollbar">
-                {service.images.map((img: string, idx: number) => {
-                  const url = img.startsWith('/') ? `https://api.instaimage.in${img}` : img;
+                {uniqueMediaList.map((media: string, idx: number) => {
+                  const url = media.startsWith('/') ? `https://api.instaimage.in${media}` : media;
+                  const isVid = isVideo(url);
                   return (
                     <div 
                       key={idx} 
                       onClick={() => setActiveImageIndex(idx)}
-                      className={`w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border-2 transition relative ${activeImageIndex === idx ? 'border-black' : 'hover:border-gray-400 border-transparent'}`}
+                      className={`w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer border-2 transition relative ${activeImageIndex === idx ? 'border-blue-600 shadow-md scale-105' : 'hover:border-gray-400 border-transparent opacity-80 hover:opacity-100'}`}
                     >
-                      <Image src={url} alt={`${service.name} ${idx}`} fill sizes="96px" className="object-cover" />
+                      {isVid ? (
+                        <>
+                          <video src={url} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <span className="text-white text-3xl drop-shadow-lg">▶</span>
+                          </div>
+                        </>
+                      ) : (
+                        <Image src={url} alt={`${service.name} ${idx}`} fill sizes="96px" className="object-cover" />
+                      )}
                     </div>
                   );
                 })}
-              </div>
-            )}
-
-            {/* Video Link */}
-            {service.videoUrl && (
-              <div className="mb-12">
-                <a href={service.videoUrl} target="_blank" rel="noopener noreferrer" className="bg-black text-white px-6 py-4 rounded-xl font-bold flex items-center justify-center hover:bg-gray-800 transition">
-                  <span className="mr-2">▶</span> Watch Showreel
-                </a>
               </div>
             )}
 
@@ -381,7 +397,16 @@ function ServiceCard({ service }: { service: any }) {
   return (
     <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
       <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
-        {imageUrl ? (
+        {service.videoUrl ? (
+          <video 
+            src={service.videoUrl.startsWith('/') ? `https://api.instaimage.in${service.videoUrl}` : service.videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover group-hover:scale-105 transition duration-500 absolute inset-0"
+          />
+        ) : imageUrl ? (
           <Image src={imageUrl} alt={service.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

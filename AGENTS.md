@@ -30,3 +30,9 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 3. **API Routing Mismatches:**
    - The local frontend `.env.local` points directly to the live production API (`NEXT_PUBLIC_API_URL=https://api.instaimage.in/api/v1`).
    - **RULE:** Be very careful when making frontend API calls locally, as they will modify the live production database.
+
+## Infrastructure & VPS Deployment
+
+1. **MongoDB Connection String (`MONGODB_URI`):**
+   - The backend API relies on MongoDB running via Docker Compose.
+   - **RULE:** If the `MONGO_INITDB_ROOT_PASSWORD` contains special characters (like `!`, `@`, `#`), they MUST be URL-encoded in the `MONGODB_URI` connection string (e.g., `!` becomes `%21`). Failing to encode special characters will cause the `api` and `workers` containers to crash continuously with a `MongoServerError: Authentication failed` error.

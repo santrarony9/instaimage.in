@@ -72,6 +72,19 @@ export default function ServicesManagementPage() {
     }
   };
 
+  const handleTogglePopular = async (id: string, currentStatus: boolean) => {
+    try {
+      await fetchApi(`/services/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ popular: !currentStatus }),
+      });
+      toast.success('Trending status updated');
+      loadData();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
     try {
@@ -277,6 +290,7 @@ export default function ServicesManagementPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Price</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Options</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trending</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -333,6 +347,18 @@ export default function ServicesManagementPage() {
                       }`}
                     >
                       {item.isActive ? 'Active' : 'Hidden'}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() => handleTogglePopular(item._id, item.popular)}
+                      className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border transition-colors ${
+                        item.popular 
+                          ? 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100' 
+                          : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                      }`}
+                    >
+                      {item.popular ? '🔥 Yes' : 'No'}
                     </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -599,10 +625,18 @@ export default function ServicesManagementPage() {
                   <label className="block text-sm font-medium text-gray-700">Video URL (Optional)</label>
                   <input type="url" value={formData.videoUrl || ''} onChange={e => setFormData({ ...formData, videoUrl: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="https://youtube.com/..." />
                 </div>
-                <div className="pt-2">
+                <div className="pt-2 flex flex-col space-y-3">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input type="checkbox" checked={formData.isActive !== false} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
                     <span className="font-medium text-gray-700">Service is Active (Visible to customers)</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" checked={formData.popular || false} onChange={e => setFormData({ ...formData, popular: e.target.checked })} className="rounded h-5 w-5 text-orange-600 focus:ring-orange-500" />
+                    <span className="font-medium text-gray-700">🔥 Mark as Trending / Popular</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" checked={formData.newService || false} onChange={e => setFormData({ ...formData, newService: e.target.checked })} className="rounded h-5 w-5 text-emerald-600 focus:ring-emerald-500" />
+                    <span className="font-medium text-gray-700">✨ Mark as Newly Added</span>
                   </label>
                 </div>
               </div>
