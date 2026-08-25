@@ -8,8 +8,7 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const WhatsappVerificationModal = dynamic(() => import("@/components/auth/WhatsappVerificationModal"), { ssr: false });
-
+import WhatsappVerificationModal from "@/components/auth/WhatsappVerificationModal";
 import { OrganizationJsonLd } from "@/components/seo/JsonLd";
 
 export const viewport: Viewport = {
