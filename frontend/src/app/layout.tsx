@@ -28,9 +28,6 @@ export const metadata: Metadata = {
   authors: [{ name: "InstaImage" }],
   creator: "InstaImage",
   publisher: "InstaImage",
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     type: "website",
     locale: "en_IN",

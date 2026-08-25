@@ -22,8 +22,17 @@ export class PaymentsController {
       throw new BadRequestException('Missing Razorpay signature');
     }
 
-    // In a real app, verify signature using crypto and RAZORPAY_WEBHOOK_SECRET
-    // const isValid = verifyWebhookSignature(payload, signature, secret);
+    const crypto = require('crypto');
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'fallback_secret';
+    
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(JSON.stringify(payload))
+      .digest('hex');
+
+    if (expectedSignature !== signature) {
+      throw new BadRequestException('Invalid webhook signature');
+    }
 
     const event = payload.event;
 

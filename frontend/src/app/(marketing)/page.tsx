@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
+import { HeroSearchBar } from '@/components/ui/HeroSearchBar';
+
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export const metadata = {
@@ -102,10 +104,13 @@ export default async function HomePage() {
       {/* Hero Section */}
       <div className="relative bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
-          <img 
+          <Image 
             src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
             alt="Photography Background" 
-            className="w-full h-full object-cover opacity-30"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
@@ -118,21 +123,7 @@ export default async function HomePage() {
             Book trusted photographers, drone pilots, and editors instantly. Get your memories captured and delivered in as little as 24 hours.
           </p>
           
-          <div className="max-w-3xl mx-auto bg-white p-2 rounded-2xl flex items-center shadow-2xl relative z-20 transition-transform focus-within:scale-[1.02]">
-            <div className="pl-4 pr-2">
-              <svg className="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <input 
-              type="text" 
-              placeholder="Search for wedding shoots, podcasts, or drone videography..." 
-              className="w-full py-3 bg-transparent border-none text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 text-base md:text-lg"
-            />
-            <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition">
-              Search
-            </button>
-          </div>
+          <HeroSearchBar />
         </div>
       </div>
 

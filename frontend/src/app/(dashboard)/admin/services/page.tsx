@@ -287,7 +287,7 @@ export default function ServicesManagementPage() {
                     <div className="flex items-center">
                       {item.coverImage || (item.images && item.images.length > 0) ? (
                         <div className="h-12 w-12 mr-4 relative flex-shrink-0">
-                          <Image src={item.coverImage || item.images[0]} alt="" fill sizes="48px" className="rounded-lg object-cover shadow-sm border border-gray-100" />
+                          <Image src={item.coverImage || item.images[0]} alt={item.name} fill sizes="48px" className="rounded-lg object-cover shadow-sm border border-gray-100" />
                         </div>
                       ) : (
                         <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 mr-4 shadow-sm border border-gray-100">

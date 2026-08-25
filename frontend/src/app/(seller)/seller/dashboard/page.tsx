@@ -275,7 +275,7 @@ export default function SellerDashboard() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   {newService.coverImage && (
                     <div className="w-20 h-20 relative flex-shrink-0">
-                      <Image src={newService.coverImage.startsWith('/') ? `https://api.instaimage.in${newService.coverImage}` : newService.coverImage} alt="Cover" fill sizes="80px" className="object-cover rounded border" />
+                      <Image src={newService.coverImage.startsWith('/') ? `https://api.instaimage.in${newService.coverImage}` : newService.coverImage} alt={`${newService.name || 'Service'} Cover`} fill sizes="80px" className="object-cover rounded border" />
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
@@ -381,7 +381,7 @@ export default function SellerDashboard() {
                   <tr key={s._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        {s.coverImage && <div className="w-10 h-10 relative flex-shrink-0"><Image src={s.coverImage} alt="" fill sizes="40px" className="rounded object-cover" /></div>}
+                        {s.coverImage && <div className="w-10 h-10 relative flex-shrink-0"><Image src={s.coverImage} alt={s.name} fill sizes="40px" className="rounded object-cover" /></div>}
                         <span className="font-medium text-gray-900">{s.name}</span>
                       </div>
                     </td>

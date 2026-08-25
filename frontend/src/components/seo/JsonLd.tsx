@@ -105,7 +105,7 @@ position: index + 1,
 item: {
 '@type': 'Service',
 name: item.name,
-url: `https://instaimage.in/services/${item._id}`, // Or slug if you use slug
+url: `https://instaimage.in/services/${item.slug || item._id}`,
 },
 })),
 };

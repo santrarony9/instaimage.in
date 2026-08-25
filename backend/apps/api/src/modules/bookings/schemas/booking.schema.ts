@@ -202,3 +202,5 @@ export const BookingSchema = SchemaFactory.createForClass(Booking);
 BookingSchema.index({ customerId: 1, status: 1 });
 BookingSchema.index({ scheduledDate: 1 });
 BookingSchema.index({ 'location.coordinates': '2dsphere' });
+BookingSchema.index({ sellerId: 1, isDeleted: 1 });
+BookingSchema.index({ customerId: 1, isDeleted: 1 });

@@ -50,6 +50,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description: service.description ? service.description.substring(0, 160) : `Book ${service.name} on InstaImage.`,
       images: [{ url: imageUrl, alt: service.name }],
     },
+    alternates: {
+      canonical: `https://instaimage.in/services/${service.slug || id}`,
+    },
     twitter: {
       card: 'summary_large_image',
       title: service.name,

@@ -139,3 +139,8 @@ export class Service extends AbstractDocument {
 }
 
 export const ServiceSchema = SchemaFactory.createForClass(Service);
+
+// Add compound indexes for heavily queried fields
+ServiceSchema.index({ isApproved: 1, isActive: 1 });
+ServiceSchema.index({ creatorId: 1 });
+ServiceSchema.index({ category: 1, isActive: 1 });

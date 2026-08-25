@@ -16,14 +16,17 @@ export class ServicesService {
     return this.servicesRepository.create(data);
   }
 
-  // Public-facing: only return approved & active services
   async findAll() {
-    return this.servicesRepository.find({ isApproved: true, isActive: true });
+    return this.servicesRepository.model
+      .find({ isApproved: true, isActive: true })
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
   }
 
   // Admin: return ALL services (approved + pending)
   async findAllAdmin() {
-    return this.servicesRepository.find({});
+    return this.servicesRepository.model.find({}).lean();
   }
 
   // Admin: return only pending (unapproved) services

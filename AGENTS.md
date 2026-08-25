@@ -8,6 +8,7 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 1. **Image Optimization:** 
    - Next.js `<Image>` components route through Vercel's proprietary image optimization API, which is extremely expensive for marketplace sites. 
    - **RULE:** DO NOT remove `unoptimized: true` from `frontend/next.config.ts`. All images must bypass Vercel's optimization server. If using `<Image>` tags manually without the global config, always include the `unoptimized` prop.
+   - **NOTE:** To maintain Core Web Vitals, image optimization (resizing and conversion to WebP) is instead handled on the backend API via the `sharp` library during file uploads before saving to Backblaze B2.
 
 2. **Serverless Function Execution (Compute):**
    - The frontend pages heavily rely on Incremental Static Regeneration (ISR) using `export const revalidate = 60;`.

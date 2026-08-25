@@ -134,7 +134,8 @@ export class BookingsService {
     return this.bookingsRepository.model
       .find({ customerId: new Types.ObjectId(customerId), isDeleted: false })
       .populate('serviceId', 'name')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
   }
 
   async findAllBookings() {
@@ -143,7 +144,8 @@ export class BookingsService {
       .populate('customerId', 'name email phone isWhatsappVerified')
       .populate('serviceId', 'name')
       .populate('sellerId', 'name bankDetails')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
   }
 
   async updateBookingStatus(id: string, status: BookingStatus) {
@@ -189,7 +191,8 @@ export class BookingsService {
       })
       .populate('customerId', 'name email phone')
       .populate('serviceId', 'name')
-      .sort({ scheduledDate: 1 });
+      .sort({ scheduledDate: 1 })
+      .lean();
   }
 
   async assignseller(bookingId: string, sellerId: string) {

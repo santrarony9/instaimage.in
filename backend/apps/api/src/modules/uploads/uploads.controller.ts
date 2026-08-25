@@ -15,7 +15,7 @@ import { S3Client, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/clien
 import sharp from 'sharp';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Public } from '@app/auth';
+import { Public, Roles, Role } from '@app/auth';
 import { Service } from '../services/schemas/service.schema';
 import { Banner } from '../banners/schemas/banner.schema';
 
@@ -140,7 +140,7 @@ export class UploadsController {
     }
   }
   
-  @Public()
+  @Roles(Role.ADMIN)
   @Delete('gallery')
   async deleteFromGallery(@Body('url') url: string) {
     if (!url) throw new BadRequestException('URL is required');

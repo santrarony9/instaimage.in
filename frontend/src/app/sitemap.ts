@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       dynamicRoutes = services
         .filter((service: any) => service.isActive && service.isApproved)
         .map((service: any) => ({
-          url: `${baseUrl}/services/${service._id}`, // Or service.slug if the app uses slugs
+          url: `${baseUrl}/services/${service.slug || service._id}`,
           lastModified: new Date(service.updatedAt || new Date()),
           changeFrequency: 'weekly',
           priority: 0.8,
