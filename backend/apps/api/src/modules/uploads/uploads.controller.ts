@@ -13,6 +13,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Public } from '@app/auth';
 import { Service } from '../services/schemas/service.schema';
 import { Banner } from '../banners/schemas/banner.schema';
 
@@ -103,8 +104,7 @@ export class UploadsController {
       console.error('B2 Upload Error:', error);
       throw new BadRequestException('Failed to upload file to Backblaze B2');
     }
-  }
-
+  @Public()
   @Get('fix-old-images')
   async fixOldImages() {
     console.log('Starting legacy image compression job...');
