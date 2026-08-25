@@ -5,6 +5,8 @@ import {
   UploadedFile,
   BadRequestException,
   Get,
+  Delete,
+  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -137,6 +139,46 @@ export class UploadsController {
       return { success: false, data: [] };
     }
   }
+  
+  @Public()
+  @Delete('gallery')
+  async deleteFromGallery(@Body('url') url: string) {
+    if (!url) throw new BadRequestException('URL is required');
+    try {
+      // 1. Delete from B2
+      const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
+      const urlParts = url.split('/');
+      const filename = urlParts[urlParts.length - 1];
+      
+      const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
+      await this.s3.send(new DeleteObjectCommand({
+        Bucket: bucketName,
+        Key: filename
+      })).catch(e => console.error('B2 delete error (might not exist):', e));
+      
+      // 2. Remove from Services
+      await this.serviceModel.updateMany(
+        { coverImage: url },
+        { $unset: { coverImage: "" } }
+      );
+      await this.serviceModel.updateMany(
+        { images: url },
+        { $pull: { images: url } }
+      );
+      
+      // 3. Remove from Banners
+      await this.bannerModel.updateMany(
+        { backgroundImage: url },
+        { $unset: { backgroundImage: "" } }
+      );
+      
+      return { success: true, message: 'Image deleted from storage and all listings' };
+    } catch (e) {
+      console.error('Failed to delete image:', e);
+      throw new BadRequestException('Failed to delete image');
+    }
+  }
+
   @Public()
   @Get('fix-old-images')
   async fixOldImages() {

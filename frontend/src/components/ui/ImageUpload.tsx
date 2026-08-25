@@ -127,31 +127,62 @@ export default function ImageUpload({ images = [], onChange, maxImages = 5, gall
             
             <div className="p-4 overflow-y-auto flex-1">
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {galleryImages.map((img, idx) => (
+                {galleryImages.map((img, idx) => {
+                  if ((window as any).deletedGalleryImages?.includes(img)) return null;
+                  return (
                   <div 
                     key={idx} 
-                    onClick={() => {
-                      if (!images.includes(img)) {
-                        onChange([...images, img]);
-                        setIsGalleryOpen(false);
-                      }
-                    }}
-                    className={`aspect-square relative rounded-lg overflow-hidden border-2 cursor-pointer shadow-sm group ${images.includes(img) ? 'border-indigo-500 opacity-50' : 'border-transparent hover:border-indigo-500'}`}
+                    className={`aspect-square relative rounded-lg overflow-hidden border-2 shadow-sm group ${images.includes(img) ? 'border-indigo-500 opacity-50' : 'border-transparent hover:border-indigo-500'}`}
                   >
                     <Image 
                       src={img.startsWith('/') ? `https://api.instaimage.in${img}` : img} 
                       alt={`Gallery image ${idx}`} 
                       fill 
                       sizes="150px" 
-                      className="object-cover group-hover:scale-105 transition-transform" 
+                      className="object-cover cursor-pointer group-hover:scale-105 transition-transform" 
+                      onClick={() => {
+                        if (!images.includes(img)) {
+                          onChange([...images, img]);
+                          setIsGalleryOpen(false);
+                        }
+                      }}
                     />
+                    
+                    <button 
+                      type="button"
+                      title="Delete permanently from entire system"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (window.confirm('WARNING: This will permanently delete this image from your storage and ALL services/banners that currently use it! Are you sure?')) {
+                          try {
+                            setUploading(true);
+                            await fetchApi('/uploads/gallery', {
+                              method: 'DELETE',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ url: img })
+                            });
+                            // Keep track locally without needing to drill props to parents
+                            if (!(window as any).deletedGalleryImages) (window as any).deletedGalleryImages = [];
+                            (window as any).deletedGalleryImages.push(img);
+                            setUploading(false); // triggers re-render
+                          } catch (err: any) {
+                            alert(err.message || 'Failed to delete image');
+                            setUploading(false);
+                          }
+                        }
+                      }}
+                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-md"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+
                     {images.includes(img) && (
-                      <div className="absolute inset-0 bg-indigo-500 bg-opacity-20 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-indigo-500 bg-opacity-20 flex items-center justify-center pointer-events-none">
                         <svg className="w-8 h-8 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                       </div>
                     )}
                   </div>
-                ))}
+                )})}
               </div>
             </div>
             <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
