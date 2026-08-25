@@ -104,6 +104,8 @@ export class UploadsController {
       console.error('B2 Upload Error:', error);
       throw new BadRequestException('Failed to upload file to Backblaze B2');
     }
+  }
+
   @Public()
   @Get('fix-old-images')
   async fixOldImages() {
@@ -134,7 +136,7 @@ export class UploadsController {
             }
 
             // Fetch the image
-            const response = await fetch(fetchUrl);
+            const response = await fetch(fetchUrl as RequestInfo);
             if (!response.ok) {
               console.error(`Failed to fetch ${fetchUrl}`);
               newImages.push(imgUrl);
@@ -185,14 +187,15 @@ export class UploadsController {
     // Also fix Banner backgrounds if needed
     const banners = await this.bannerModel.find({});
     for (const banner of banners) {
-      if (banner.backgroundImage && !banner.backgroundImage.endsWith('.webp')) {
-        console.log(`Processing banner image: ${banner.backgroundImage}`);
+      const bg = banner.backgroundImage;
+      if (bg && typeof bg === 'string' && !bg.endsWith('.webp')) {
+        console.log(`Processing banner image: ${bg}`);
         try {
-          let fetchUrl = banner.backgroundImage;
+          let fetchUrl = bg;
           if (fetchUrl.startsWith('/')) {
             fetchUrl = `https://api.instaimage.in${fetchUrl}`;
           }
-          const response = await fetch(fetchUrl);
+          const response = await fetch(fetchUrl as RequestInfo);
           if (response.ok) {
             const arrayBuffer = await response.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
