@@ -29,6 +29,8 @@ export default function ServicesManagementPage() {
   const [formData, setFormData] = useState<any>({});
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
 
   const loadData = async () => {
     setIsLoading(true);
@@ -224,6 +226,19 @@ export default function ServicesManagementPage() {
     }
   };
 
+  const filteredData = data.filter(item => {
+    const searchMatch = item.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+           (item.category && item.category.toLowerCase().includes(searchQuery.toLowerCase()));
+    return searchMatch;
+  }).sort((a, b) => {
+    if (sortBy === 'price_low') return (a.basePrice || 0) - (b.basePrice || 0);
+    if (sortBy === 'price_high') return (b.basePrice || 0) - (a.basePrice || 0);
+    if (sortBy === 'name_asc') return (a.name || '').localeCompare(b.name || '');
+    if (sortBy === 'oldest') return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+    // newest default
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+  });
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Services Catalog</h1>
@@ -297,21 +312,49 @@ export default function ServicesManagementPage() {
       )}
 
       {/* ===== ALL APPROVED SERVICES ===== */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">All Services</h2>
-        <button
-          onClick={() => openModal()}
-          className="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
-        >
-          + Add New Service
-        </button>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+        <h2 className="text-xl font-semibold whitespace-nowrap">All Services</h2>
+        
+        <div className="flex-1 flex flex-col sm:flex-row gap-3 w-full justify-end items-center">
+          <div className="relative w-full sm:max-w-xs">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search services..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="block w-full sm:w-auto pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="price_low">Price: Low to High</option>
+            <option value="price_high">Price: High to Low</option>
+            <option value="name_asc">Name: A to Z</option>
+          </select>
+
+          <button
+            onClick={() => openModal()}
+            className="w-full sm:w-auto bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 whitespace-nowrap"
+          >
+            + Add New Service
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
-      ) : data.length === 0 ? (
+      ) : filteredData.length === 0 ? (
         <div className="text-center p-8 text-gray-500">No services found</div>
       ) : (
         <div className="overflow-x-auto bg-white shadow rounded-lg">
@@ -328,7 +371,7 @@ export default function ServicesManagementPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {data.map(item => (
+              {filteredData.map(item => (
                 <tr key={item._id} className="group hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
