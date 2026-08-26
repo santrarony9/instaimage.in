@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useBookingStore } from '@/hooks/use-booking-store';
+import { AddressAutocomplete } from './AddressAutocomplete';
 
 const MapSelector = dynamic(() => import('./MapSelector'), { 
   ssr: false,
@@ -194,14 +195,18 @@ export function Step4Location() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Apartment / Road / Area *</label>
-          <textarea
+          <AddressAutocomplete 
             value={area}
-            onChange={(e) => setArea(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-black focus:border-black"
-            rows={2}
-            placeholder="e.g. Green Valley Apartments, MG Road"
+            onChange={(val) => setArea(val)}
+            onSelect={(lat, lng, addressDetails) => {
+              setCoordinates([lng, lat]);
+              if (addressDetails?.postcode) setPincode(addressDetails.postcode);
+              if (addressDetails?.city || addressDetails?.state_district) {
+                setCity(addressDetails.city || addressDetails.state_district || '');
+              }
+            }}
+            error={errors.area}
           />
-          {errors.area && <p className="text-red-500 text-sm mt-1">{errors.area}</p>}
         </div>
 
         <div>
