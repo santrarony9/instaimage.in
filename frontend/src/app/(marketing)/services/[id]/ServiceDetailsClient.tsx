@@ -419,6 +419,26 @@ function ServiceCard({ service }: { service: any }) {
             {service.deliveryMethod === 'REMOTE' ? 'Online' : 'On-Site'}
           </div>
         )}
+
+        {/* Top Right Animated Badges */}
+        {service.popular && (
+          <div className="absolute top-2 right-2 z-10">
+            <div className="bg-gradient-to-r from-red-600 to-orange-500 text-white pl-1.5 pr-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md flex items-center border border-red-400">
+              <span className="relative flex h-2 w-2 mr-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+              HOT
+            </div>
+          </div>
+        )}
+        {service.newService && !service.popular && (
+          <div className="absolute top-2 right-2 z-10">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md flex items-center border border-emerald-400">
+              NEW
+            </div>
+          </div>
+        )}
       </div>
       <div className="p-3 flex flex-col flex-grow bg-white">
         <h3 className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>

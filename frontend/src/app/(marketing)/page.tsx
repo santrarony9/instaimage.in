@@ -232,7 +232,7 @@ export default async function HomePage() {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {popularServices.map(service => <ServiceCard key={service._id} service={service} badge="Popular" API_URL={PUBLIC_API_URL} />)}
+            {popularServices.map(service => <ServiceCard key={service._id} service={service} badge={service.popular ? "Popular" : undefined} API_URL={PUBLIC_API_URL} />)}
           </div>
         </div>
 
@@ -243,7 +243,7 @@ export default async function HomePage() {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge="New" API_URL={PUBLIC_API_URL} />)}
+            {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge={service.newService ? "New" : undefined} API_URL={PUBLIC_API_URL} />)}
           </div>
         </div>
 

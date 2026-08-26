@@ -380,265 +380,218 @@ export default function ServicesManagementPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-6 border-b pb-2">{editingItem ? 'Edit Service' : 'Add New Service'}</h3>
             <form onSubmit={handleSave} className="space-y-6">
               
-              <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
-                <h4 className="font-semibold text-gray-700">1. Base Details & Pricing</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2 border-b pb-4 mb-2">
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Service Type *</label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="adminDeliveryMethod" value="ON_SPOT" checked={formData.deliveryMethod !== 'REMOTE'} onChange={() => setFormData({...formData, deliveryMethod: 'ON_SPOT', locations: []})} className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
-                        <span className="text-sm font-medium text-gray-700">On-Site (Shoot / Physical)</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="adminDeliveryMethod" value="REMOTE" checked={formData.deliveryMethod === 'REMOTE'} onChange={() => setFormData({...formData, deliveryMethod: 'REMOTE', locations: ['Remote'], flexiblePrice: 0, extraHourPrice: 0})} className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
-                        <span className="text-sm font-medium text-gray-700">Remote (Post-Production / Editing)</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Service Name</label>
-                    <input 
-                      required 
-                      type="text" 
-                      value={formData.name || ''} 
-                      onChange={e => {
-                        const newName = e.target.value;
-                        const newSlug = newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                        setFormData({ ...formData, name: newName, slug: newSlug });
-                      }} 
-                      className="mt-1 block w-full border border-gray-300 rounded p-2" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Fixed Time Price (₹)</label>
-                    <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4000" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Duration (Hours)</label>
-                    <input required type="number" step="0.5" value={formData.duration || ''} onChange={e => setFormData({ ...formData, duration: Number(e.target.value) })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4" />
-                  </div>
-                  {formData.deliveryMethod !== 'REMOTE' && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Extra Hour Price (₹) - Optional</label>
-                        <input type="number" value={formData.extraHourPrice || ''} onChange={e => setFormData({ ...formData, extraHourPrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 1500" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Flexible Timing Premium Price (₹)</label>
-                        <input type="number" value={formData.flexiblePrice || ''} onChange={e => setFormData({ ...formData, flexiblePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 3000" />
-                      </div>
-                    </>
-                  )}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Slug (URL friendly)</label>
-                    <input type="text" value={formData.slug || ''} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 text-gray-500" placeholder="e.g. personal-portraits" />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea rows={3} value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <label className="block text-sm font-medium text-gray-700">Category</label>
-                      <button 
-                        type="button" 
-                        onClick={async () => {
-                          const name = window.prompt("Enter new category name:");
-                          if (!name) return;
-                          try {
-                            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                            const newCat = await fetchApi('/categories', {
-                              method: 'POST',
-                              body: JSON.stringify({ name, slug, description: name, isActive: true })
-                            });
-                            toast.success("Category created!");
-                            const catsRes = await fetchApi('/categories/admin').catch(() => ({ data: [] }));
-                            const cats = catsRes.data || catsRes || [];
-                            setCategories(Array.isArray(cats) ? cats : []);
-                            
-                            // Auto-select the newly created category
-                            setFormData({
-                              ...formData,
-                              category: newCat.name || name,
-                              categoryId: newCat._id || null
-                            });
-                          } catch (err: any) {
-                            toast.error(err.message || "Failed to create category");
-                          }
-                        }}
-                        className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
-                      >
-                        + Create New
-                      </button>
-                    </div>
-                    <select 
-                      value={formData.category || ''} 
-                      onChange={e => {
-                        const selectedCat = categories.find(c => c.name === e.target.value);
-                        setFormData({ 
-                          ...formData, 
-                          category: selectedCat ? selectedCat.name : '',
-                          categoryId: selectedCat ? selectedCat._id : null
-                        });
-                      }} 
-                      className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
-                    >
-                      <option value="">-- Select Category --</option>
-                      {categories.map(cat => (
-                        <option key={cat._id} value={cat.name}>{cat.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Tags (comma separated)</label>
-                    <input type="text" value={Array.isArray(formData.tags) ? formData.tags.join(', ') : formData.tags || ''} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. popular, premium, outdoor" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-purple-50 p-4 rounded-lg border border-purple-100 space-y-4">
-                <h4 className="font-semibold text-purple-900">2. Discovery & Filtering (Locations & Occasions)</h4>
-                {formData.deliveryMethod !== 'REMOTE' ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Service Areas (Locations)</label>
-                      <div className="max-h-48 overflow-y-auto border border-gray-200 rounded p-2 bg-white space-y-1">
-                        {PREDEFINED_LOCATIONS.map(loc => (
-                          <label key={loc} className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-gray-50 p-1 rounded">
-                            <input 
-                              type="checkbox" 
-                              checked={formData.locations?.includes(loc) || false}
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                const current = formData.locations || [];
-                                setFormData({
-                                  ...formData,
-                                  locations: checked ? [...current, loc] : current.filter((l: string) => l !== loc)
-                                });
-                              }}
-                            />
-                            <span>{loc}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Suitable Occasions</label>
-                      <div className="max-h-48 overflow-y-auto border border-gray-200 rounded p-2 bg-white space-y-1">
-                        {PREDEFINED_OCCASIONS.map(occ => (
-                          <label key={occ} className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-gray-50 p-1 rounded">
-                            <input 
-                              type="checkbox" 
-                              checked={formData.occasions?.includes(occ) || false}
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                const current = formData.occasions || [];
-                                setFormData({
-                                  ...formData,
-                                  occasions: checked ? [...current, occ] : current.filter((o: string) => o !== occ)
-                                });
-                              }}
-                            />
-                            <span>{occ}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-purple-800">
-                    Location and Occasions are automatically disabled for Remote services (since it can be done from anywhere and is usually not event-specific).
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-4">
-                <div className="flex justify-between items-center border-b border-blue-200 pb-2">
-                  <h4 className="font-semibold text-blue-900">3. Extra Options & Add-ons</h4>
-                  <div className="flex gap-2">
-                    <select 
-                      className="text-sm border rounded px-2 py-1 bg-white max-w-[200px]"
-                      onChange={(e) => {
-                        if (!e.target.value) return;
-                        const selectedService = data.find(s => s._id === e.target.value);
-                        if (selectedService) {
-                          const addons = formData.addons ? [...formData.addons] : [];
-                          addons.push({ name: selectedService.name, price: selectedService.basePrice });
-                          setFormData({ ...formData, addons });
-                        }
-                        e.target.value = ""; // Reset after selection
-                      }}
-                    >
-                      <option value="">+ Add from Services</option>
-                      {data.map(s => (
-                        <option key={s._id} value={s._id}>{s.name} (₹{s.basePrice})</option>
-                      ))}
-                    </select>
-                    <button type="button" onClick={handleAddAddon} className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                      + Custom Option
-                    </button>
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 
-                {formData.addons && formData.addons.length > 0 ? (
-                  <div className="space-y-3">
-                    {formData.addons.map((addon: any, index: number) => (
-                      <div key={index} className="flex gap-3 items-start bg-white p-3 rounded border border-blue-100 shadow-sm">
-                        <div className="flex-1">
-                          <label className="block text-xs font-medium text-gray-500">Option Name (e.g. "+1 Hour", "Drone")</label>
-                          <input required type="text" value={addon.name} onChange={e => handleUpdateAddon(index, 'name', e.target.value)} className="mt-1 block w-full border rounded p-1.5 text-sm" />
-                        </div>
-                        <div className="w-32">
-                          <label className="block text-xs font-medium text-gray-500">Price (₹)</label>
-                          <input required type="number" value={addon.price} onChange={e => handleUpdateAddon(index, 'price', e.target.value)} className="mt-1 block w-full border rounded p-1.5 text-sm" />
-                        </div>
-                        <div className="pt-6">
-                          <button type="button" onClick={() => handleRemoveAddon(index)} className="text-red-500 hover:text-red-700 p-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                          </button>
+                {/* --- LEFT COLUMN --- */}
+                <div className="space-y-6">
+                  {/* 1. Base Details & Pricing */}
+                  <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
+                    <h4 className="font-semibold text-gray-700">1. Base Details & Pricing</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="md:col-span-2 border-b pb-4 mb-2">
+                        <label className="block text-sm font-bold text-gray-900 mb-2">Service Type *</label>
+                        <div className="flex gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="adminDeliveryMethod" value="ON_SPOT" checked={formData.deliveryMethod !== 'REMOTE'} onChange={() => setFormData({...formData, deliveryMethod: 'ON_SPOT', locations: []})} className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
+                            <span className="text-sm font-medium text-gray-700">On-Site (Shoot / Physical)</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="adminDeliveryMethod" value="REMOTE" checked={formData.deliveryMethod === 'REMOTE'} onChange={() => setFormData({...formData, deliveryMethod: 'REMOTE', locations: ['Remote'], flexiblePrice: 0, extraHourPrice: 0})} className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
+                            <span className="text-sm font-medium text-gray-700">Remote (Editing)</span>
+                          </label>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500 italic text-center py-2">No extra options added. Click "+ Add Option" to offer addons.</p>
-                )}
-              </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
-                <h4 className="font-semibold text-gray-700">4. Media & Settings</h4>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Images Gallery</label>
-                  <ImageUpload 
-                    images={formData.images || []}
-                    onChange={(imgs) => setFormData({ ...formData, images: imgs })}
-                    galleryImages={galleryImages}
-                  />
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">Service Name</label>
+                        <input required type="text" value={formData.name || ''} onChange={e => {
+                          const newName = e.target.value;
+                          const newSlug = newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                          setFormData({ ...formData, name: newName, slug: newSlug });
+                        }} className="mt-1 block w-full border border-gray-300 rounded p-2" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Fixed Time Price (₹)</label>
+                        <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4000" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Duration (Hours)</label>
+                        <input required type="number" step="0.5" value={formData.duration || ''} onChange={e => setFormData({ ...formData, duration: Number(e.target.value) })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4" />
+                      </div>
+                      {formData.deliveryMethod !== 'REMOTE' && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Extra Hour Price (₹)</label>
+                            <input type="number" value={formData.extraHourPrice || ''} onChange={e => setFormData({ ...formData, extraHourPrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 1500" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Flexible Timing Premium (₹)</label>
+                            <input type="number" value={formData.flexiblePrice || ''} onChange={e => setFormData({ ...formData, flexiblePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 3000" />
+                          </div>
+                        </>
+                      )}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Slug (URL friendly)</label>
+                        <input type="text" value={formData.slug || ''} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 text-gray-500" placeholder="e.g. personal-portraits" />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea rows={3} value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="block text-sm font-medium text-gray-700">Category</label>
+                          <button type="button" onClick={async () => {
+                            const name = window.prompt("Enter new category name:");
+                            if (!name) return;
+                            try {
+                              const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                              const newCat = await fetchApi('/categories', { method: 'POST', body: JSON.stringify({ name, slug, description: name, isActive: true }) });
+                              toast.success("Category created!");
+                              const catsRes = await fetchApi('/categories/admin').catch(() => ({ data: [] }));
+                              const cats = catsRes.data || catsRes || [];
+                              setCategories(Array.isArray(cats) ? cats : []);
+                              setFormData({ ...formData, category: newCat.name || name, categoryId: newCat._id || null });
+                            } catch (err: any) { toast.error(err.message || "Failed to create category"); }
+                          }} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">+ Create New</button>
+                        </div>
+                        <select value={formData.category || ''} onChange={e => {
+                          const selectedCat = categories.find(c => c.name === e.target.value);
+                          setFormData({ ...formData, category: selectedCat ? selectedCat.name : '', categoryId: selectedCat ? selectedCat._id : null });
+                        }} className="mt-1 block w-full border border-gray-300 rounded p-2 bg-white">
+                          <option value="">-- Select Category --</option>
+                          {categories.map(cat => <option key={cat._id} value={cat.name}>{cat.name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Tags (comma separated)</label>
+                        <input type="text" value={Array.isArray(formData.tags) ? formData.tags.join(', ') : formData.tags || ''} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. popular, premium" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. Extra Options & Add-ons */}
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-4">
+                    <div className="flex justify-between items-center border-b border-blue-200 pb-2">
+                      <h4 className="font-semibold text-blue-900">3. Extra Options & Add-ons</h4>
+                      <div className="flex gap-2">
+                        <select className="text-sm border rounded px-2 py-1 bg-white max-w-[140px]" onChange={(e) => {
+                          if (!e.target.value) return;
+                          const selectedService = data.find(s => s._id === e.target.value);
+                          if (selectedService) {
+                            const addons = formData.addons ? [...formData.addons] : [];
+                            addons.push({ name: selectedService.name, price: selectedService.basePrice });
+                            setFormData({ ...formData, addons });
+                          }
+                          e.target.value = "";
+                        }}>
+                          <option value="">+ From Services</option>
+                          {data.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                        </select>
+                        <button type="button" onClick={handleAddAddon} className="text-sm bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">+ Custom</button>
+                      </div>
+                    </div>
+                    {formData.addons && formData.addons.length > 0 ? (
+                      <div className="space-y-3">
+                        {formData.addons.map((addon: any, index: number) => (
+                          <div key={index} className="flex gap-2 items-start bg-white p-2 rounded border border-blue-100 shadow-sm">
+                            <div className="flex-1">
+                              <label className="block text-[10px] font-medium text-gray-500">Option Name</label>
+                              <input required type="text" value={addon.name} onChange={e => handleUpdateAddon(index, 'name', e.target.value)} className="mt-1 block w-full border rounded p-1 text-sm" />
+                            </div>
+                            <div className="w-24">
+                              <label className="block text-[10px] font-medium text-gray-500">Price (₹)</label>
+                              <input required type="number" value={addon.price} onChange={e => handleUpdateAddon(index, 'price', e.target.value)} className="mt-1 block w-full border rounded p-1 text-sm" />
+                            </div>
+                            <div className="pt-5">
+                              <button type="button" onClick={() => handleRemoveAddon(index)} className="text-red-500 hover:text-red-700 p-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-500 italic text-center py-2">No extra options added.</p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Video URL (Optional)</label>
-                  <input type="url" value={formData.videoUrl || ''} onChange={e => setFormData({ ...formData, videoUrl: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="https://youtube.com/..." />
+
+                {/* --- RIGHT COLUMN --- */}
+                <div className="space-y-6">
+                  {/* 2. Discovery & Filtering */}
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-100 space-y-4">
+                    <h4 className="font-semibold text-purple-900">2. Discovery & Filtering</h4>
+                    {formData.deliveryMethod !== 'REMOTE' ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Locations</label>
+                          <div className="max-h-40 overflow-y-auto border border-gray-200 rounded p-2 bg-white space-y-1">
+                            {PREDEFINED_LOCATIONS.map(loc => (
+                              <label key={loc} className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-gray-50 p-1 rounded">
+                                <input type="checkbox" checked={formData.locations?.includes(loc) || false} onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  const current = formData.locations || [];
+                                  setFormData({ ...formData, locations: checked ? [...current, loc] : current.filter((l: string) => l !== loc) });
+                                }} />
+                                <span>{loc}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Occasions</label>
+                          <div className="max-h-40 overflow-y-auto border border-gray-200 rounded p-2 bg-white space-y-1">
+                            {PREDEFINED_OCCASIONS.map(occ => (
+                              <label key={occ} className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-gray-50 p-1 rounded">
+                                <input type="checkbox" checked={formData.occasions?.includes(occ) || false} onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  const current = formData.occasions || [];
+                                  setFormData({ ...formData, occasions: checked ? [...current, occ] : current.filter((o: string) => o !== occ) });
+                                }} />
+                                <span>{occ}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-purple-800">Location and Occasions are disabled for Remote services.</div>
+                    )}
+                  </div>
+
+                  {/* 4. Media & Settings */}
+                  <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
+                    <h4 className="font-semibold text-gray-700">4. Media & Settings</h4>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Images Gallery</label>
+                      <ImageUpload images={formData.images || []} onChange={(imgs) => setFormData({ ...formData, images: imgs })} galleryImages={galleryImages} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Video URL (Optional)</label>
+                      <input type="url" value={formData.videoUrl || ''} onChange={e => setFormData({ ...formData, videoUrl: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="https://youtube.com/..." />
+                    </div>
+                    <div className="pt-2 flex flex-col space-y-3">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" checked={formData.isActive !== false} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
+                        <span className="font-medium text-gray-700">Service is Active (Visible to customers)</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" checked={formData.popular || false} onChange={e => setFormData({ ...formData, popular: e.target.checked })} className="rounded h-5 w-5 text-orange-600 focus:ring-orange-500" />
+                        <span className="font-medium text-gray-700">🔥 Mark as Trending / Popular</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" checked={formData.newService || false} onChange={e => setFormData({ ...formData, newService: e.target.checked })} className="rounded h-5 w-5 text-emerald-600 focus:ring-emerald-500" />
+                        <span className="font-medium text-gray-700">✨ Mark as Newly Added</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
-                <div className="pt-2 flex flex-col space-y-3">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" checked={formData.isActive !== false} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded h-5 w-5 text-indigo-600 focus:ring-indigo-500" />
-                    <span className="font-medium text-gray-700">Service is Active (Visible to customers)</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" checked={formData.popular || false} onChange={e => setFormData({ ...formData, popular: e.target.checked })} className="rounded h-5 w-5 text-orange-600 focus:ring-orange-500" />
-                    <span className="font-medium text-gray-700">🔥 Mark as Trending / Popular</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" checked={formData.newService || false} onChange={e => setFormData({ ...formData, newService: e.target.checked })} className="rounded h-5 w-5 text-emerald-600 focus:ring-emerald-500" />
-                    <span className="font-medium text-gray-700">✨ Mark as Newly Added</span>
-                  </label>
-                </div>
+
               </div>
 
               <div className="flex justify-end space-x-3 mt-8 border-t pt-4">
