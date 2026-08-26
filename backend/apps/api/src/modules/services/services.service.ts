@@ -74,4 +74,40 @@ export class ServicesService {
   async remove(id: string) {
     return this.servicesRepository.findOneAndDelete({ _id: id });
   }
+
+  async generateAiDescription(data: { name: string; basePrice?: number; category?: string; tags?: string; roughNotes?: string }) {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY is not configured in the backend environment.');
+    }
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+
+    const prompt = `
+You are an expert SEO copywriter and marketer for a professional photography and videography platform called InstaImage.
+Write a highly professional, engaging, and SEO-friendly description for the following service:
+
+Service Name: ${data.name}
+Category: ${data.category || 'N/A'}
+Base Price: ₹${data.basePrice || 'N/A'}
+Tags: ${data.tags || 'N/A'}
+Rough Notes / Current Description: ${data.roughNotes || 'None provided'}
+
+Instructions:
+1. Write 2-3 short, engaging paragraphs.
+2. Focus on the value proposition, the experience, and why the customer should book this.
+3. Incorporate the tags naturally for SEO.
+4. If rough notes are provided, flesh them out into professional sentences.
+5. Do NOT include formatting like "Paragraph 1:", just write the text directly. Do not include markdown headers.
+6. Keep it punchy and conversion-focused.
+`;
+
+    try {
+      const result = await model.generateContent(prompt);
+      return { description: result.response.text().trim() };
+    } catch (error) {
+      console.error('AI Generation Error:', error);
+      throw new Error('Failed to generate AI description');
+    }
+  }
 }

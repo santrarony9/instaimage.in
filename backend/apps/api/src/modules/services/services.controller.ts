@@ -24,6 +24,12 @@ interface AuthenticatedRequest extends ExpressRequest {
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
+  @Roles(Role.ADMIN, Role.SELLER, Role.PHOTOGRAPHER)
+  @Post('admin/ai-description')
+  async generateAiDescription(@Body() data: { name: string; basePrice?: number; category?: string; tags?: string; roughNotes?: string }) {
+    return this.servicesService.generateAiDescription(data);
+  }
+
   @Roles(Role.ADMIN, Role.PHOTOGRAPHER, Role.SELLER)
   @Post()
   create(

@@ -56,6 +56,26 @@ export default function ImageUpload({ images = [], onChange, maxImages = 5, gall
     onChange(images.filter((_, index) => index !== indexToRemove));
   };
 
+  const moveLeft = (idx: number) => {
+    if (idx === 0) return;
+    const newImgs = [...images];
+    [newImgs[idx - 1], newImgs[idx]] = [newImgs[idx], newImgs[idx - 1]];
+    onChange(newImgs);
+  };
+  const moveRight = (idx: number) => {
+    if (idx === images.length - 1) return;
+    const newImgs = [...images];
+    [newImgs[idx + 1], newImgs[idx]] = [newImgs[idx], newImgs[idx + 1]];
+    onChange(newImgs);
+  };
+  const makeCover = (idx: number) => {
+    if (idx === 0) return;
+    const newImgs = [...images];
+    const item = newImgs.splice(idx, 1)[0];
+    newImgs.unshift(item); // insert at index 0
+    onChange(newImgs);
+  };
+
   // The base URL for images. If fetchApi hits the Next.js proxy, we need to prepend API_URL if it returns a relative path
   // Our backend returns /uploads/filename.ext. We need to prefix it with NEXT_PUBLIC_API_URL or it will hit Next.js /uploads which doesn't exist.
   const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
@@ -66,19 +86,58 @@ export default function ImageUpload({ images = [], onChange, maxImages = 5, gall
       
       <div className="flex flex-wrap gap-4">
         {images.map((img, index) => (
-          <div key={index} className="relative w-24 h-24 border rounded overflow-hidden group">
+          <div key={index} className="relative w-28 h-28 border rounded-lg overflow-hidden group shadow-sm">
             <img 
-              src={img} 
+              src={img.startsWith('/') ? `https://api.instaimage.in${img}` : img} 
               alt="Uploaded" 
               className="w-full h-full object-cover"
             />
+            {/* Top Right Delete */}
             <button
               type="button"
               onClick={() => removeImage(index)}
-              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 shadow text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
             >
-              &times;
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
+
+            {/* Bottom Rearrange Bar */}
+            <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-1 py-1 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <button 
+                type="button" 
+                onClick={() => moveLeft(index)} 
+                disabled={index === 0} 
+                className="text-white hover:text-blue-300 disabled:opacity-20 transition-colors"
+                title="Move Left"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              
+              {index !== 0 ? (
+                <button 
+                  type="button" 
+                  onClick={() => makeCover(index)} 
+                  className="text-[9px] font-bold text-white uppercase tracking-wider hover:text-blue-300 transition-colors"
+                  title="Make Cover Image"
+                >
+                  Set Cover
+                </button>
+              ) : (
+                <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">
+                  ⭐ Cover
+                </span>
+              )}
+
+              <button 
+                type="button" 
+                onClick={() => moveRight(index)} 
+                disabled={index === images.length - 1} 
+                className="text-white hover:text-blue-300 disabled:opacity-20 transition-colors"
+                title="Move Right"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
           </div>
         ))}
         

@@ -27,7 +27,7 @@ export default function ServicesManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
-
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
   const loadData = async () => {
@@ -128,6 +128,38 @@ export default function ServicesManagementPage() {
     const addons = [...formData.addons];
     addons[index][field] = value;
     setFormData({ ...formData, addons });
+  };
+
+  const handleGenerateAiDescription = async () => {
+    if (!formData.name) {
+      toast.error('Please enter a Service Name first');
+      return;
+    }
+    
+    setIsGeneratingAi(true);
+    try {
+      const response = await fetchApi('/services/admin/ai-description', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: formData.name,
+          basePrice: formData.basePrice,
+          category: formData.category,
+          tags: Array.isArray(formData.tags) ? formData.tags.join(', ') : formData.tags,
+          roughNotes: formData.description
+        }),
+      });
+      
+      if (response && response.description) {
+        setFormData({ ...formData, description: response.description });
+        toast.success('Description generated successfully!');
+      } else {
+        throw new Error('Invalid response from AI');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to generate description. Ensure GEMINI_API_KEY is configured in backend.');
+    } finally {
+      setIsGeneratingAi(false);
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -439,8 +471,29 @@ export default function ServicesManagementPage() {
                         <input type="text" value={formData.slug || ''} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 text-gray-500" placeholder="e.g. personal-portraits" />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea rows={3} value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" />
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="block text-sm font-medium text-gray-700">Description / Details</label>
+                          <button 
+                            type="button" 
+                            onClick={handleGenerateAiDescription}
+                            disabled={isGeneratingAi}
+                            className="text-xs flex items-center gap-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 font-semibold px-2 py-1 rounded transition-colors disabled:opacity-50"
+                          >
+                            {isGeneratingAi ? (
+                              <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            ) : (
+                              <span className="text-amber-500">✨</span>
+                            )}
+                            {isGeneratingAi ? 'Generating...' : 'Write with AI'}
+                          </button>
+                        </div>
+                        <textarea 
+                          rows={4} 
+                          value={formData.description || ''} 
+                          onChange={e => setFormData({ ...formData, description: e.target.value })} 
+                          className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                          placeholder="Type some rough notes here, then click 'Write with AI'..."
+                        />
                       </div>
                       <div>
                         <div className="flex justify-between items-center mb-1">
