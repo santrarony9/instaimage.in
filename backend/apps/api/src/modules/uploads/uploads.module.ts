@@ -9,7 +9,7 @@ import { Banner, BannerSchema } from '../banners/schemas/banner.schema';
   imports: [
     MongooseModule.forFeature([
       { name: Service.name, schema: ServiceSchema },
-      { name: Banner.name, schema: BannerSchema }
+      { name: Banner.name, schema: BannerSchema },
     ]),
     MulterModule.register({
       dest: './uploads',

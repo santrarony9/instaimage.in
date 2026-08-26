@@ -75,6 +75,9 @@ function LoginContent() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24">
         <div className="max-w-md w-full space-y-8">
           <div>
+            <Link href="/" className="inline-block mb-6">
+              <img src="/logo.png" alt="InstaImage" className="h-10 w-auto object-contain" />
+            </Link>
             <h2 className="text-3xl font-black text-black tracking-tight">
               Sign In
             </h2>

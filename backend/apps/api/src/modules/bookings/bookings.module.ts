@@ -5,6 +5,7 @@ import { BookingsController } from './bookings.controller';
 import { DatabaseModule } from '@app/database';
 import { Booking, BookingSchema } from './schemas/booking.schema';
 import { BookingsRepository } from './bookings.repository';
+import { BookingsCronService } from './bookings-cron.service';
 
 import { ServicesModule } from '../services/services.module';
 import { CouponsModule } from '../coupons/coupons.module';
@@ -14,6 +15,8 @@ import { AvailabilityModule } from '../availability/availability.module';
 import { SellersModule } from '../sellers/sellers.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { SettingsModule } from '../settings/settings.module';
+import { UsersModule } from '../users/users.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -27,9 +30,11 @@ import { SettingsModule } from '../settings/settings.module';
     SellersModule,
     NotificationsModule,
     SettingsModule,
+    UsersModule,
+    EmailModule,
   ],
   controllers: [BookingsController],
-  providers: [BookingsService, BookingsRepository],
+  providers: [BookingsService, BookingsRepository, BookingsCronService],
   exports: [BookingsService],
 })
 export class BookingsModule {}

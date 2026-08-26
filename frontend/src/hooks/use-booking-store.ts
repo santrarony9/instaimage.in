@@ -27,6 +27,7 @@ interface BookingData {
   appliedCouponId?: string;
   customerNotes?: string;
   isExpressDelivery?: boolean;
+  applyWalletBalance?: boolean;
 }
 
 interface BookingState {

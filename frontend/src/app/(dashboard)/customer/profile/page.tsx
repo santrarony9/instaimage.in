@@ -33,6 +33,39 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      <div className="bg-white shadow sm:rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg leading-6 font-bold text-green-700">🎁 Refer & Earn ₹500</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            Share your unique referral code with friends. When they sign up, they get ₹500 in their wallet! 
+            Once they complete their first booking, <strong>you</strong> instantly get ₹500 in your wallet too!
+          </p>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700">Your Referral Code</label>
+            <div className="mt-1 flex rounded-md shadow-sm max-w-sm">
+              <input 
+                type="text" 
+                readOnly 
+                value={user?.referralCode || 'Generate by booking first service'} 
+                className="flex-1 block w-full min-w-0 rounded-none rounded-l-md sm:text-sm border-gray-300 px-3 py-2 border bg-gray-50 font-bold text-gray-900" 
+              />
+              <button 
+                type="button" 
+                onClick={() => {
+                  if (user?.referralCode) {
+                    navigator.clipboard.writeText(user.referralCode);
+                    alert('Referral code copied!');
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-black"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

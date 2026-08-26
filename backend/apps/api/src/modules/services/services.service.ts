@@ -68,19 +68,24 @@ export class ServicesService {
   async update(id: string, updateServiceDto: UpdateServiceDto) {
     const data: any = { ...updateServiceDto };
     if (data.categoryId) data.categoryId = new Types.ObjectId(data.categoryId);
-    return this.servicesRepository.findOneAndUpdate(
-      { _id: id },
-      data,
-    );
+    return this.servicesRepository.findOneAndUpdate({ _id: id }, data);
   }
 
   async remove(id: string) {
     return this.servicesRepository.findOneAndDelete({ _id: id });
   }
 
-  async generateAiDescription(data: { name: string; basePrice?: number; category?: string; tags?: string; roughNotes?: string }) {
+  async generateAiDescription(data: {
+    name: string;
+    basePrice?: number;
+    category?: string;
+    tags?: string;
+    roughNotes?: string;
+  }) {
     if (!process.env.GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is not configured in the backend environment.');
+      throw new Error(
+        'GEMINI_API_KEY is not configured in the backend environment.',
+      );
     }
     const { GoogleGenerativeAI } = require('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

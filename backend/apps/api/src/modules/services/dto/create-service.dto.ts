@@ -38,6 +38,10 @@ export class CreateServiceDto {
 
   @IsNumber()
   @IsOptional()
+  compareAtPrice?: number;
+
+  @IsNumber()
+  @IsOptional()
   extraHourPrice?: number;
 
   @IsNumber()

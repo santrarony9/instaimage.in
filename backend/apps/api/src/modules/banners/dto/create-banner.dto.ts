@@ -1,4 +1,11 @@
-﻿import { IsString, IsOptional, IsBoolean, IsNumber, IsArray, IsMongoId } from 'class-validator';
+﻿import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  IsArray,
+  IsMongoId,
+} from 'class-validator';
 
 export class CreateBannerDto {
   @IsString()

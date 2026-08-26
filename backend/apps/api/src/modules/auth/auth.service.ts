@@ -30,6 +30,19 @@ export class AuthService {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(registerDto.password, salt);
 
+    let referredBy = undefined;
+    if (registerDto.referralCode) {
+      const referrer = await this.usersService.findByReferralCode(
+        registerDto.referralCode,
+      );
+      if (referrer) {
+        referredBy = referrer._id;
+      }
+    }
+
+    const referralCode =
+      'INSTA' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
     const user = await this.usersService.create({
       name: registerDto.name,
       email: registerDto.email,
@@ -38,10 +51,21 @@ export class AuthService {
         registerDto.email === 'admin@instaimage.com'
           ? Role.ADMIN
           : Role.CUSTOMER,
+      referralCode,
+      referredBy,
     });
 
     const payload = { sub: user._id, email: user.email, role: user.role };
-    
+
+    // Give welcome wallet bonus
+    if (user.role === Role.CUSTOMER) {
+      await this.usersService.addWalletBalance(
+        user._id.toString(),
+        500,
+        'Welcome Bonus',
+      );
+    }
+
     // Send welcome email asynchronously
     this.emailService.sendWelcomeEmail(user.email, user.name);
 
@@ -86,7 +110,7 @@ export class AuthService {
     });
 
     const payload = { sub: user._id, email: user.email, role: user.role };
-    
+
     this.emailService.sendWelcomeEmail(user.email, user.name);
 
     return {
@@ -135,7 +159,7 @@ export class AuthService {
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(registerDto.password, salt);
-    
+
     let parsedRole = Role.CUSTOMER;
     if (registerDto.role === 'ADMIN') parsedRole = Role.ADMIN;
     if (registerDto.role === 'SELLER') parsedRole = Role.SELLER;
@@ -161,24 +185,38 @@ export class AuthService {
 
     this.emailService.sendWelcomeEmail(user.email, user.name);
 
-    return { success: true, user: { id: user._id, name: user.name, role: user.role } };
+    return {
+      success: true,
+      user: { id: user._id, name: user.name, role: user.role },
+    };
   }
 
   async validateGoogleUser(googleUser: any) {
     let user = await this.usersService.findByEmail(googleUser.email);
-    
+
     if (!user) {
       // Create user if they don't exist
       const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(Math.random().toString(36).slice(-8), salt);
-      
+      const passwordHash = await bcrypt.hash(
+        Math.random().toString(36).slice(-8),
+        salt,
+      );
+      const referralCode =
+        'INSTA' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
       user = await this.usersService.create({
         name: googleUser.name,
         email: googleUser.email,
         passwordHash,
         role: Role.CUSTOMER,
+        referralCode,
       });
 
+      await this.usersService.addWalletBalance(
+        user._id.toString(),
+        500,
+        'Welcome Bonus',
+      );
       this.emailService.sendWelcomeEmail(user.email, user.name);
     }
 
@@ -198,12 +236,15 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       // Return success anyway to prevent email enumeration
-      return { success: true, message: 'If an account exists, a reset link was sent.' };
+      return {
+        success: true,
+        message: 'If an account exists, a reset link was sent.',
+      };
     }
 
     const token = crypto.randomBytes(32).toString('hex');
     const tokenHash = await bcrypt.hash(token, 10);
-    
+
     await this.usersService.update(user._id.toString(), {
       resetPasswordToken: tokenHash,
       resetPasswordExpires: new Date(Date.now() + 3600000), // 1 hour from now
@@ -212,12 +253,15 @@ export class AuthService {
     const resetLink = `https://instaimage.in/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
     this.emailService.sendPasswordResetEmail(user.email, resetLink);
 
-    return { success: true, message: 'If an account exists, a reset link was sent.' };
+    return {
+      success: true,
+      message: 'If an account exists, a reset link was sent.',
+    };
   }
 
   async resetPassword(email: string, token: string, newPassword: string) {
     const user = await this.usersService.findByEmail(email);
-    
+
     if (!user || !user.resetPasswordToken || !user.resetPasswordExpires) {
       throw new BadRequestException('Invalid or expired password reset token');
     }

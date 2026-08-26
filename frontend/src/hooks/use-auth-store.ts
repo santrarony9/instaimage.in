@@ -8,6 +8,7 @@ interface User {
   role: string;
   phone?: string;
   isWhatsappVerified?: boolean;
+  referralCode?: string;
 }
 
 interface AuthState {

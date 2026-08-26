@@ -24,7 +24,7 @@ export class PaymentsController {
 
     const crypto = require('crypto');
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'fallback_secret';
-    
+
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(JSON.stringify(payload))

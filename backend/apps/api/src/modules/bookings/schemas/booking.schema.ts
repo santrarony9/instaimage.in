@@ -75,6 +75,9 @@ export class PricingDetails {
   @Prop({ required: true, min: 0, default: 0 })
   discount: number;
 
+  @Prop({ default: 0 })
+  walletDiscountApplied: number;
+
   @Prop({ required: true, min: 0 })
   totalPrice: number;
 
@@ -119,6 +122,9 @@ export class Booking extends AbstractDocument {
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   photographerId?: Types.ObjectId;
+
+  @Prop({ default: false })
+  recoveryEmailSent: boolean;
 
   @Prop({ enum: ['PENDING', 'PAID'], default: 'PENDING' })
   payoutStatus: string;
@@ -194,7 +200,10 @@ export class Booking extends AbstractDocument {
   @Prop()
   deliveryLink?: string; // For Google Drive / high-res link
 
-  @Prop({ type: [{ url: String, filename: String, isWishlisted: Boolean }], default: [] })
+  @Prop({
+    type: [{ url: String, filename: String, isWishlisted: Boolean }],
+    default: [],
+  })
   gallery?: Array<{ url: string; filename: string; isWishlisted: boolean }>;
 }
 

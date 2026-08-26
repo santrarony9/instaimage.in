@@ -28,7 +28,9 @@ export class CategoriesService {
   }
 
   async findBySlug(slug: string) {
-    const category = await this.categoryModel.findOne({ slug, isActive: true }).exec();
+    const category = await this.categoryModel
+      .findOne({ slug, isActive: true })
+      .exec();
     if (!category) throw new NotFoundException('Category not found');
     return category;
   }

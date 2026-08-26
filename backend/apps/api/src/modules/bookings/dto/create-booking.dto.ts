@@ -85,4 +85,8 @@ export class CreateBookingDto {
   @IsOptional()
   @IsBoolean()
   isExpressDelivery?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  applyWalletBalance?: boolean;
 }

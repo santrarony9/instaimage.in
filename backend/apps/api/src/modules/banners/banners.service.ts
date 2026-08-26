@@ -18,11 +18,18 @@ export class BannersService {
 
   async findAll(activeOnly: boolean = false): Promise<Banner[]> {
     const filter = activeOnly ? { isActive: true } : {};
-    return this.bannerModel.find(filter).sort({ sortOrder: 1, createdAt: -1 }).populate('services').exec();
+    return this.bannerModel
+      .find(filter)
+      .sort({ sortOrder: 1, createdAt: -1 })
+      .populate('services')
+      .exec();
   }
 
   async findOne(id: string): Promise<Banner> {
-    const banner = await this.bannerModel.findById(id).populate('services').exec();
+    const banner = await this.bannerModel
+      .findById(id)
+      .populate('services')
+      .exec();
     if (!banner) {
       throw new NotFoundException(`Banner #${id} not found`);
     }

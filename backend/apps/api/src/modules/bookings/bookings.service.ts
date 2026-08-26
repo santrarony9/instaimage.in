@@ -24,6 +24,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { EmailService } from '../email/email.service';
 
 import { SettingsService } from '../settings/settings.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class BookingsService {
@@ -40,6 +41,7 @@ export class BookingsService {
     private readonly notificationsService: NotificationsService,
     private readonly emailService: EmailService,
     private readonly settingsService: SettingsService,
+    private readonly usersService: UsersService,
   ) {}
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
@@ -61,7 +63,8 @@ export class BookingsService {
     );
 
     try {
-      const { pricing, matchedAddons } = await this.calculateFullPrice(createBookingDto);
+      const { pricing, matchedAddons, walletDiscountApplied } =
+        await this.calculateFullPrice(createBookingDto, customerId);
 
       // 2. Create Booking Record
       const booking = await this.bookingsRepository.create({
@@ -86,6 +89,16 @@ export class BookingsService {
         customerNotes: createBookingDto.customerNotes,
       });
 
+      // Deduct wallet balance if applied
+      if (walletDiscountApplied && walletDiscountApplied > 0) {
+        await this.usersService.addWalletBalance(
+          customerId,
+          -walletDiscountApplied,
+          `Applied to booking ${bookingId}`,
+          booking._id.toString(),
+        );
+      }
+
       // 3. Create Payment Order Mock
       const paymentOrder = await this.paymentsService.createPaymentOrder(
         bookingId,
@@ -94,16 +107,22 @@ export class BookingsService {
       );
 
       // Async email sending (no await)
-      this.bookingsRepository.model.findById(booking._id).populate('customerId', 'name email').populate('serviceId', 'title name').then(b => {
-        if (b && b.customerId && (b.customerId as any).email) {
-          this.emailService.sendBookingConfirmation(
-            (b.customerId as any).email,
-            (b.customerId as any).name,
-            (b.serviceId as any).title || (b.serviceId as any).name || 'Service',
-            b.scheduledDate.toLocaleDateString()
-          );
-        }
-      });
+      this.bookingsRepository.model
+        .findById(booking._id)
+        .populate('customerId', 'name email')
+        .populate('serviceId', 'title name')
+        .then((b) => {
+          if (b && b.customerId && (b.customerId as any).email) {
+            this.emailService.sendBookingConfirmation(
+              (b.customerId as any).email,
+              (b.customerId as any).name,
+              (b.serviceId as any).title ||
+                (b.serviceId as any).name ||
+                'Service',
+              b.scheduledDate.toLocaleDateString(),
+            );
+          }
+        });
 
       return {
         booking,
@@ -149,11 +168,34 @@ export class BookingsService {
   }
 
   async updateBookingStatus(id: string, status: BookingStatus) {
-    return this.bookingsRepository.update(id, { status });
+    const booking = await this.bookingsRepository.update(id, { status });
+
+    if (status === BookingStatus.CONFIRMED && booking && booking.customerId) {
+      const user = await this.usersService.findById(
+        booking.customerId.toString(),
+      );
+      if (user && !user.hasCompletedFirstBooking && user.referredBy) {
+        // Reward the referrer
+        await this.usersService.addWalletBalance(
+          user.referredBy.toString(),
+          500,
+          `Referral reward for ${user.name}'s first booking`,
+          booking._id.toString(),
+        );
+        // Mark as completed
+        await this.usersService.update(user._id.toString(), {
+          hasCompletedFirstBooking: true,
+        });
+      }
+    }
+
+    return booking;
   }
 
   async updateTipAmount(id: string, tipAmount: number) {
-    return this.bookingsRepository.update(id, { 'pricing.tipAmount': tipAmount } as any);
+    return this.bookingsRepository.update(id, {
+      'pricing.tipAmount': tipAmount,
+    });
   }
 
   async addSurcharge(
@@ -208,15 +250,15 @@ export class BookingsService {
         'BOOKING_ASSIGNED',
         { bookingId },
       );
-      
+
       if (seller.email) {
         // Fetch service to get name
-        this.servicesService.findOne(booking.serviceId.toString()).then(s => {
+        this.servicesService.findOne(booking.serviceId.toString()).then((s) => {
           this.emailService.sendBookingAlert(
             seller.email,
             seller.name,
             s?.name || 'a Service',
-            booking.scheduledDate.toLocaleDateString()
+            booking.scheduledDate.toLocaleDateString(),
           );
         });
       }
@@ -265,14 +307,21 @@ export class BookingsService {
     let travelDistanceKm = 0;
     let nearestOfficeName = undefined;
 
-    const officeLocations = await this.settingsService.getSetting('officeLocations') || [];
-    const travelConfig = await this.settingsService.getSetting('travelChargeConfig') || {
+    const officeLocations =
+      (await this.settingsService.getSetting('officeLocations')) || [];
+    const travelConfig = (await this.settingsService.getSetting(
+      'travelChargeConfig',
+    )) || {
       perKmRate: 15,
       freeRadiusKm: 5,
-      defaultFlatCharge: 500
+      defaultFlatCharge: 500,
     };
 
-    if (clientCoordinates && clientCoordinates.length === 2 && officeLocations.length > 0) {
+    if (
+      clientCoordinates &&
+      clientCoordinates.length === 2 &&
+      officeLocations.length > 0
+    ) {
       const [lng2, lat2] = clientCoordinates;
       let minDistance = Infinity;
 
@@ -280,13 +329,15 @@ export class BookingsService {
         if (office.coordinates && office.coordinates.length === 2) {
           const [lng1, lat1] = office.coordinates;
           const R = 6371; // Earth's radius in km
-          const dLat = (lat2 - lat1) * Math.PI / 180;
-          const dLon = (lng2 - lng1) * Math.PI / 180;
-          const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const dLat = ((lat2 - lat1) * Math.PI) / 180;
+          const dLon = ((lng2 - lng1) * Math.PI) / 180;
+          const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+              Math.cos((lat2 * Math.PI) / 180) *
+              Math.sin(dLon / 2) *
+              Math.sin(dLon / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
           const d = R * c; // Distance in km
 
           if (d < minDistance) {
@@ -298,8 +349,13 @@ export class BookingsService {
 
       if (minDistance !== Infinity) {
         travelDistanceKm = parseFloat(minDistance.toFixed(2));
-        const billableDistance = Math.max(0, travelDistanceKm - travelConfig.freeRadiusKm);
-        deliveryCharge = Math.ceil(billableDistance * 2 * travelConfig.perKmRate); // * 2 for round trip
+        const billableDistance = Math.max(
+          0,
+          travelDistanceKm - travelConfig.freeRadiusKm,
+        );
+        deliveryCharge = Math.ceil(
+          billableDistance * 2 * travelConfig.perKmRate,
+        ); // * 2 for round trip
       } else {
         deliveryCharge = travelConfig.defaultFlatCharge || 500;
       }
@@ -310,8 +366,10 @@ export class BookingsService {
     return { deliveryCharge, travelDistanceKm, nearestOfficeName };
   }
 
-  async calculateFullPrice(createBookingDto: CreateBookingDto) {
-    const service = await this.servicesService.findOne(createBookingDto.serviceId);
+  async calculateFullPrice(createBookingDto: CreateBookingDto, customerId?: string) {
+    const service = await this.servicesService.findOne(
+      createBookingDto.serviceId,
+    );
     if (!service) throw new NotFoundException('Service not found');
 
     let basePrice = 0;
@@ -319,12 +377,22 @@ export class BookingsService {
 
     if (createBookingDto.pricingMode === 'fixed') {
       basePrice = service.basePrice;
-      if (createBookingDto.extraHoursBooked && createBookingDto.extraHoursBooked > 0) {
-        if (!service.extraHourPrice) throw new BadRequestException('This service does not allow extra fixed hours.');
-        extraHoursPrice = createBookingDto.extraHoursBooked * service.extraHourPrice;
+      if (
+        createBookingDto.extraHoursBooked &&
+        createBookingDto.extraHoursBooked > 0
+      ) {
+        if (!service.extraHourPrice)
+          throw new BadRequestException(
+            'This service does not allow extra fixed hours.',
+          );
+        extraHoursPrice =
+          createBookingDto.extraHoursBooked * service.extraHourPrice;
       }
     } else if (createBookingDto.pricingMode === 'flexible') {
-      if (!service.flexiblePrice) throw new BadRequestException('This service does not allow flexible pricing.');
+      if (!service.flexiblePrice)
+        throw new BadRequestException(
+          'This service does not allow flexible pricing.',
+        );
       basePrice = service.flexiblePrice;
     }
 
@@ -334,7 +402,10 @@ export class BookingsService {
 
     if (service.addons && service.addons.length > 0) {
       for (const addonObj of service.addons) {
-        if (createBookingDto.addonNames && createBookingDto.addonNames.includes(addonObj.name)) {
+        if (
+          createBookingDto.addonNames &&
+          createBookingDto.addonNames.includes(addonObj.name)
+        ) {
           addonsPrice += addonObj.price;
           matchedAddons.push({ name: addonObj.name, price: addonObj.price });
         } else {
@@ -344,24 +415,29 @@ export class BookingsService {
     }
 
     const surchargesPrice = 0;
-    const surcharges: Array<{ name: string; amount: number; reason?: string }> = [];
+    const surcharges: Array<{ name: string; amount: number; reason?: string }> =
+      [];
 
-    const { deliveryCharge, travelDistanceKm, nearestOfficeName } = 
+    const { deliveryCharge, travelDistanceKm, nearestOfficeName } =
       await this.calculateTravelCharge(createBookingDto.location?.coordinates);
     let discount = 0;
 
-    const travelConfig = await this.settingsService.getSetting('travelChargeConfig');
+    const travelConfig =
+      await this.settingsService.getSetting('travelChargeConfig');
     let deliveryDiscount = 0;
     if (travelConfig?.isFreeOfferActive) {
       deliveryDiscount = deliveryCharge;
     }
 
     if (createBookingDto.appliedCouponId) {
-      const coupon = await this.couponsService.findOne(createBookingDto.appliedCouponId);
+      const coupon = await this.couponsService.findOne(
+        createBookingDto.appliedCouponId,
+      );
       if (coupon && coupon.isActive) {
         if (coupon.discountType === 'PERCENTAGE') {
           discount = (basePrice + addonsPrice) * (coupon.discountValue / 100);
-          if (coupon.maxDiscount && discount > coupon.maxDiscount) discount = coupon.maxDiscount;
+          if (coupon.maxDiscount && discount > coupon.maxDiscount)
+            discount = coupon.maxDiscount;
         } else {
           discount = coupon.discountValue;
         }
@@ -369,21 +445,60 @@ export class BookingsService {
     }
 
     const availableExpressFee = service.expressDeliveryFee || 0;
-    const expressDeliveryFee = createBookingDto.isExpressDelivery ? availableExpressFee : 0;
+    const expressDeliveryFee = createBookingDto.isExpressDelivery
+      ? availableExpressFee
+      : 0;
     const totalDiscount = discount + deliveryDiscount;
-    const totalPrice = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge + expressDeliveryFee - totalDiscount;
+    let totalPrice =
+      basePrice +
+      addonsPrice +
+      extraHoursPrice +
+      surchargesPrice +
+      deliveryCharge +
+      expressDeliveryFee -
+      totalDiscount;
+
+    let walletDiscountApplied = 0;
+    if (createBookingDto.applyWalletBalance && customerId) {
+      const user = await this.usersService.findById(customerId);
+      if (user && user.walletBalance && user.walletBalance > 0) {
+        walletDiscountApplied = Math.min(totalPrice, user.walletBalance);
+        totalPrice -= walletDiscountApplied;
+      }
+    }
+
     const advancePaid = totalPrice * 0.2;
     const balanceDue = totalPrice - advancePaid;
 
-    const platformFee = totalPrice * 0.10;
-    const sellerPayout = totalPrice * 0.90;
+    const platformFee = totalPrice * 0.1;
+    const sellerPayout = totalPrice * 0.9;
 
-    const pricing: PricingDetails = {
-      basePrice, addonsPrice, extraHoursPrice, surcharges, surchargesPrice,
-      deliveryCharge, expressDeliveryFee, deliveryDiscount, discount, totalPrice, platformFee, sellerPayout,
-      advancePaid, balanceDue, travelDistanceKm, nearestOfficeName,
+    const pricing = {
+      basePrice,
+      addonsPrice,
+      extraHoursPrice,
+      surcharges,
+      surchargesPrice,
+      deliveryCharge,
+      expressDeliveryFee,
+      deliveryDiscount,
+      discount,
+      walletDiscountApplied,
+      totalPrice,
+      platformFee,
+      sellerPayout,
+      advancePaid,
+      balanceDue,
+      travelDistanceKm,
+      nearestOfficeName,
     };
 
-    return { pricing, matchedAddons, unselectedAddons, availableExpressFee };
+    return {
+      pricing,
+      matchedAddons,
+      unselectedAddons,
+      availableExpressFee,
+      walletDiscountApplied,
+    };
   }
 }

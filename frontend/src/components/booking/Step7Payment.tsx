@@ -9,6 +9,19 @@ export function Step7Payment() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [pricingInfo, setPricingInfo] = useState<any>(null);
   const [isLoadingPrice, setIsLoadingPrice] = useState(true);
+  const [walletBalance, setWalletBalance] = useState(0);
+
+  useEffect(() => {
+    const fetchWallet = async () => {
+      try {
+        const res = await fetchApi('/users/me/wallet');
+        setWalletBalance(res.balance || 0);
+      } catch (err) {
+        console.error('Failed to fetch wallet', err);
+      }
+    };
+    fetchWallet();
+  }, []);
 
   useEffect(() => {
     const fetchPrice = async () => {
@@ -22,6 +35,7 @@ export function Step7Payment() {
           location: data.location,
           appliedCouponId: data.appliedCouponId,
           isExpressDelivery: data.isExpressDelivery || false,
+          applyWalletBalance: data.applyWalletBalance || false,
         };
         const res = await fetchApi('/bookings/calculate-price', {
           method: 'POST',
@@ -108,6 +122,23 @@ export function Step7Payment() {
         </div>
       )}
 
+      {walletBalance > 0 && (
+        <div className="bg-white p-4 rounded-lg border border-green-100 shadow-sm mb-6 flex items-center justify-between">
+          <div>
+            <h4 className="font-bold text-gray-900">💰 InstaImage Wallet</h4>
+            <p className="text-sm text-gray-500">You have ₹{walletBalance} available. Apply it to this booking?</p>
+          </div>
+          <button
+            onClick={() => {
+              useBookingStore.getState().updateData({ applyWalletBalance: !data.applyWalletBalance });
+            }}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${data.applyWalletBalance ? 'bg-green-600' : 'bg-gray-200'}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.applyWalletBalance ? 'translate-x-6' : 'translate-x-1'}`} />
+          </button>
+        </div>
+      )}
+
       <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8 space-y-3 text-sm">
         <h3 className="font-bold text-gray-800 text-base border-b pb-2 mb-4">Invoice Summary</h3>
         <div className="flex justify-between">
@@ -154,8 +185,15 @@ export function Step7Payment() {
 
         {p?.discount > 0 && (
           <div className="flex justify-between text-green-600">
-            <span>Discount Applied</span>
+            <span>Coupon Discount Applied</span>
             <span className="font-medium">-₹{p.discount}</span>
+          </div>
+        )}
+
+        {p?.walletDiscountApplied > 0 && (
+          <div className="flex justify-between text-green-600 font-bold">
+            <span>💰 Wallet Balance Used</span>
+            <span>-₹{p.walletDiscountApplied}</span>
           </div>
         )}
         

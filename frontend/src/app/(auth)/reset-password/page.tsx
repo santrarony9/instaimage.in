@@ -85,6 +85,9 @@ function ResetPasswordForm() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-8">
+          <Link href="/" className="inline-block mb-6">
+            <img src="/logo.png" alt="InstaImage" className="h-10 w-auto object-contain mx-auto" />
+          </Link>
           <h2 className="text-3xl font-bold text-gray-900">Set new password</h2>
           <p className="text-gray-500 mt-2">Enter your new password below.</p>
         </div>

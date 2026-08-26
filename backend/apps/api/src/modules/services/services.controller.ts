@@ -26,7 +26,16 @@ export class ServicesController {
 
   @Roles(Role.ADMIN, Role.SELLER, Role.PHOTOGRAPHER)
   @Post('admin/ai-description')
-  async generateAiDescription(@Body() data: { name: string; basePrice?: number; category?: string; tags?: string; roughNotes?: string }) {
+  async generateAiDescription(
+    @Body()
+    data: {
+      name: string;
+      basePrice?: number;
+      category?: string;
+      tags?: string;
+      roughNotes?: string;
+    },
+  ) {
     return this.servicesService.generateAiDescription(data);
   }
 

@@ -22,7 +22,10 @@ export class SettingsController {
   @Put(':key')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  async setSetting(@Param('key') key: string, @Body() body: { value: any; description?: string }) {
+  async setSetting(
+    @Param('key') key: string,
+    @Body() body: { value: any; description?: string },
+  ) {
     return this.settingsService.setSetting(key, body.value, body.description);
   }
 }

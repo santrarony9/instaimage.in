@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +31,7 @@ export default function RegisterPage() {
     try {
       const response = await fetchApi('/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, referralCode: referralCode.trim() || undefined }),
       });
 
       setAuth(response.access_token, response.user);
@@ -62,6 +63,9 @@ export default function RegisterPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24">
         <div className="max-w-md w-full space-y-8">
           <div>
+            <Link href="/" className="inline-block mb-6">
+              <img src="/logo.png" alt="InstaImage" className="h-10 w-auto object-contain" />
+            </Link>
             <h2 className="text-3xl font-black text-black tracking-tight">
               Create an Account
             </h2>
@@ -118,6 +122,18 @@ export default function RegisterPage() {
                   onChange={e => setPassword(e.target.value)}
                   className="appearance-none block w-full px-4 py-4 border border-gray-200 rounded-xl bg-gray-50 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
                   placeholder="At least 6 characters"
+                />
+              </div>
+              <div>
+                <label htmlFor="referralCode" className="block text-sm font-bold text-gray-900 mb-2">Referral Code (Optional)</label>
+                <input
+                  id="referralCode"
+                  name="referralCode"
+                  type="text"
+                  value={referralCode}
+                  onChange={e => setReferralCode(e.target.value.toUpperCase())}
+                  className="appearance-none block w-full px-4 py-4 border border-gray-200 rounded-xl bg-gray-50 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+                  placeholder="e.g. INSTA123"
                 />
               </div>
             </div>

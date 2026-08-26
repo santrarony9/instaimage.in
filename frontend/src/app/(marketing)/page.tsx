@@ -210,7 +210,14 @@ export default async function HomePage() {
             <div className="bg-white p-5 md:p-6 rounded-2xl w-full lg:w-auto min-w-[280px] shadow-2xl flex flex-col relative z-10">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-gray-500 font-bold text-sm">Total Value</span>
-                <span className="text-gray-400 line-through text-sm font-semibold">₹{banner.originalPrice?.toLocaleString('en-IN') || 0}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400 line-through text-sm font-semibold">₹{banner.originalPrice?.toLocaleString('en-IN') || 0}</span>
+                  {banner.originalPrice > banner.comboPrice && (
+                    <span className="bg-red-100 text-red-700 text-xs font-black px-1.5 py-0.5 rounded">
+                      {Math.round(((banner.originalPrice - banner.comboPrice) / banner.originalPrice) * 100)}% OFF
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex justify-between items-end mb-6">
                 <span className="text-gray-900 font-black text-sm">Combo Price</span>
@@ -325,7 +332,17 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
         <p className="text-[10px] sm:text-[11px] text-gray-500 mb-2">{service.category}</p>
         
         <div className="mt-auto flex items-center justify-between">
-          <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+          <div className="flex flex-col">
+            {service.compareAtPrice && service.compareAtPrice > service.basePrice && (
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-gray-400 line-through">₹{service.compareAtPrice.toLocaleString()}</span>
+                <span className="text-[9px] font-black text-red-600 bg-red-50 px-1 rounded">
+                  {Math.round(((service.compareAtPrice - service.basePrice) / service.compareAtPrice) * 100)}% OFF
+                </span>
+              </div>
+            )}
+            <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+          </div>
           <AddToCartButton service={service} />
         </div>
       </div>

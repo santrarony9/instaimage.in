@@ -11,6 +11,7 @@ interface User {
   phone?: string;
   isWhatsappVerified?: boolean;
   role: 'ADMIN' | 'CUSTOMER' | 'SELLER';
+  walletBalance?: number;
   createdAt: string;
 }
 
@@ -21,6 +22,12 @@ export default function UsersPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'CUSTOMER' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [selectedUserForWallet, setSelectedUserForWallet] = useState<User | null>(null);
+  const [walletAmount, setWalletAmount] = useState('');
+  const [walletDescription, setWalletDescription] = useState('Admin adjustment');
+
   const { addToast } = useToast();
 
   const fetchUsers = async (query: string = '') => {
@@ -82,6 +89,27 @@ export default function UsersPage() {
     }
   };
 
+  const handleAdjustWallet = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUserForWallet || !walletAmount) return;
+    try {
+      setIsSubmitting(true);
+      await fetchApi(`/users/${selectedUserForWallet._id}/wallet`, {
+        method: 'POST',
+        body: JSON.stringify({ amount: Number(walletAmount), description: walletDescription }),
+      });
+      addToast('Wallet balance updated', 'success');
+      setIsWalletModalOpen(false);
+      setSelectedUserForWallet(null);
+      setWalletAmount('');
+      fetchUsers(search);
+    } catch (error: any) {
+      addToast(error.message || 'Failed to update wallet', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'ADMIN':
@@ -125,6 +153,7 @@ export default function UsersPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone / WhatsApp</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined Date</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -160,6 +189,20 @@ export default function UsersPage() {
                       {user.role}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-green-600">₹{user.walletBalance || 0}</span>
+                      <button 
+                        onClick={() => {
+                          setSelectedUserForWallet(user);
+                          setIsWalletModalOpen(true);
+                        }}
+                        className="text-xs text-indigo-600 hover:text-indigo-900 border border-indigo-200 rounded px-2 py-1"
+                      >
+                        Adjust
+                      </button>
+                    </div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
@@ -187,6 +230,7 @@ export default function UsersPage() {
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">Add New User</h2>
             <form onSubmit={handleAddUser} className="space-y-4">
+              {/* Form fields here */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                 <input
@@ -246,6 +290,60 @@ export default function UsersPage() {
                   className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
                 >
                   {isSubmitting ? 'Creating...' : 'Create User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Wallet Adjust Modal */}
+      {isWalletModalOpen && selectedUserForWallet && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Adjust Wallet Balance</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Modifying balance for <span className="font-semibold text-gray-900">{selectedUserForWallet.name}</span>. 
+              Current balance: <span className="font-semibold text-green-600">₹{selectedUserForWallet.walletBalance || 0}</span>
+            </p>
+            <form onSubmit={handleAdjustWallet} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (+ for credit, - for debit)</label>
+                <input
+                  type="number"
+                  required
+                  placeholder="e.g. 500 or -100"
+                  value={walletAmount}
+                  onChange={(e) => setWalletAmount(e.target.value)}
+                  className="w-full border p-2 rounded focus:ring-black focus:border-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description / Reason</label>
+                <input
+                  type="text"
+                  required
+                  value={walletDescription}
+                  onChange={(e) => setWalletDescription(e.target.value)}
+                  className="w-full border p-2 rounded focus:ring-black focus:border-black"
+                />
+              </div>
+              
+              <div className="flex gap-3 justify-end pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsWalletModalOpen(false)}
+                  className="px-4 py-2 border rounded hover:bg-gray-50"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Processing...' : 'Apply Adjustment'}
                 </button>
               </div>
             </form>

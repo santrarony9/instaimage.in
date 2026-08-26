@@ -1,4 +1,13 @@
-import { Controller, Get, Patch, Param, Body, Query, Req, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Param,
+  Body,
+  Query,
+  Req,
+  Post,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles, Role, Public } from '@app/auth';
 
@@ -32,5 +41,31 @@ export class UsersController {
   @Roles(Role.ADMIN)
   updateRole(@Param('id') id: string, @Body('role') role: string) {
     return this.usersService.updateRole(id, role);
+  }
+
+  @Get('me/wallet')
+  getWallet(@Req() req: any) {
+    return this.usersService
+      .findById(req.user.sub)
+      .then((user) => ({ balance: user?.walletBalance || 0 }));
+  }
+
+  @Get('me/wallet/transactions')
+  getWalletTransactions(@Req() req: any) {
+    return this.usersService.getWalletTransactions(req.user.sub);
+  }
+
+  @Post(':id/wallet')
+  @Roles(Role.ADMIN)
+  adjustWalletBalance(
+    @Param('id') id: string,
+    @Body('amount') amount: number,
+    @Body('description') description: string,
+  ) {
+    return this.usersService.addWalletBalance(
+      id,
+      amount,
+      description || 'Admin adjustment',
+    );
   }
 }

@@ -158,7 +158,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
               </div>
             )}
 
-            {/* Tabs Section */}
+            {/* Tabs Section hidden for now
             <div className="border-b border-gray-200 mb-8 overflow-x-auto whitespace-nowrap hide-scrollbar">
               <div className="flex space-x-8">
                 {['details', 'delivery', 'process'].map(tab => (
@@ -172,29 +172,12 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                 ))}
               </div>
             </div>
+            */}
 
             <div className="prose max-w-none text-gray-600 leading-relaxed mb-12 text-lg">
-              {activeTab === 'details' && (
-                <div className="whitespace-pre-line">
-                  {service.description}
-                </div>
-              )}
-              {activeTab === 'delivery' && (
-                <div>
-                  <p>Standard delivery timelines typically fall within 48-72 hours for initial proofs.</p>
-                  <p className="mt-4">Final edited high-resolution files will be delivered via a secure cloud link within 1-2 weeks.</p>
-                </div>
-              )}
-              {activeTab === 'process' && (
-                <div>
-                  <ol className="list-decimal pl-5 space-y-4">
-                    <li><strong>Book:</strong> Select your options and confirm your slot.</li>
-                    <li><strong>Consult:</strong> We will reach out to discuss moodboards and styling.</li>
-                    <li><strong>Shoot:</strong> Our team arrives on location.</li>
-                    <li><strong>Delivery:</strong> Review proofs and receive final edits.</li>
-                  </ol>
-                </div>
-              )}
+              <div className="whitespace-pre-line">
+                {service.description}
+              </div>
             </div>
           </div>
 
@@ -202,7 +185,17 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
           <div className="w-full lg:w-5/12">
             <div className="sticky top-32 bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
               <h1 className="text-3xl font-bold text-gray-900 mb-2 leading-tight">{service.name}</h1>
-              <div className="text-3xl font-black text-gray-900 mb-8">₹{totalPrice.toLocaleString()}</div>
+              <div className="flex flex-col mb-8">
+                {service.compareAtPrice && service.compareAtPrice > service.basePrice && (
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg text-gray-400 line-through">₹{service.compareAtPrice.toLocaleString()}</span>
+                    <span className="text-sm font-black text-red-600 bg-red-50 px-2 py-0.5 rounded">
+                      {Math.round(((service.compareAtPrice - service.basePrice) / service.compareAtPrice) * 100)}% OFF
+                    </span>
+                  </div>
+                )}
+                <div className="text-3xl font-black text-gray-900">₹{totalPrice.toLocaleString()}</div>
+              </div>
 
               {/* Pricing Mode Selector */}
               <div className="mb-8 border-t border-gray-100 pt-6">
@@ -314,7 +307,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                   Have questions before you book? Drop us a quick "Hi" on WhatsApp and one of our production experts will reach out to you within 2 hours.
                 </p>
                 <a 
-                  href={`https://wa.me/918240508915?text=${encodeURIComponent(`Hi! I have some questions about your ${service.name} service.`)}`}
+                  href={`https://wa.me/918240508915?text=${encodeURIComponent(`Hi! I have some questions about your ${service.name} service.\n\nSKU: ${service._id}\nLink: https://instaimage.in/services/${service.slug || service._id}\nCover Image: ${service.images?.[0] ? (service.images[0].startsWith('http') ? service.images[0] : `https://instaimage.in${service.images[0]}`) : 'N/A'}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center bg-[#25D366] text-white py-3.5 rounded font-bold uppercase tracking-widest text-sm hover:bg-[#1ebe57] transition shadow-sm"

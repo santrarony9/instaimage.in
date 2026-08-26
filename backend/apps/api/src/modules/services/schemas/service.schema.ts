@@ -36,6 +36,9 @@ export class Service extends AbstractDocument {
   @Prop({ required: true })
   basePrice: number;
 
+  @Prop()
+  compareAtPrice?: number;
+
   @Prop({ required: true, default: 'INR' })
   currency: string;
 

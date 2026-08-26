@@ -27,7 +27,7 @@ export class SettingsService {
       return this.settingsRepository.model.findOneAndUpdate(
         { key },
         { value, ...(description && { description }) },
-        { new: true }
+        { new: true },
       );
     } else {
       return this.settingsRepository.model.create({ key, value, description });
