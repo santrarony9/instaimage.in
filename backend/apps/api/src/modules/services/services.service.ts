@@ -14,6 +14,14 @@ export class ServicesService {
 
   async create(createServiceDto: CreateServiceDto) {
     const data: any = { ...createServiceDto };
+    
+    // Auto-generate professional SKU like SRV-A5F9B2
+    if (!data.sku) {
+      const crypto = require('crypto');
+      const randomStr = crypto.randomBytes(3).toString('hex').toUpperCase();
+      data.sku = `SRV-${randomStr}`;
+    }
+    
     if (data.creatorId) data.creatorId = new Types.ObjectId(data.creatorId);
     if (data.categoryId) data.categoryId = new Types.ObjectId(data.categoryId);
     return this.servicesRepository.create(data);

@@ -307,7 +307,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                   Have questions before you book? Drop us a quick "Hi" on WhatsApp and one of our production experts will reach out to you within 2 hours.
                 </p>
                 <a 
-                  href={`https://wa.me/918240508915?text=${encodeURIComponent(`Hi! I have some questions about your ${service.name} service.\n\nSKU: ${service._id}\nLink: https://instaimage.in/services/${service.slug || service._id}\nCover Image: ${service.images?.[0] ? (service.images[0].startsWith('http') ? service.images[0] : `https://instaimage.in${service.images[0]}`) : 'N/A'}`)}`}
+                  href={`https://wa.me/918240508915?text=${encodeURIComponent(`Hi! I have some questions about your ${service.name} service.\n\nSKU: ${service.sku || service._id}\nLink: https://instaimage.in/services/${service.slug || service._id}\nCover Image: ${service.images?.[0] ? (service.images[0].startsWith('http') ? service.images[0] : `https://instaimage.in${service.images[0]}`) : 'N/A'}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center bg-[#25D366] text-white py-3.5 rounded font-bold uppercase tracking-widest text-sm hover:bg-[#1ebe57] transition shadow-sm"
