@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ServicesRepository } from './services.repository';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
-
 import { Types } from 'mongoose';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class ServicesService {
-  constructor(private readonly servicesRepository: ServicesRepository) {}
+  constructor(
+    private readonly servicesRepository: ServicesRepository,
+    private readonly settingsService: SettingsService,
+  ) {}
 
   async create(createServiceDto: CreateServiceDto) {
     const data: any = { ...createServiceDto };
@@ -83,23 +86,26 @@ export class ServicesService {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
-    const prompt = `
-You are an expert SEO copywriter and marketer for a professional photography and videography platform called InstaImage.
-Write a highly professional, engaging, and SEO-friendly description for the following service:
+    let customInstructions = await this.settingsService.getSetting('aiPrompt');
+    if (!customInstructions) {
+      customInstructions = `You are an expert SEO copywriter and marketer for a professional photography and videography platform called InstaImage.
+Write a highly professional, engaging, and SEO-friendly description.
+Focus on the value proposition, the experience, and why the customer should book this.
+Incorporate any provided tags naturally for SEO.
+If rough notes are provided, flesh them out into professional sentences.
+Do NOT include formatting like "Paragraph 1:". Keep it punchy and conversion-focused.
+CRITICAL: Output the response as a bulleted list of the main features/benefits, as customers prefer easily scannable bullet points over long paragraphs.`;
+    }
 
+    const prompt = `
+${customInstructions}
+
+--- DATA TO USE ---
 Service Name: ${data.name}
 Category: ${data.category || 'N/A'}
 Base Price: ₹${data.basePrice || 'N/A'}
 Tags: ${data.tags || 'N/A'}
 Rough Notes / Current Description: ${data.roughNotes || 'None provided'}
-
-Instructions:
-1. Write 2-3 short, engaging paragraphs.
-2. Focus on the value proposition, the experience, and why the customer should book this.
-3. Incorporate the tags naturally for SEO.
-4. If rough notes are provided, flesh them out into professional sentences.
-5. Do NOT include formatting like "Paragraph 1:", just write the text directly. Do not include markdown headers.
-6. Keep it punchy and conversion-focused.
 `;
 
     try {
