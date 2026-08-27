@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1116.0",
-    "@aws-sdk/s3-request-presigner": "^3.1116.0",
+    "@aws-sdk/s3-request-presigner": "^3.1119.0",
     "@google/generative-ai": "^0.24.1",
     "@nestjs/bullmq": "^11.0.5",
     "@nestjs/common": "^11.0.1",
@@ -51,7 +51,8 @@
     "reflect-metadata": "^0.2.2",
     "resend": "^6.21.0",
     "rxjs": "^7.8.1",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "ssh2": "^1.17.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

@@ -19,7 +19,16 @@ export default async function ServicesPage({
   let services = [];
 
   try {
-    const res = await fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    const res = await fetch(`${SERVER_API_URL}/services`, { 
+      next: { revalidate: 60 },
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
     if (res.ok) {
       const data = await res.json();
       services = Array.isArray(data) ? data : (data.data || []);

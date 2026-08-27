@@ -5,9 +5,15 @@ import {
   Body,
   Patch,
   Param,
+  Delete,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { Request as ExpressRequest } from 'express';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
@@ -106,5 +112,40 @@ export class BookingsController {
     @Body() surcharge: { name: string; amount: number; reason?: string },
   ) {
     return this.bookingsService.addSurcharge(id, surcharge);
+  }
+
+  @Post(':id/gallery')
+  @Roles(Role.SELLER, Role.ADMIN)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|mp4|webm|zip|pdf|rar)$/)) {
+          return cb(new BadRequestException('Invalid file type!'), false);
+        }
+        cb(null, true);
+      },
+      limits: {
+        fileSize: 100 * 1024 * 1024,
+      },
+    }),
+  )
+  async uploadToGallery(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) throw new BadRequestException('File is required');
+    return this.bookingsService.uploadToGallery(id, req.user.sub, file);
+  }
+
+  @Delete(':id/gallery/:imageId')
+  @Roles(Role.SELLER, Role.ADMIN)
+  async deleteFromGallery(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Param('imageId') imageId: string,
+  ) {
+    return this.bookingsService.deleteFromGallery(id, req.user.sub, imageId);
   }
 }

@@ -15,7 +15,6 @@ export function Footer() {
               <li><Link href="/services" className="hover:text-white transition-colors">All Services</Link></li>
               <li><Link href="/become-a-photographer" className="hover:text-white transition-colors">Become a Creator</Link></li>
               <li><Link href="/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
-              <li><Link href="/reviews" className="hover:text-white transition-colors">Reviews</Link></li>
             </ul>
           </div>
           <div className="col-span-1">
@@ -38,7 +37,6 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-sm md:text-base">Portals</h4>
             <ul className="space-y-2 text-sm md:text-base text-gray-400">
               <li><Link href="/seller/login" className="hover:text-white transition-colors">Creator Login</Link></li>
-              <li><Link href="/login" className="hover:text-white transition-colors">Admin Login</Link></li>
             </ul>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useAuthStore } from '@/hooks/use-auth-store';
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
@@ -241,6 +242,11 @@ export default function SellerDashboard() {
                           }}
                           className="flex-1 border-gray-300 rounded-md shadow-sm text-sm p-2 border"
                         />
+                      </div>
+                      <div className="mt-4 pt-4 border-t">
+                        <Link href={`/seller/bookings/${job._id}/gallery`} className="w-full text-center block bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-md shadow transition">
+                          Manage Secure Gallery
+                        </Link>
                       </div>
                       <p className="text-xs text-gray-400 mt-1">Click outside to save. Customers will see this link to download full resolution images.</p>
                     </div>

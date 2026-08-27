@@ -14,6 +14,10 @@ import {
 } from './schemas/booking.schema';
 import { Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import sharp from 'sharp';
+import * as crypto from 'crypto';
 
 import { ServicesService } from '../services/services.service';
 import { CouponsService } from '../coupons/coupons.service';
@@ -30,6 +34,8 @@ import { UsersService } from '../users/users.service';
 export class BookingsService {
   private readonly logger = new Logger(BookingsService.name);
 
+  private s3: S3Client;
+
   constructor(
     private readonly bookingsRepository: BookingsRepository,
     private readonly configService: ConfigService,
@@ -42,7 +48,16 @@ export class BookingsService {
     private readonly emailService: EmailService,
     private readonly settingsService: SettingsService,
     private readonly usersService: UsersService,
-  ) {}
+  ) {
+    this.s3 = new S3Client({
+      endpoint: process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com',
+      region: process.env.B2_REGION || 'eu-central-003',
+      credentials: {
+        accessKeyId: process.env.B2_KEY_ID || 'f87ad6faa8b3',
+        secretAccessKey: process.env.B2_APPLICATION_KEY || '0031697847c74883ae60204a0d5fd410f394a59adf',
+      },
+    });
+  }
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
     const date = new Date();
@@ -146,7 +161,29 @@ export class BookingsService {
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
-    return booking;
+
+    // Generate pre-signed URLs for gallery
+    const bookingObj = booking.toObject();
+    if (bookingObj.gallery && bookingObj.gallery.length > 0) {
+      const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
+      bookingObj.gallery = await Promise.all(
+        bookingObj.gallery.map(async (item: any) => {
+          if (item.key) {
+            try {
+              const command = new GetObjectCommand({
+                Bucket: bucketName,
+                Key: item.key,
+              });
+              item.url = await getSignedUrl(this.s3, command, { expiresIn: 3600 });
+            } catch (err) {
+              this.logger.error(`Failed to sign URL for ${item.key}`, err);
+            }
+          }
+          return item;
+        })
+      );
+    }
+    return bookingObj;
   }
 
   async getUserBookings(customerId: string) {
@@ -500,5 +537,102 @@ export class BookingsService {
       availableExpressFee,
       walletDiscountApplied,
     };
+  }
+
+  async uploadToGallery(bookingId: string, sellerId: string, file: Express.Multer.File) {
+    const booking = await this.bookingsRepository.findById(bookingId);
+    if (!booking) throw new NotFoundException('Booking not found');
+    
+    // Check if assigned
+    if (booking.sellerId?.toString() !== sellerId) {
+      throw new ForbiddenException('You are not assigned to this booking');
+    }
+
+    let fileBuffer = file.buffer;
+    let mimeType = file.mimetype;
+    let fileExt = '.webp'; 
+
+    if (mimeType.startsWith('image/') && !mimeType.includes('gif')) {
+      try {
+        fileBuffer = await sharp(file.buffer)
+          .resize(1600, 1600, { fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 85, effort: 4 })
+          .toBuffer();
+        mimeType = 'image/webp';
+      } catch (err) {
+        this.logger.error('Sharp optimization failed, falling back:', err);
+        const path = require('path');
+        fileExt = path.extname(file.originalname);
+      }
+    } else {
+      const path = require('path');
+      fileExt = path.extname(file.originalname);
+    }
+
+    const uuid = crypto.randomUUID();
+    const key = `private/galleries/${booking.bookingId}/${uuid}${fileExt}`;
+    const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
+
+    try {
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: key,
+          Body: fileBuffer,
+          ContentType: mimeType,
+        })
+      );
+
+      const galleryItem = {
+        _id: crypto.randomUUID(),
+        key,
+        filename: file.originalname,
+        isWishlisted: false,
+      };
+
+      await this.bookingsRepository.model.updateOne(
+        { _id: booking._id },
+        { $push: { gallery: galleryItem } }
+      );
+
+      return galleryItem;
+    } catch (error) {
+      this.logger.error('Gallery Upload Error:', error);
+      throw new BadRequestException('Failed to upload file to storage');
+    }
+  }
+
+  async deleteFromGallery(bookingId: string, sellerId: string, imageId: string) {
+    const booking = await this.bookingsRepository.findById(bookingId);
+    if (!booking) throw new NotFoundException('Booking not found');
+    
+    if (booking.sellerId?.toString() !== sellerId) {
+      throw new ForbiddenException('You are not assigned to this booking');
+    }
+
+    const image = booking.gallery?.find(img => img._id === imageId);
+    if (!image) throw new NotFoundException('Image not found in gallery');
+
+    const bucketName = process.env.B2_BUCKET_NAME || 'instaimage-bucket';
+
+    if (image.key) {
+      try {
+        await this.s3.send(
+          new DeleteObjectCommand({
+            Bucket: bucketName,
+            Key: image.key,
+          })
+        );
+      } catch (e) {
+        this.logger.error('Failed to delete from B2:', e);
+      }
+    }
+
+    await this.bookingsRepository.model.updateOne(
+      { _id: booking._id },
+      { $pull: { gallery: { _id: imageId } } }
+    );
+
+    return { success: true, message: 'Image deleted' };
   }
 }
