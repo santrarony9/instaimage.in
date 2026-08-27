@@ -165,8 +165,11 @@ export default async function HomePage() {
         )}
 
         {/* Dynamic Banners Section */}
-        {banners && banners.length > 0 && banners.map((banner, index) => (
-          <div key={banner._id || index} className={`mb-12 mt-4 rounded-2xl p-4 md:p-8 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden ${index % 2 === 0 ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-gradient-to-r from-indigo-600 to-blue-500'}`}>
+        {banners && banners.length > 0 && (
+          <div className="relative mb-12 mt-4">
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-6 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+              {banners.map((banner, index) => (
+                <div key={banner._id || index} className={`snap-center flex-shrink-0 w-[90vw] lg:w-[850px] rounded-2xl p-4 md:p-8 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden ${index % 2 === 0 ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-gradient-to-r from-indigo-600 to-blue-500'}`}>
             <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
             
             <div className="flex-1 w-full relative z-10">
@@ -229,7 +232,10 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-        ))}
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Popular Services Section (previously called trending services) */}
         <div className="mb-12 mt-12">
@@ -251,6 +257,17 @@ export default async function HomePage() {
           
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
             {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge={service.newService ? "New" : undefined} API_URL={PUBLIC_API_URL} />)}
+          </div>
+        </div>
+
+        {/* All Services Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900">📸 All Services</h2>
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+            {services.map(service => <ServiceCard key={service._id} service={service} API_URL={PUBLIC_API_URL} />)}
           </div>
         </div>
 
