@@ -494,6 +494,20 @@ export default function ServicesManagementPage() {
                         <label className="block text-sm font-medium text-gray-700">Fixed Time Price (₹)</label>
                         <input required type="number" value={formData.basePrice || ''} onChange={e => setFormData({ ...formData, basePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4000" />
                       </div>
+                      
+                      {formData.deliveryMethod !== 'REMOTE' && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Flexible Timing Premium (₹)</label>
+                            <input type="number" value={formData.flexiblePrice || ''} onChange={e => setFormData({ ...formData, flexiblePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 3000" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Extra Hour Price (₹)</label>
+                            <input type="number" value={formData.extraHourPrice || ''} onChange={e => setFormData({ ...formData, extraHourPrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 1500" />
+                          </div>
+                        </>
+                      )}
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Original Total Price (₹) (For % OFF badge)</label>
                         <input type="number" value={formData.compareAtPrice || ''} onChange={e => setFormData({ ...formData, compareAtPrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 8000" />
@@ -502,18 +516,6 @@ export default function ServicesManagementPage() {
                         <label className="block text-sm font-medium text-gray-700">Duration (Hours)</label>
                         <input required type="number" step="0.5" value={formData.duration || ''} onChange={e => setFormData({ ...formData, duration: Number(e.target.value) })} className="mt-1 block w-full border border-gray-300 rounded p-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 4" />
                       </div>
-                      {formData.deliveryMethod !== 'REMOTE' && (
-                        <>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">Extra Hour Price (₹)</label>
-                            <input type="number" value={formData.extraHourPrice || ''} onChange={e => setFormData({ ...formData, extraHourPrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 1500" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">Flexible Timing Premium (₹)</label>
-                            <input type="number" value={formData.flexiblePrice || ''} onChange={e => setFormData({ ...formData, flexiblePrice: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="e.g. 3000" />
-                          </div>
-                        </>
-                      )}
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Slug (URL friendly)</label>
                         <input type="text" value={formData.slug || ''} onChange={e => setFormData({ ...formData, slug: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2 text-gray-500" placeholder="e.g. personal-portraits" />
