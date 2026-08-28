@@ -122,6 +122,13 @@ export default function WhatsappVerificationModal() {
             >
               {loading ? "Sending Code..." : "Send Verification Code"}
             </button>
+            
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-full mt-4 text-gray-500 hover:text-gray-800 text-sm font-medium transition-colors"
+            >
+              Skip for now
+            </button>
           </div>
         ) : (
           <div>
@@ -151,6 +158,13 @@ export default function WhatsappVerificationModal() {
                 {loading ? "Verifying..." : "Verify OTP"}
               </button>
             </div>
+            
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-full mt-4 text-gray-500 hover:text-gray-800 text-sm font-medium transition-colors"
+            >
+              Skip for now
+            </button>
           </div>
         )}
       </div>
