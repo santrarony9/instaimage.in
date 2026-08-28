@@ -25,6 +25,7 @@ export default function BannersManagementPage() {
     redirectUrl: '',
     sortOrder: 0,
     isActive: true,
+    time: '',
     services: [] as string[]
   };
   
@@ -105,12 +106,27 @@ export default function BannersManagementPage() {
 
   const handleServiceToggle = (serviceId: string) => {
     setFormData((prev: any) => {
+      let newServices;
       const exists = prev.services.includes(serviceId);
       if (exists) {
-        return { ...prev, services: prev.services.filter((id: string) => id !== serviceId) };
+        newServices = prev.services.filter((id: string) => id !== serviceId);
       } else {
-        return { ...prev, services: [...prev.services, serviceId] };
+        newServices = [...prev.services, serviceId];
       }
+
+      // Automatically calculate original price by summing up base prices of selected services
+      const calculatedOriginalPrice = newServices.reduce((sum: number, id: string) => {
+        const service = services.find(s => s._id === id);
+        return sum + (service?.basePrice || 0);
+      }, 0);
+
+      // We only auto-update the originalPrice if there are services selected, 
+      // so we don't zero it out if they are just making a text banner.
+      return { 
+        ...prev, 
+        services: newServices, 
+        originalPrice: calculatedOriginalPrice > 0 ? calculatedOriginalPrice : prev.originalPrice 
+      };
     });
   };
 
@@ -166,9 +182,12 @@ export default function BannersManagementPage() {
               )}
 
               <div className="mt-auto pt-4 border-t flex justify-between items-center">
-                <div>
-                  {banner.originalPrice > 0 && <span className="line-through text-gray-400 text-sm mr-2">₹{banner.originalPrice}</span>}
-                  <span className="font-bold text-lg text-gray-900">₹{banner.comboPrice || 0}</span>
+                <div className="flex items-center flex-wrap gap-2">
+                  <div>
+                    {banner.originalPrice > 0 && <span className="line-through text-gray-400 text-sm mr-2">₹{banner.originalPrice}</span>}
+                    <span className="font-bold text-lg text-gray-900">₹{banner.comboPrice || 0}</span>
+                  </div>
+                  {banner.time && <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100 flex items-center gap-1"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{banner.time}</span>}
                 </div>
                 <div>
                   <span className={`px-2 py-1 rounded text-xs font-bold ${banner.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -208,12 +227,16 @@ export default function BannersManagementPage() {
                   </select>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Time / Duration (e.g. "8 Hours")</label>
+                  <input type="text" value={formData.time || ''} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full border rounded-lg p-2" placeholder="Leave empty if not applicable" />
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order (Higher = First)</label>
                   <input type="number" value={formData.sortOrder} onChange={e => setFormData({...formData, sortOrder: parseInt(e.target.value)})} className="w-full border rounded-lg p-2" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (₹)</label>
-                  <input type="number" value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: parseInt(e.target.value)})} className="w-full border rounded-lg p-2" />
+                  <input type="number" value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: parseInt(e.target.value)})} className="w-full border rounded-lg p-2 bg-yellow-50" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Combo Price (₹)</label>
