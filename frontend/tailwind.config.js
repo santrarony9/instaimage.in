@@ -12,8 +12,8 @@ module.exports = {
         foreground: "var(--foreground)",
       },
       animation: {
-        'marquee-left': 'marquee-left 40s linear infinite',
-        'marquee-right': 'marquee-right 40s linear infinite',
+        'marquee-left': 'marquee-left 120s linear infinite',
+        'marquee-right': 'marquee-right 120s linear infinite',
       },
       keyframes: {
         'marquee-left': {
