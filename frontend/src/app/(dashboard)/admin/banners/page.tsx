@@ -114,10 +114,14 @@ export default function BannersManagementPage() {
         newServices = [...prev.services, serviceId];
       }
 
-      // Automatically calculate original price by summing up base prices of selected services
+      // Extract multiplier from time field (e.g., "6 hours" -> 6)
+      const timeMatch = prev.time?.match(/(\d+(\.\d+)?)/);
+      const hoursMultiplier = timeMatch ? parseFloat(timeMatch[1]) : 1;
+
+      // Automatically calculate original price by summing up fixed base prices multiplied by hours
       const calculatedOriginalPrice = newServices.reduce((sum: number, id: string) => {
         const service = services.find(s => s._id === id);
-        return sum + (service?.basePrice || 0);
+        return sum + ((service?.basePrice || 0) * hoursMultiplier);
       }, 0);
 
       // We only auto-update the originalPrice if there are services selected, 
@@ -233,7 +237,22 @@ export default function BannersManagementPage() {
                 </div>
                 <div className="md:col-span-1">
                   <label className="block text-xs font-bold text-gray-700 mb-1">Duration (Optional)</label>
-                  <input type="text" value={formData.time || ''} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" placeholder="e.g. 8 Hours" />
+                  <input type="text" value={formData.time || ''} onChange={e => {
+                    const newTime = e.target.value;
+                    const timeMatch = newTime.match(/(\d+(\.\d+)?)/);
+                    const hoursMultiplier = timeMatch ? parseFloat(timeMatch[1]) : 1;
+                    
+                    const calculatedOriginalPrice = formData.services.reduce((sum: number, id: string) => {
+                      const service = services.find(s => s._id === id);
+                      return sum + ((service?.basePrice || 0) * hoursMultiplier);
+                    }, 0);
+
+                    setFormData({
+                      ...formData, 
+                      time: newTime, 
+                      originalPrice: formData.services.length > 0 ? calculatedOriginalPrice : formData.originalPrice
+                    });
+                  }} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" placeholder="e.g. 6 Hours" />
                 </div>
                 <div className="md:col-span-1">
                   <label className="block text-xs font-bold text-gray-700 mb-1">Original Price (₹)</label>
