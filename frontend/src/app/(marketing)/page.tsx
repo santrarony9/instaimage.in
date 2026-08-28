@@ -8,8 +8,8 @@ import { HeroSearchBar } from '@/components/ui/HeroSearchBar';
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export const metadata = {
-  title: 'All Photography Services in One Place - Book Trusted Photographers',
-  description: 'InstaImage is the premier platform to book premium photography, videography, and drone services on-demand in Kolkata. Trusted and quick with a strong infrastructure.',
+  title: 'InstaImage | Professional Photography On-Demand in Kolkata',
+  description: 'Book trusted photographers, videographers, and drone pilots instantly. Get your memories captured and delivered in as little as 24 hours.',
 };
 
 export default async function HomePage() {
@@ -92,6 +92,14 @@ export default async function HomePage() {
     })
     .slice(0, 6);
 
+  // Extract a real hero image from the services portfolio
+  let heroImage = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"; // fallback
+  const servicesWithImages = services.filter(s => s.images && s.images.length > 0);
+  if (servicesWithImages.length > 0) {
+    const img = servicesWithImages[0].images[0];
+    heroImage = img.startsWith('/') ? `https://api.instaimage.in${img}` : img;
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
       <WebSiteJsonLd />
@@ -105,12 +113,12 @@ export default async function HomePage() {
       <div className="relative bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image 
-            src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-            alt="Photography Background" 
+            src={heroImage} 
+            alt="InstaImage Professional Photography" 
             fill
             priority
             sizes="100vw"
-            className="object-cover opacity-30"
+            className="object-cover opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>

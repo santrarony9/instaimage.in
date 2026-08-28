@@ -44,6 +44,8 @@ This is an **On-Demand Photography & Production Booking Platform** (similar to U
     *   **CRITICAL CONSTRAINT**: The VPS has limited memory. NEVER run `npm run build` twice in parallel, it will trigger OOM and crash the server requiring a hard reboot. 
     *   **Dockerfile Architecture**: Uses a single multi-stage build. In `nest-cli.json`, `"deleteOutDir": false` is strictly required so `api` and `workers` builds do not overwrite each other.
     *   **Nginx & Cloudflared**: The VPS runs `cloudflared` (locally managed via `/etc/cloudflared/config.yml`) which routes `api.instaimage.in` to the local Nginx container on port 80. Nginx proxies `/v1/` to the `api` container on port 3000. Nginx `client_max_body_size` is set to `50M` to allow large image uploads.
+        *   **CRITICAL NGINX BUG FIX**: Nginx MUST use `rewrite ^/api/(.*) /$1 break; proxy_pass http://api:3000;` (without trailing slash on proxy_pass) to prevent double-slash bugs (`//v1/categories`) which NestJS will reject with a 404.
+    *   **MongoDB Auth**: If `MONGO_INITDB_ROOT_PASSWORD` contains special characters, it MUST be URL-encoded (e.g., `!` to `%21`) in `docker-compose.yml` for `MONGODB_URI`, otherwise the connection string will silently fail and the backend will continuously crash.
 *   **Deployment Script**: ALWAYS use `node deploy_now.js` to deploy backend changes. It tars `backend/`, uploads it via SSH, rebuilds Docker safely, and runs `docker system prune -af` to prevent disk full issues.
 
 ## 6. Current State & Pending Tasks

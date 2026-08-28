@@ -1,4 +1,4 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
   nginx:
@@ -31,7 +31,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD:-changeit}@mongo:27017/marketplace?authSource=admin
+      - MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:InstaMongo2026%21@mongo:27017/marketplace?authSource=admin
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - AWS_S3_BUCKET=snapmarket-media

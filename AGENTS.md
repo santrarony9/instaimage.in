@@ -36,3 +36,7 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 1. **MongoDB Connection String (`MONGODB_URI`):**
    - The backend API relies on MongoDB running via Docker Compose.
    - **RULE:** If the `MONGO_INITDB_ROOT_PASSWORD` contains special characters (like `!`, `@`, `#`), they MUST be URL-encoded in the `MONGODB_URI` connection string (e.g., `!` becomes `%21`). Failing to encode special characters will cause the `api` and `workers` containers to crash continuously with a `MongoServerError: Authentication failed` error.
+
+2. **Nginx Reverse Proxy & Double Slash Bug:**
+   - **RULE:** When configuring Nginx `proxy_pass` to the NestJS API, DO NOT use `proxy_pass http://api:3000/;` (with a trailing slash) if inside a location block like `location /api/`. Nginx appends the remaining URI to the root `/`, generating double slashes (e.g., `//v1/categories`), which NestJS automatically rejects with a 404 Not Found.
+   - **SOLUTION:** Always use `rewrite ^/api/(.*) /$1 break;` and `proxy_pass http://api:3000;` (without trailing slash).
