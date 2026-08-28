@@ -118,10 +118,17 @@ export default function BannersManagementPage() {
       const timeMatch = prev.time?.match(/(\d+(\.\d+)?)/);
       const hoursMultiplier = timeMatch ? parseFloat(timeMatch[1]) : 1;
 
-      // Automatically calculate original price by summing up fixed base prices multiplied by hours
+      // Automatically calculate original price factoring in extraHourPrice for subsequent hours
       const calculatedOriginalPrice = newServices.reduce((sum: number, id: string) => {
         const service = services.find(s => s._id === id);
-        return sum + ((service?.basePrice || 0) * hoursMultiplier);
+        let servicePrice = service?.basePrice || 0;
+        
+        if (hoursMultiplier > 1) {
+          const extraPrice = service?.extraHourPrice !== undefined ? service.extraHourPrice : (service?.basePrice || 0);
+          servicePrice += (hoursMultiplier - 1) * extraPrice;
+        }
+        
+        return sum + servicePrice;
       }, 0);
 
       // We only auto-update the originalPrice if there are services selected, 
@@ -244,7 +251,14 @@ export default function BannersManagementPage() {
                     
                     const calculatedOriginalPrice = formData.services.reduce((sum: number, id: string) => {
                       const service = services.find(s => s._id === id);
-                      return sum + ((service?.basePrice || 0) * hoursMultiplier);
+                      let servicePrice = service?.basePrice || 0;
+                      
+                      if (hoursMultiplier > 1) {
+                        const extraPrice = service?.extraHourPrice !== undefined ? service.extraHourPrice : (service?.basePrice || 0);
+                        servicePrice += (hoursMultiplier - 1) * extraPrice;
+                      }
+                      
+                      return sum + servicePrice;
                     }, 0);
 
                     setFormData({
