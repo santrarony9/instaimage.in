@@ -8,6 +8,17 @@ import { useAuthStore } from '@/hooks/use-auth-store';
 
 import { Suspense } from 'react';
 
+import { HeroMarquee } from '@/components/ui/HeroMarquee';
+
+const fallbackImages = [
+  "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=80",
+];
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -56,24 +67,16 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
-      {/* Left side - Image */}
-      <div className="hidden lg:block lg:w-1/2 relative">
-        <div className="absolute inset-0 bg-black/20 z-10"></div>
-        <img 
-          src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=2070&auto=format&fit=crop" 
-          alt="Login background" 
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute bottom-12 left-12 z-20 text-white max-w-md">
-          <h2 className="text-4xl font-black mb-4">Welcome back to the studio.</h2>
-          <p className="text-lg font-medium text-gray-200">Manage your bookings, review your galleries, and connect with your creative team.</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-black py-12 px-4">
+      {/* Background Marquee */}
+      <div className="absolute inset-0 z-0">
+        <HeroMarquee images={fallbackImages} />
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10"></div>
       </div>
 
-      {/* Right side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24">
-        <div className="max-w-md w-full space-y-8">
+      {/* Centered Form */}
+      <div className="relative z-20 w-full max-w-md bg-white rounded-[2rem] p-8 sm:p-10 shadow-2xl">
+        <div className="space-y-6">
           <div>
             <Link href="/" className="flex justify-center mb-8 w-full">
               <img src="/auth-graphic.png" alt="InstaImage Branding" className="w-full max-w-sm h-auto object-contain" />
