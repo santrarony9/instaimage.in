@@ -228,11 +228,22 @@ export default async function HomePage() {
                   )}
                 </div>
               </div>
-              <div className="flex justify-between items-end mb-6">
+              <div className="flex justify-between items-end mb-4">
                 <span className="text-gray-900 font-black text-sm">Combo Price</span>
                 <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">₹{banner.comboPrice?.toLocaleString('en-IN') || 0}</span>
               </div>
-              <Link href={banner.redirectUrl || "/services"} className="w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2">
+              
+              {banner.time && (
+                <div className="flex justify-between items-center bg-blue-50 text-blue-800 rounded-lg px-3 py-2 mb-6 text-sm font-bold border border-blue-100">
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Duration</span>
+                  </div>
+                  <span>{banner.time}</span>
+                </div>
+              )}
+
+              <Link href={banner.redirectUrl || "/services"} className={`w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2 ${!banner.time && 'mt-2'}`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                 {banner.type === 'COMBO' ? 'ADD COMBO' : 'EXPLORE'}
               </Link>
