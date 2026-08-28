@@ -227,10 +227,10 @@ export default async function HomePage() {
                 <span className="text-blue-100 text-sm font-semibold">{banner.subtitle || `${banner.services?.length || 0} Services Combo`}</span>
               </div>
               <h2 className="text-2xl md:text-4xl font-black mb-2 leading-tight text-white">{banner.title}</h2>
-              {banner.time && (
+              {(banner.time || (banner.title === 'PANDAL HOPPING COMBO' ? '4 Hours' : null)) && (
                 <div className="inline-flex items-center gap-2 bg-yellow-400 text-yellow-900 px-4 py-1.5 rounded-lg font-black text-sm md:text-base mb-5 shadow-sm">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  {banner.time}
+                  {banner.time || '4 Hours'}
                 </div>
               )}
               
@@ -280,10 +280,13 @@ export default async function HomePage() {
               </div>
               
 
-
-              <Link href={banner.redirectUrl || "/services"} className="mt-4 w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2">
+              <Link 
+                href={banner.redirectUrl || (banner.type === 'COMBO' ? `https://wa.me/918240508915?text=${encodeURIComponent(`Hi, I would like to book the ${banner.title} (${banner.time || '4 Hours'}) for ₹${banner.comboPrice}.`)}` : "/services")}
+                target={(!banner.redirectUrl && banner.type === 'COMBO') ? "_blank" : "_self"}
+                className="mt-4 w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                {banner.type === 'COMBO' ? 'ADD COMBO' : 'EXPLORE'}
+                {banner.type === 'COMBO' ? 'BOOK COMBO' : 'EXPLORE'}
               </Link>
             </div>
           </div>
