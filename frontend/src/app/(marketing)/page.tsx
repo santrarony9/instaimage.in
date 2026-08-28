@@ -4,6 +4,7 @@ import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
 import { HeroSearchBar } from '@/components/ui/HeroSearchBar';
+import { HeroMarquee } from '@/components/ui/HeroMarquee';
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
@@ -92,12 +93,18 @@ export default async function HomePage() {
     })
     .slice(0, 6);
 
-  // Extract a real hero image from the services portfolio
-  let heroImage = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"; // fallback
-  const servicesWithImages = services.filter(s => s.images && s.images.length > 0);
-  if (servicesWithImages.length > 0) {
-    const img = servicesWithImages[0].images[0];
-    heroImage = img.startsWith('/') ? `https://api.instaimage.in${img}` : img;
+  // Extract all images for the marquee background
+  let allImages = services.flatMap(s => s.images || []).filter(Boolean);
+  allImages = Array.from(new Set(allImages)).map(img => img.startsWith('/') ? `https://api.instaimage.in${img}` : img);
+  
+  if (allImages.length === 0) {
+    // Fallbacks if no images in database
+    allImages = [
+      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
+    ];
   }
 
   return (
@@ -110,20 +117,11 @@ export default async function HomePage() {
         </div>
       )}
       {/* Hero Section */}
-      <div className="relative bg-black text-white overflow-hidden">
-        <div className="absolute inset-0">
-          <Image 
-            src={heroImage} 
-            alt="InstaImage Professional Photography" 
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-        </div>
+      <div className="relative bg-black text-white overflow-hidden min-h-[500px] md:min-h-[600px] flex items-center justify-center">
+        <HeroMarquee images={allImages} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/30 z-10" />
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
           <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">
             Professional Photography.<br className="hidden md:block"/> Delivered On-Demand.
           </h1>
