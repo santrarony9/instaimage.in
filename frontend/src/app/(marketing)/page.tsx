@@ -66,6 +66,9 @@ export default async function HomePage() {
     slug: cat.toLowerCase().replace(/\s+/g, '-')
   }));
 
+  // Extract Event Managers
+  const eventManagers = services.filter(s => s.category === 'Event Management').slice(0, 6);
+
   // E-commerce logic
   // Newly Added: sort by newest first (createdAt descending)
   const newlyAdded = [...services]
@@ -166,6 +169,47 @@ export default async function HomePage() {
                   </Link>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Dedicated Event Managers Section */}
+        {eventManagers.length > 0 && (
+          <div className="mb-12 bg-white rounded-[2rem] p-6 md:p-8 shadow-sm border border-gray-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 z-0"></div>
+            
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-gray-100 pb-4 gap-4">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Dedicated Event Managers</h2>
+                <p className="text-gray-500 text-sm md:text-base max-w-2xl">
+                  Planning a massive event? Hire a dedicated Event Manager. From planning to deployment, they handle the entire crew, logistics, and shoot so you can just enjoy the day.
+                </p>
+              </div>
+              <Link href="/services?category=Event+Management" className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-800 whitespace-nowrap transition-colors shadow-md">
+                View All Managers
+              </Link>
+            </div>
+            
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {eventManagers.map((manager: any) => (
+                <Link href={`/services/${manager.slug || manager._id}`} key={manager._id} className="group flex items-center gap-5 p-4 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all bg-gray-50 hover:bg-white">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden relative shadow-inner border-4 border-white flex-shrink-0">
+                    {manager.images && manager.images[0] ? (
+                      <Image src={manager.images[0].startsWith('/') ? `https://api.instaimage.in${manager.images[0]}` : manager.images[0]} alt={manager.name} fill sizes="96px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full bg-blue-100 flex items-center justify-center text-blue-500 text-2xl">👤</div>
+                    )}
+                  </div>
+                  <div className="flex flex-col flex-grow">
+                    <span className="text-blue-600 text-[10px] font-black uppercase tracking-wider mb-1">Lead Event Manager</span>
+                    <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight mb-1">{manager.name}</h3>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-sm font-black text-gray-900">₹{manager.basePrice?.toLocaleString()}</span>
+                      <span className="text-xs font-bold text-blue-600 group-hover:underline">Hire Me &rarr;</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         )}
