@@ -143,7 +143,7 @@ export default async function HomePage() {
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {categories.slice(0, 4).map((category: any, idx: number) => {
+              {categories.map((category: any, idx: number) => {
                 const gradients = [
                   'from-purple-500 to-indigo-600',
                   'from-rose-400 to-red-500',
@@ -226,7 +226,13 @@ export default async function HomePage() {
                 </span>
                 <span className="text-blue-100 text-sm font-semibold">{banner.subtitle || `${banner.services?.length || 0} Services Combo`}</span>
               </div>
-              <h2 className="text-2xl md:text-4xl font-black mb-4 leading-tight text-white">{banner.title}</h2>
+              <h2 className="text-2xl md:text-4xl font-black mb-2 leading-tight text-white">{banner.title}</h2>
+              {banner.time && (
+                <div className="inline-flex items-center gap-2 bg-yellow-400 text-yellow-900 px-4 py-1.5 rounded-lg font-black text-sm md:text-base mb-5 shadow-sm">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {banner.time}
+                </div>
+              )}
               
               {/* Quick Commerce style horizontally scrollable included items with REAL images */}
               {banner.services && banner.services.length > 0 && (
@@ -246,9 +252,8 @@ export default async function HomePage() {
                             <div className="w-full h-full flex items-center justify-center text-xl">📸</div>
                           )}
                         </div>
-                        <div className="p-2 bg-white flex-1 flex flex-col justify-between">
-                          <span className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2 mb-1">{service.name}</span>
-                          <span className="text-xs font-black text-gray-900">₹{service.basePrice?.toLocaleString('en-IN') || 0}</span>
+                        <div className="p-2 bg-white flex-1 flex flex-col justify-center text-center">
+                          <span className="text-[10px] font-bold text-gray-800 leading-tight line-clamp-2">{service.name}</span>
                         </div>
                       </Link>
                     );
@@ -274,17 +279,9 @@ export default async function HomePage() {
                 <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">₹{banner.comboPrice?.toLocaleString('en-IN') || 0}</span>
               </div>
               
-              {banner.time && (
-                <div className="flex justify-between items-center bg-blue-50 text-blue-800 rounded-lg px-3 py-2 mb-6 text-sm font-bold border border-blue-100">
-                  <div className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>Duration</span>
-                  </div>
-                  <span>{banner.time}</span>
-                </div>
-              )}
 
-              <Link href={banner.redirectUrl || "/services"} className={`w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2 ${!banner.time && 'mt-2'}`}>
+
+              <Link href={banner.redirectUrl || "/services"} className="mt-4 w-full bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-blue-700 transition-colors shadow-lg text-center flex justify-center items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                 {banner.type === 'COMBO' ? 'ADD COMBO' : 'EXPLORE'}
               </Link>
@@ -325,6 +322,30 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+
+        {/* Category Specific Rows */}
+        {categories.map((category: any) => {
+          const categoryServices = services.filter(s => s.category === category.name).slice(0, 8);
+          // Skip if no services or if it's Event Management (since they already have a dedicated block above)
+          if (categoryServices.length === 0 || category.name === 'Event Management') return null;
+          
+          return (
+            <div key={`section-${category.name}`} className="mb-12">
+              <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900">📸 Top in {category.name}</h2>
+                <Link href={`/services?category=${category.name}`} className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
+              </div>
+              
+              <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                {categoryServices.map(service => (
+                  <div key={service._id} className="snap-start flex-shrink-0 w-40 sm:w-48 lg:w-56">
+                    <ServiceCard service={service} API_URL={PUBLIC_API_URL} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
 
 
 
