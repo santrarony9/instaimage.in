@@ -208,67 +208,68 @@ export default function BannersManagementPage() {
               <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                  <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full border rounded-lg p-2" />
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Title</label>
+                  <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Badge Text (e.g. BLOCKBUSTER DEAL)</label>
-                  <input type="text" value={formData.badgeText} onChange={e => setFormData({...formData, badgeText: e.target.value})} className="w-full border rounded-lg p-2" />
+                <div className="md:col-span-1">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Badge Text</label>
+                  <input type="text" value={formData.badgeText} onChange={e => setFormData({...formData, badgeText: e.target.value})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" placeholder="e.g. DEAL" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} className="w-full border rounded-lg p-2">
+                <div className="md:col-span-1">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Type</label>
+                  <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none">
                     <option value="COMBO">Combo Deal</option>
                     <option value="HERO">Hero Banner</option>
                     <option value="PROMO">Promo Banner</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Time / Duration (e.g. "8 Hours")</label>
-                  <input type="text" value={formData.time || ''} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full border rounded-lg p-2" placeholder="Leave empty if not applicable" />
+                
+                <div className="md:col-span-1">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Sort Order</label>
+                  <input type="number" value={formData.sortOrder} onChange={e => setFormData({...formData, sortOrder: parseInt(e.target.value)})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order (Higher = First)</label>
-                  <input type="number" value={formData.sortOrder} onChange={e => setFormData({...formData, sortOrder: parseInt(e.target.value)})} className="w-full border rounded-lg p-2" />
+                <div className="md:col-span-1">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Duration (Optional)</label>
+                  <input type="text" value={formData.time || ''} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" placeholder="e.g. 8 Hours" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (₹)</label>
-                  <input type="number" value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: parseInt(e.target.value)})} className="w-full border rounded-lg p-2 bg-yellow-50" />
+                <div className="md:col-span-1">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Original Price (₹)</label>
+                  <input type="number" value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: parseInt(e.target.value)})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm bg-yellow-50 focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Combo Price (₹)</label>
-                  <input type="number" value={formData.comboPrice} onChange={e => setFormData({...formData, comboPrice: parseInt(e.target.value)})} className="w-full border rounded-lg p-2" />
+                <div className="md:col-span-1">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Combo Price (₹)</label>
+                  <input type="number" value={formData.comboPrice} onChange={e => setFormData({...formData, comboPrice: parseInt(e.target.value)})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm font-bold text-blue-700 focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Included Services (For Combo Deals)</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-4 border rounded-lg bg-gray-50">
+                <label className="block text-xs font-bold text-gray-700 mb-1">Included Services (For Combo Deals)</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-32 overflow-y-auto p-2 border border-gray-200 rounded-md bg-gray-50 custom-scrollbar">
                   {services.map(service => (
-                    <label key={service._id} className="flex items-center space-x-2 bg-white p-2 rounded border cursor-pointer hover:bg-blue-50">
+                    <label key={service._id} className="flex items-center space-x-1.5 bg-white p-1.5 rounded border border-gray-200 cursor-pointer hover:bg-blue-50 transition-colors">
                       <input 
                         type="checkbox" 
                         checked={formData.services.includes(service._id)}
                         onChange={() => handleServiceToggle(service._id)}
-                        className="rounded text-blue-600 focus:ring-blue-500"
+                        className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 flex-shrink-0"
                       />
-                      <span className="text-sm font-medium truncate">{service.name}</span>
+                      <span className="text-[11px] font-semibold text-gray-800 truncate" title={service.name}>{service.name}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 pt-2">
                 <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4" />
-                <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Active (Visible on Homepage)</label>
+                <label htmlFor="isActive" className="text-xs font-bold text-gray-700 cursor-pointer">Active (Visible on Homepage)</label>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4 border-t">
-                <button type="button" onClick={handleCloseModal} className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">Save Banner</button>
+              <div className="flex justify-end space-x-2 pt-3 border-t">
+                <button type="button" onClick={handleCloseModal} className="px-4 py-1.5 text-sm border rounded-md text-gray-700 hover:bg-gray-50 font-semibold">Cancel</button>
+                <button type="submit" className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 font-bold shadow-sm">Save Banner</button>
               </div>
             </form>
           </div>
