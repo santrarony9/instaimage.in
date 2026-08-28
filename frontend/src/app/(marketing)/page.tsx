@@ -245,15 +245,19 @@ export default async function HomePage() {
           </div>
         )}
 
-        {/* Popular Services Section (previously called trending services) */}
+        {/* Popular Services Section */}
         <div className="mb-12 mt-12">
           <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
             <h2 className="text-lg md:text-xl font-bold text-gray-900">⭐ Popular Packages</h2>
             <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {popularServices.map(service => <ServiceCard key={service._id} service={service} badge={service.popular ? "Popular" : undefined} API_URL={PUBLIC_API_URL} />)}
+          <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            {popularServices.map(service => (
+              <div key={service._id} className="snap-start flex-shrink-0 w-40 sm:w-48 lg:w-56">
+                <ServiceCard service={service} badge={service.popular ? "Popular" : undefined} API_URL={PUBLIC_API_URL} />
+              </div>
+            ))}
           </div>
         </div>
 
@@ -263,21 +267,16 @@ export default async function HomePage() {
             <h2 className="text-lg md:text-xl font-bold text-gray-900">✨ Newly Added</h2>
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {newlyAdded.map(service => <ServiceCard key={service._id} service={service} badge={service.newService ? "New" : undefined} API_URL={PUBLIC_API_URL} />)}
+          <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            {newlyAdded.map(service => (
+              <div key={service._id} className="snap-start flex-shrink-0 w-40 sm:w-48 lg:w-56">
+                <ServiceCard service={service} badge={service.newService ? "New" : undefined} API_URL={PUBLIC_API_URL} />
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* All Services Section */}
-        <div className="mb-12">
-          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900">📸 All Services</h2>
-          </div>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {services.map(service => <ServiceCard key={service._id} service={service} API_URL={PUBLIC_API_URL} />)}
-          </div>
-        </div>
+
 
       </div>
     </div>
@@ -298,7 +297,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
   // If it's already a full URL (Backblaze S3 etc), use as-is
 
   return (
-    <Link href={`/services/${service.slug || service._id}`} className="group bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
+    <Link href={`/services/${service.slug || service._id}`} className="group h-full bg-white rounded-xl overflow-hidden border border-gray-200 transition-all duration-300 flex flex-col relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-blue-600">
       
       <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
         {service.videoUrl ? (
