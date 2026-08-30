@@ -33,8 +33,10 @@ interface BookingData {
 interface BookingState {
   currentStep: number;
   data: BookingData;
+  confirmedBooking: any | null;
   setStep: (step: number) => void;
   updateData: (data: Partial<BookingData>) => void;
+  setConfirmedBooking: (data: any) => void;
   nextStep: () => void;
   prevStep: () => void;
   submitBooking: () => Promise<any>;
@@ -46,11 +48,13 @@ export const useBookingStore = create<BookingState>()(
     (set, get) => ({
       currentStep: 4, // Default to step 4 since 1-3 are skipped
       data: {},
+      confirmedBooking: null,
       setStep: (step) => set({ currentStep: step }),
       updateData: (newData) => set((state) => ({ data: { ...state.data, ...newData } })),
+      setConfirmedBooking: (data) => set({ confirmedBooking: data }),
       nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 8) })),
       prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 4) })),
-      reset: () => set({ currentStep: 4, data: {} }),
+      reset: () => set({ currentStep: 4, data: {}, confirmedBooking: null }),
       submitBooking: async () => {
         const { data } = get();
         

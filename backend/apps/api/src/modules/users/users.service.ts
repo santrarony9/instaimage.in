@@ -29,6 +29,15 @@ export class UsersService {
     return users.length > 0 ? users[0] : null;
   }
 
+  async findByPhone(phone: string): Promise<User | null> {
+    let cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) cleaned = `91${cleaned}`;
+    const users = await this.usersRepository.find({
+      $or: [{ phone: cleaned }, { phone: phone.trim() }, { phone: `+${cleaned}` }],
+    });
+    return users.length > 0 ? users[0] : null;
+  }
+
   async findByReferralCode(code: string): Promise<User | null> {
     const users = await this.usersRepository.find({ referralCode: code });
     return users.length > 0 ? users[0] : null;

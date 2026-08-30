@@ -56,4 +56,29 @@ export class NotificationsService {
       },
     );
   }
+
+  async sendBookingConfirmationWhatsApp(
+    phone: string,
+    customerName: string,
+    bookingId: string,
+    date: string,
+  ) {
+    this.logger.log(
+      `Queueing WhatsApp confirmation for ${phone} - Booking ${bookingId}`,
+    );
+
+    await this.notificationsQueue.add(
+      'send-whatsapp',
+      {
+        type: 'BOOKING_CONFIRMATION',
+        to: phone,
+        templateName: 'booking_confirmation_alert',
+        parameters: [customerName, `#${bookingId}`, date],
+      },
+      {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 2000 },
+      },
+    );
+  }
 }

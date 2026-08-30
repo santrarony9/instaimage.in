@@ -129,6 +129,12 @@ export class Booking extends AbstractDocument {
   @Prop({ enum: ['PENDING', 'PAID'], default: 'PENDING' })
   payoutStatus: string;
 
+  @Prop({ enum: ['PENDING', 'PAID', 'FAILED'], default: 'PENDING' })
+  paymentStatus: string;
+
+  @Prop()
+  paymentId?: string;
+
   @Prop({ type: Date, required: true })
   scheduledDate: Date;
 

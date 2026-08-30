@@ -8,37 +8,20 @@ import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/hooks/use-cart-store';
 
 export function Step8Confirmation() {
-  const { data, prevStep, submitBooking, reset } = useBookingStore();
+  const { confirmedBooking, reset } = useBookingStore();
   const clearCart = useCartStore((state) => state.clearCart);
   const router = useRouter();
-  
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successData, setSuccessData] = useState<any>(null);
-
-  const handleConfirm = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await submitBooking();
-      setSuccessData(response);
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit booking. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDone = () => {
     reset();
     try {
       clearCart();
     } catch (e) {}
-    router.push('/customer');
+    router.push('/customer/bookings');
   };
 
-  if (successData) {
-    const booking = successData.booking;
+  if (confirmedBooking) {
+    const booking = confirmedBooking;
     const pricing = booking?.pricing || {};
 
     return (
@@ -120,61 +103,9 @@ export function Step8Confirmation() {
   }
 
   return (
-    <div className="">
-      <h2 className="text-xl font-bold mb-4">Review & Confirm</h2>
-      
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
-          {error}
-        </div>
-      )}
-
-      <div className="space-y-4">
-        <div className="p-4 border rounded-lg">
-          <h3 className="font-semibold text-gray-900 mb-2 border-b pb-2">Booking Summary</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-gray-500">Location</p>
-              <p className="font-medium">{data.location?.address}, {data.location?.city}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Date & Time</p>
-              <p className="font-medium">
-                {data.scheduledDate ? new Date(data.scheduledDate).toLocaleDateString() : 'N/A'}<br/>
-                {data.startTime} - {data.endTime}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-500">Flexibility</p>
-              <p className="font-medium">{data.timeFlexibility}</p>
-              {data.timeFlexibility === 'FLEXIBLE' && (
-                <p className="text-xs text-gray-500">+{data.extraHoursBooked} extra hours</p>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        <p className="text-sm text-gray-500 text-center">
-          By confirming, you agree to pay the calculated total price for this booking. Final pricing will be calculated based on selected packages and addons.
-        </p>
-      </div>
-
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6">
-        <button
-          onClick={prevStep}
-          disabled={loading}
-          className="w-full sm:w-auto px-6 py-3 sm:py-1.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleConfirm}
-          disabled={loading}
-          className="w-full sm:w-auto justify-center px-8 py-3 sm:py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center disabled:opacity-50"
-        >
-          {loading ? 'Processing...' : 'Confirm & Book'}
-        </button>
-      </div>
+    <div className="max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
+      <h2 className="text-xl font-bold mb-4">Processing...</h2>
+      <p className="text-gray-500">Please wait while we confirm your booking.</p>
     </div>
   );
 }

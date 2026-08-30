@@ -12,6 +12,30 @@ import { Public } from '@app/auth';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
+  @Post('verify')
+  async verifyPayment(
+    @Body() payload: {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+      bookingId: string;
+    }
+  ) {
+    const isValid = await this.paymentsService.verifyPaymentSignature(
+      payload.razorpay_order_id,
+      payload.razorpay_payment_id,
+      payload.razorpay_signature
+    );
+
+    if (!isValid) {
+      throw new BadRequestException('Invalid payment signature');
+    }
+
+    // Usually you would also update the booking status to PAID or CONFIRMED here.
+    // For now we just return success so frontend knows it's verified.
+    return { success: true };
+  }
+
   @Public()
   @Post('webhook')
   async handleRazorpayWebhook(

@@ -1,40 +1,92 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-title: 'Terms of Service | InstaImage',
-description: 'Terms of Service and User Agreement for InstaImage.',
+  title: 'Terms of Service | InstaImage',
+  description: 'Terms of Service and User Agreement for INSTAIMAGE (Kolkata, India).',
 };
 
 export default function TermsPage() {
-return (
-<div className="max-w-3xl mx-auto px-4 py-20">
-<h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
-<p className="text-gray-500 mb-8">Last updated: August 25, 2026</p>
-<p className="mb-6">Welcome to InstaImage. These Terms of Service ("Terms") govern your use of the InstaImage platform and the photography, videography, and drone services provided through our website. By accessing or using our platform, you agree to be bound by these Terms.</p>
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-16 sm:py-20 text-gray-800">
+      <div className="border-b border-gray-200 pb-6 mb-8">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 mb-2">
+          Terms of Service
+        </h1>
+        <p className="text-sm text-gray-500 font-medium">
+          Effective Date: August 30, 2026 | Enterprise: INSTAIMAGE (Udyam Reg: UDYAM-WB-18-0211603)
+        </p>
+      </div>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">1. Our Services</h2>
-<p className="mb-6">InstaImage operates an online marketplace that connects customers seeking professional photography services with qualified creators, photographers, and drone pilots ("Service Providers"). We facilitate the booking and payment processes, ensuring a seamless experience for all parties.</p>
+      <div className="prose prose-gray max-w-none space-y-6 text-sm sm:text-base leading-relaxed">
+        <p>
+          Welcome to <strong>INSTAIMAGE</strong> (&ldquo;InstaImage&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;), registered under the Ministry of Micro, Small and Medium Enterprises, Government of India (Udyam Registration Number: <strong>UDYAM-WB-18-0211603</strong>). These Terms of Service (&ldquo;Terms&rdquo;) constitute a legally binding agreement between you (&ldquo;User&rdquo;, &ldquo;Customer&rdquo;, or &ldquo;Service Provider&rdquo;) and INSTAIMAGE, governing your access to and use of our marketplace platform (<a href="https://instaimage.in" className="text-black font-semibold underline">https://instaimage.in</a>) and professional photography, videography, and event media services.
+        </p>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">2. User Accounts</h2>
-<p className="mb-6">To book a service or list your services as a Service Provider, you must register for an account. You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate. You are responsible for safeguarding your password and for all activities that occur under your account.</p>
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          1. Platform Marketplace & Services
+        </h2>
+        <p>
+          INSTAIMAGE operates an on-demand marketplace connecting customers with verified professional photographers, videographers, editors, and drone operators in Kolkata and surrounding service zones. We facilitate booking scheduling, customer support, and secure payment processing.
+        </p>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">3. Booking and Cancellations</h2>
-<p className="mb-6">When you book a service through InstaImage, you enter into a direct agreement with the Service Provider. Cancellations and reschedulings are subject to our standard cancellation policy, which may require advanced notice. Fees may apply for late cancellations.</p>
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          2. Account Registration & WhatsApp Verification
+        </h2>
+        <p>
+          To access bookings and creator dashboards, you must register using an authentic name and valid mobile phone number.
+        </p>
+        <ul className="list-disc pl-6 space-y-2">
+          <li><strong>WhatsApp OTP Authentication:</strong> Registration and authentication require verification via a 6-digit WhatsApp OTP code sent to your registered mobile number.</li>
+          <li><strong>Account Security:</strong> You are responsible for all activities occurring under your account session. Sessions remain securely active for up to 15 days on authorized devices.</li>
+        </ul>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">4. Payments</h2>
-<p className="mb-6">All payments for services must be processed securely through the InstaImage platform. We hold funds in escrow and release them to the Service Provider only after the successful completion and delivery of the media, minus any applicable platform fees.</p>
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          3. Bookings, Payments & Advances
+        </h2>
+        <ul className="list-disc pl-6 space-y-2">
+          <li><strong>Booking Confirmation:</strong> Bookings are locked and confirmed upon payment of the required booking advance through our verified payment gateway.</li>
+          <li><strong>Pricing & Taxes:</strong> All pricing listed on the platform is in Indian Rupees (INR) and includes applicable service charges unless explicitly stated.</li>
+          <li><strong>Wallet & Promo Codes:</strong> Welcome bonuses (e.g. ₹500 wallet credit) and promotional coupons apply towards eligible bookings per terms outlined at checkout.</li>
+        </ul>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">5. Intellectual Property and Usage Rights</h2>
-<p className="mb-6">Unless otherwise agreed upon in writing, the Service Provider retains the copyright to all media captured during a booking. Customers receive a non-exclusive, perpetual, worldwide license to use, reproduce, and display the media for personal or promotional purposes. Reselling the raw media without permission is prohibited.</p>
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          4. Rescheduling, Cancellations & Refunds
+        </h2>
+        <p>
+          Cancellations or reschedule requests must be submitted through your customer dashboard. Refund eligibility and applicable deduction fees depend on the time remaining before the scheduled shoot:
+        </p>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>Cancellations made more than 48 hours before the shoot qualify for a full refund or wallet credit.</li>
+          <li>Late cancellations within 24 hours of the scheduled shoot may incur a partial creator compensation fee.</li>
+        </ul>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">6. Prohibited Activities</h2>
-<p className="mb-6">You agree not to use the platform for any unlawful purpose or to solicit others to perform or participate in any unlawful acts. Harassment of Service Providers or customers, fraudulent bookings, and attempts to bypass the platform's payment system are strictly prohibited and will result in immediate account termination.</p>
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          5. Intellectual Property & Media Deliverables
+        </h2>
+        <ul className="list-disc pl-6 space-y-2">
+          <li><strong>Customer License:</strong> Customers receive a perpetual, non-exclusive license for personal and commercial usage of the delivered photographs/videos.</li>
+          <li><strong>Portfolio Rights:</strong> Service providers and INSTAIMAGE retain reasonable promotional usage rights for portfolio showcases unless a non-disclosure agreement (NDA) is requested prior to the shoot.</li>
+        </ul>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">7. Limitation of Liability</h2>
-<p className="mb-6">InstaImage is not liable for any indirect, incidental, special, consequential, or punitive damages arising out of your access to or use of our platform or any services booked through it. Our liability is limited to the maximum extent permitted by law.</p>
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          6. Governing Law & Dispute Resolution
+        </h2>
+        <p>
+          These Terms are governed by and construed in accordance with the laws of the Republic of India. Any disputes or claims arising out of or in connection with these Terms or the platform shall be subject to the exclusive jurisdiction of the competent courts in <strong>Kolkata, West Bengal, India</strong>.
+        </p>
 
-<h2 className="text-2xl font-bold mt-8 mb-4">8. Contact Information</h2>
-<p className="mb-6">If you have any questions about these Terms, please contact us at support@instaimage.in.</p>
-</div>
-);
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
+          7. Registered Enterprise Information
+        </h2>
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-2 text-sm">
+          <p className="font-bold text-gray-900 text-base">INSTAIMAGE</p>
+          <p><strong>Proprietorship:</strong> Priyanka Santra</p>
+          <p><strong>Udyam Registration Number:</strong> UDYAM-WB-18-0211603</p>
+          <p><strong>Registered Address:</strong> 85, Tilottama Plaza, Karunamoyee Ghat Road, Kolkata, South 24 Parganas, West Bengal - 700082, India</p>
+          <p><strong>Email:</strong> <a href="mailto:info.instaimage@gmail.com" className="text-black font-semibold underline">info.instaimage@gmail.com</a> / <a href="mailto:support@instaimage.in" className="text-black font-semibold underline">support@instaimage.in</a></p>
+          <p><strong>Phone / WhatsApp:</strong> +91 94778 33176</p>
+        </div>
+      </div>
+    </div>
+  );
 }

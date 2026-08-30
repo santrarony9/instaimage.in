@@ -51,7 +51,7 @@ services:
       - .env
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:${MONGO_INITDB_ROOT_PASSWORD:-changeit}@mongo:27017/marketplace?authSource=admin
+      - MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME:-admin}:InstaMongo2026%21@mongo:27017/marketplace?authSource=admin
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:

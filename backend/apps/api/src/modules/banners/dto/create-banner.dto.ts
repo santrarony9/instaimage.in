@@ -1,4 +1,4 @@
-﻿import {
+import {
   IsString,
   IsOptional,
   IsBoolean,
@@ -35,6 +35,10 @@ export class CreateBannerDto {
   @IsNumber()
   @IsOptional()
   comboPrice?: number;
+
+  @IsString()
+  @IsOptional()
+  time?: string;
 
   @IsString()
   @IsOptional()

@@ -14,7 +14,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
           'JWT_SECRET',
           'fallback_secret_key_for_dev',
         ),
-        signOptions: { expiresIn: '7d' },
+        signOptions: { expiresIn: '15d' },
       }),
       inject: [ConfigService],
     }),

@@ -29,6 +29,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { EmailModule } from './modules/email/email.module';
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { BannersModule } from './modules/banners/banners.module';
 
 @Module({
@@ -41,6 +42,7 @@ import { BannersModule } from './modules/banners/banners.module';
       serveRoot: '/v1/uploads',
     }),
     EmailModule,
+    WhatsappModule,
     ServicesModule,
     ServiceZonesModule,
     CouponsModule,

@@ -68,6 +68,19 @@ export class BookingsController {
     return this.bookingsService.getBookingById(id);
   }
 
+  @Post(':id/verify-payment')
+  @Roles(Role.CUSTOMER)
+  async verifyPayment(
+    @Param('id') id: string,
+    @Body() payload: {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+    },
+  ) {
+    return this.bookingsService.verifyPayment(id, payload);
+  }
+
   @Patch(':id/status')
   @Roles(Role.ADMIN)
   updateStatus(@Param('id') id: string, @Body('status') status: BookingStatus) {

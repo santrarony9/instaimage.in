@@ -10,7 +10,13 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Public, Roles, Role } from '@app/auth';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import {
+  RegisterDto,
+  LoginDto,
+  SendWhatsappOtpDto,
+  VerifyWhatsappOtpDto,
+  LinkWhatsappPhoneDto,
+} from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,6 +25,24 @@ export class AuthController {
   @Get('me')
   getMe(@Req() req: any) {
     return { user: req.user };
+  }
+
+  @Public()
+  @Post('whatsapp/send-otp')
+  sendWhatsappOtp(@Body() dto: SendWhatsappOtpDto) {
+    return this.authService.sendWhatsappOtp(dto);
+  }
+
+  @Public()
+  @Post('whatsapp/verify-otp')
+  verifyWhatsappOtp(@Body() dto: VerifyWhatsappOtpDto) {
+    return this.authService.verifyWhatsappOtp(dto);
+  }
+
+  @Post('whatsapp/link-phone')
+  linkWhatsappPhone(@Req() req: any, @Body() dto: LinkWhatsappPhoneDto) {
+    const userId = req.user?.sub || req.user?.id || req.user?._id;
+    return this.authService.linkWhatsappPhone(userId, dto);
   }
 
   @Public()

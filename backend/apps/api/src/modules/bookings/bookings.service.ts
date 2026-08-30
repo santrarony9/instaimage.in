@@ -153,6 +153,40 @@ export class BookingsService {
     }
   }
 
+  async verifyPayment(
+    bookingId: string,
+    payload: {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+    },
+  ) {
+    const isValid = await this.paymentsService.verifyPaymentSignature(
+      payload.razorpay_order_id,
+      payload.razorpay_payment_id,
+      payload.razorpay_signature,
+    );
+
+    if (!isValid) {
+      import('@nestjs/common').then(m => {
+        throw new m.BadRequestException('Invalid payment signature');
+      });
+      throw new Error('Invalid payment signature');
+    }
+
+    const booking = await this.bookingsRepository.model.findById(bookingId);
+    if (!booking) {
+      throw new Error('Booking not found');
+    }
+
+    booking.status = BookingStatus.CONFIRMED;
+    booking.paymentStatus = 'PAID';
+    booking.paymentId = payload.razorpay_payment_id;
+    await booking.save();
+
+    return { success: true, booking };
+  }
+
   async getBookingById(id: string) {
     const booking = await this.bookingsRepository.model
       .findById(id)

@@ -17,6 +17,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { SettingsModule } from '../settings/settings.module';
 import { UsersModule } from '../users/users.module';
 import { EmailModule } from '../email/email.module';
+import { WhatsappModule } from '../whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { EmailModule } from '../email/email.module';
     SettingsModule,
     UsersModule,
     EmailModule,
+    WhatsappModule,
   ],
   controllers: [BookingsController],
   providers: [BookingsService, BookingsRepository, BookingsCronService],

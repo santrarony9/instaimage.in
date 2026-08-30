@@ -51,9 +51,88 @@ export function Step7Payment() {
     fetchPrice();
   }, [data]);
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePayNow = async () => {
-    // Only proceed to confirmation step — actual submission happens in Step8
-    nextStep();
+    setIsProcessing(true);
+    try {
+      const response = await submitBooking();
+      const { booking, paymentOrder } = response;
+      
+      const isScriptLoaded = await loadRazorpayScript();
+      if (!isScriptLoaded) {
+        alert('Failed to load Razorpay SDK. Please check your internet connection.');
+        setIsProcessing(false);
+        return;
+      }
+      
+      if (!paymentOrder || !paymentOrder.id) {
+        // If there's no payment required (e.g. 100% wallet paid), directly confirm
+        useBookingStore.getState().setConfirmedBooking(booking);
+        nextStep();
+        setIsProcessing(false);
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_mock',
+        amount: paymentOrder.amount,
+        currency: paymentOrder.currency,
+        name: 'InstaImage',
+        description: 'Booking Payment',
+        order_id: paymentOrder.id,
+        handler: async function (response: any) {
+          try {
+            const verifyRes = await fetchApi(`/bookings/${booking._id}/verify-payment`, {
+              method: 'POST',
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+            useBookingStore.getState().setConfirmedBooking(verifyRes.booking);
+            nextStep();
+          } catch (err) {
+            alert('Payment verification failed.');
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: (data.location as any)?.contactName || '',
+        },
+        theme: {
+          color: '#000000',
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const rzp1 = new (window as any).Razorpay(options);
+      rzp1.on('payment.failed', function (response: any) {
+        alert('Payment failed: ' + response.error.description);
+        setIsProcessing(false);
+      });
+      rzp1.open();
+    } catch (err) {
+      alert('Failed to create booking order.');
+      setIsProcessing(false);
+    }
   };
 
   if (isLoadingPrice) {

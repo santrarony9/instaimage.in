@@ -5,16 +5,22 @@ import { ConfigService } from '@nestjs/config';
 export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
 
-  // In a real scenario, this would be an initialized razorpay instance
-  // private razorpay: Razorpay;
+  private razorpay: any;
 
   constructor(private readonly configService: ConfigService) {
-    /*
-    this.razorpay = new Razorpay({
-      key_id: configService.get<string>('RAZORPAY_KEY_ID'),
-      key_secret: configService.get<string>('RAZORPAY_KEY_SECRET'),
-    });
-    */
+    const key_id = this.configService.get<string>('RAZORPAY_KEY_ID');
+    const key_secret = this.configService.get<string>('RAZORPAY_KEY_SECRET');
+    
+    if (key_id && key_secret) {
+      const Razorpay = require('razorpay');
+      this.razorpay = new Razorpay({
+        key_id: key_id,
+        key_secret: key_secret,
+      });
+      this.logger.log('Razorpay initialized');
+    } else {
+      this.logger.warn('Razorpay keys not found in environment. Payments will run in mock mode.');
+    }
   }
 
   async createPaymentOrder(
@@ -22,22 +28,38 @@ export class PaymentsService {
     amount: number,
     currency: string = 'INR',
   ) {
-    this.logger.log(
-      `Mocking Razorpay Order for Booking: ${bookingId}, Amount: ${amount}`,
-    );
+    if (this.razorpay) {
+      try {
+        const orderOptions = {
+          amount: Math.round(amount * 100), // amount in paisa
+          currency: currency,
+          receipt: bookingId,
+        };
+        const order = await this.razorpay.orders.create(orderOptions);
+        this.logger.log(`Razorpay Order created: ${order.id} for booking: ${bookingId}`);
+        return order;
+      } catch (err) {
+        this.logger.error(`Error creating Razorpay order: ${err.message}`, err.stack);
+        throw err;
+      }
+    } else {
+      this.logger.log(
+        `Mocking Razorpay Order for Booking: ${bookingId}, Amount: ${amount}`,
+      );
 
-    // Mock Razorpay order response
-    return {
-      id: `order_mock_${new Date().getTime()}`,
-      entity: 'order',
-      amount: amount * 100, // Razorpay takes amounts in paisa
-      amount_paid: 0,
-      amount_due: amount * 100,
-      currency,
-      receipt: bookingId,
-      status: 'created',
-      attempts: 0,
-    };
+      // Mock Razorpay order response
+      return {
+        id: `order_mock_${new Date().getTime()}`,
+        entity: 'order',
+        amount: Math.round(amount * 100),
+        amount_paid: 0,
+        amount_due: Math.round(amount * 100),
+        currency,
+        receipt: bookingId,
+        status: 'created',
+        attempts: 0,
+      };
+    }
   }
 
   async verifyPaymentSignature(
@@ -46,7 +68,19 @@ export class PaymentsService {
     signature: string,
   ) {
     this.logger.log(`Verifying signature for Order: ${razorpayOrderId}`);
-    // Mock verification: always return true in development
-    return true;
+    if (this.razorpay) {
+      const crypto = require('crypto');
+      const secret = this.configService.get<string>('RAZORPAY_KEY_SECRET');
+      
+      const generatedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+        .digest('hex');
+
+      return generatedSignature === signature;
+    } else {
+      // Mock verification: always return true in development
+      return true;
+    }
   }
 }

@@ -1,4 +1,4 @@
-﻿import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AbstractDocument } from '@app/database';
 import { Types } from 'mongoose';
 
@@ -24,6 +24,9 @@ export class Banner extends AbstractDocument {
 
   @Prop()
   comboPrice?: number;
+
+  @Prop()
+  time?: string;
 
   @Prop()
   backgroundImage?: string;

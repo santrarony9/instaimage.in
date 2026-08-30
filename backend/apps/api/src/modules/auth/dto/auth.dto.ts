@@ -4,6 +4,7 @@ import {
   IsString,
   MinLength,
   IsOptional,
+  Matches,
 } from 'class-validator';
 
 export class RegisterDto {
@@ -47,4 +48,44 @@ export class ResetPasswordDto {
   @IsString()
   @MinLength(6)
   password: string;
+}
+
+export class SendWhatsappOtpDto {
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
+}
+
+export class VerifyWhatsappOtpDto {
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(4)
+  otp: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  referralCode?: string;
+}
+
+export class LinkWhatsappPhoneDto {
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(4)
+  otp: string;
 }
