@@ -172,9 +172,13 @@ export class WhatsappService {
    * Send OTP Verification Message
    */
   async sendOtpMessage(to: string, otp: string, customerName: string = 'User') {
-    const textMessage = `Your InstaImage OTP is: *${otp}*\n\nDo not share this code with anyone. Valid for 5 minutes.\n\n_— Team InstaImage_`;
-
-    // Send direct text message (Cloud API supports this for any WhatsApp number)
-    return this.sendTextMessage(to, textMessage);
+    // We MUST use a pre-approved template for business-initiated OTPs 
+    // outside of the 24-hour customer service window.
+    return this.sendTemplateMessage(
+      to,
+      'instaimage_otp', // This exact template must be created in Meta dashboard
+      [otp], // Assuming the template takes the code as the first {{1}} parameter
+      'en_US',
+    );
   }
 }
