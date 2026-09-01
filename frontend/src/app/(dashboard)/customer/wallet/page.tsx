@@ -10,6 +10,11 @@ export default function WalletHistoryPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [couponCode, setCouponCode] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [couponError, setCouponError] = useState('');
+
   useEffect(() => {
     async function loadTransactions() {
       try {
@@ -23,6 +28,26 @@ export default function WalletHistoryPage() {
     }
     loadTransactions();
   }, []);
+
+  const handleRedeemCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError('');
+    setCouponSuccess('');
+    try {
+      const res = await api.post('/users/me/redeem-coupon', { code: couponCode.trim().toUpperCase() });
+      setCouponSuccess(res.data?.message || '₹500 added to your wallet!');
+      setCouponCode('');
+      // Reload transactions to show the new credit
+      const data = await fetchApi('/users/me/wallet/transactions');
+      setTransactions(data);
+    } catch (err: any) {
+      setCouponError(err.message || 'Invalid or expired coupon code.');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl space-y-6 pb-10">
@@ -46,6 +71,30 @@ export default function WalletHistoryPage() {
               {(user?.walletBalance ?? 0).toLocaleString('en-IN')}
             </h2>
           </div>
+        </div>
+        
+        <div className="relative z-10 w-full md:w-auto bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+          <form onSubmit={handleRedeemCoupon} className="flex flex-col gap-2">
+            <label className="text-xs font-bold text-emerald-50 uppercase tracking-wider">Have a Coupon?</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter Code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                className="w-full md:w-48 bg-white/20 border border-white/30 rounded-xl px-4 py-2.5 text-white placeholder-emerald-100 font-bold focus:outline-none focus:ring-2 focus:ring-white/50 uppercase"
+              />
+              <button
+                type="submit"
+                disabled={couponLoading || !couponCode.trim()}
+                className="bg-white text-emerald-600 px-4 py-2.5 rounded-xl font-black hover:bg-emerald-50 transition-colors disabled:opacity-70"
+              >
+                {couponLoading ? '...' : 'Redeem'}
+              </button>
+            </div>
+            {couponError && <p className="text-red-200 text-xs font-bold mt-1">{couponError}</p>}
+            {couponSuccess && <p className="text-white text-xs font-bold mt-1">{couponSuccess}</p>}
+          </form>
         </div>
       </div>
 

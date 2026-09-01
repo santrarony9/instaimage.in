@@ -71,7 +71,20 @@ export default function OnboardingModal() {
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    // If they entered a name in step 1, we should save it even if they skip email
+    if (name.trim() !== user?.name) {
+      try {
+        setLoading(true);
+        const payload = { name: name.trim() };
+        await api.patch('/users/me', payload);
+        updateUser(payload);
+      } catch (err) {
+        console.error("Failed to save name on skip", err);
+      } finally {
+        setLoading(false);
+      }
+    }
     setIsOpen(false);
   };
 
