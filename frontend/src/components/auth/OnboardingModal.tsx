@@ -14,8 +14,11 @@ export default function OnboardingModal() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [hasDismissed, setHasDismissed] = useState(false);
 
   useEffect(() => {
+    if (hasDismissed) return;
+    
     // Only show if user exists, and either name is completely missing, 
     // or email is completely missing or is the temporary placeholder email.
     if (user) {
@@ -63,6 +66,7 @@ export default function OnboardingModal() {
       await api.patch('/users/me', payload);
       updateUser(payload);
       
+      setHasDismissed(true);
       setIsOpen(false);
     } catch (err: any) {
       setError(err.message || "Failed to save details");
@@ -85,6 +89,7 @@ export default function OnboardingModal() {
         setLoading(false);
       }
     }
+    setHasDismissed(true);
     setIsOpen(false);
   };
 

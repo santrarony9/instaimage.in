@@ -113,7 +113,7 @@ export default function CustomerDashboardOverview() {
               
               <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                 <div className="flex-1">
-                  <h4 className="text-2xl font-black mb-4 truncate">{upcomingBookings[0].serviceId?.title || 'Photography Shoot'}</h4>
+                  <h4 className="text-2xl font-black mb-4 truncate">{upcomingBookings[0].serviceId?.name || 'Photography Shoot'}</h4>
                   
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-blue-100 text-sm font-medium">
@@ -166,7 +166,7 @@ export default function CustomerDashboardOverview() {
                       {booking.status}
                     </span>
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-1 truncate">{booking.serviceId?.title || 'Shoot'}</h3>
+                  <h3 className="font-bold text-gray-900 mb-1 truncate">{booking.serviceId?.name || 'Shoot'}</h3>
                   <p className="text-xs font-semibold text-gray-400">
                     {new Date(booking.scheduledDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>

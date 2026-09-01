@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/use-auth-store';
@@ -36,6 +36,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -139,6 +140,51 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col md:flex-row font-sans selection:bg-blue-200">
       <OnboardingModal />
       
+      {/* --- MOBILE DRAWER MENU --- */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-[100] flex justify-end">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="relative w-64 bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+              <span className="font-black text-gray-900">More Options</span>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-gray-100 rounded-full">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+              {secondaryLinks.map((link) => {
+                const isActive = pathname === link.href;
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 group ${
+                      isActive ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-600 font-medium hover:bg-gray-50'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="p-4 border-t border-gray-100 pb-safe">
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-red-500 font-bold bg-red-50 hover:bg-red-100 w-full transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* --- DESKTOP SIDEBAR --- */}
       <div className="hidden md:block w-[280px] shrink-0 sticky top-0 h-screen z-50">
         <DesktopSidebar />
@@ -146,18 +192,30 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
       {/* --- MOBILE TOP APP BAR --- */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-gray-100 z-40 px-4 flex items-center justify-between shadow-sm">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-            <span className="text-white text-sm font-black">II</span>
-          </div>
-          <span className="text-lg font-black text-gray-900 tracking-tight">
-            InstaImage
-          </span>
-        </Link>
-        <Link href="/customer/wallet" className="flex items-center gap-1.5 bg-gray-900 text-white px-3 py-1.5 rounded-full shadow-md">
-          <Wallet className="w-3.5 h-3.5 text-gray-300" />
-          <span className="text-xs font-bold">₹{walletBalance}</span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+              <span className="text-white text-sm font-black">II</span>
+            </div>
+            <span className="text-lg font-black text-gray-900 tracking-tight">
+              InstaImage
+            </span>
+          </Link>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link href="/customer/wallet" className="flex items-center gap-1.5 bg-gray-900 text-white px-3 py-1.5 rounded-full shadow-md">
+            <Wallet className="w-3.5 h-3.5 text-gray-300" />
+            <span className="text-xs font-bold">₹{walletBalance}</span>
+          </Link>
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* --- MAIN CONTENT AREA --- */}
