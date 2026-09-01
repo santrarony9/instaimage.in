@@ -126,7 +126,7 @@ export default function ProfilePage() {
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 z-0"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none"></div>
         <div className="px-6 py-8 relative z-10">
           <div className="flex items-center gap-4 mb-8 border-b border-gray-100 pb-6">
             <div className="relative group flex-shrink-0 cursor-pointer" onClick={() => !uploadingImage && fileInputRef.current?.click()}>
@@ -155,11 +155,12 @@ export default function ProfilePage() {
               <label className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
               <input 
                 type="text" 
-                disabled={!isEditing} 
+                readOnly={!isEditing}
+                onClick={() => setIsEditing(true)}
                 value={name} 
                 onChange={(e) => setName(e.target.value)}
                 className={`block w-full px-4 py-3 border rounded-xl text-sm transition-colors ${
-                  isEditing ? 'border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500'
+                  isEditing ? 'border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 cursor-pointer'
                 }`}
               />
             </div>
@@ -167,11 +168,12 @@ export default function ProfilePage() {
               <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
               <input 
                 type="email" 
-                disabled={!isEditing} 
+                readOnly={!isEditing}
+                onClick={() => setIsEditing(true)}
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)}
                 className={`block w-full px-4 py-3 border rounded-xl text-sm transition-colors ${
-                  isEditing ? 'border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500'
+                  isEditing ? 'border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 cursor-pointer'
                 }`}
               />
             </div>
@@ -181,18 +183,19 @@ export default function ProfilePage() {
                 type="tel" 
                 disabled 
                 value={user?.phone || 'Not provided'} 
-                className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-500" 
+                className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-500 cursor-not-allowed" 
               />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Date of Birth</label>
               <input 
                 type="date" 
-                disabled={!isEditing} 
+                readOnly={!isEditing}
+                onClick={() => setIsEditing(true)}
                 value={dateOfBirth} 
                 onChange={(e) => setDateOfBirth(e.target.value)}
                 className={`block w-full px-4 py-3 border rounded-xl text-sm transition-colors ${
-                  isEditing ? 'border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500'
+                  isEditing ? 'border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 shadow-sm' : 'border-gray-200 bg-gray-50 text-gray-500 cursor-pointer'
                 }`}
               />
             </div>
