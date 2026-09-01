@@ -120,23 +120,34 @@ export function Step7Payment() {
       )}
 
       {pricingInfo?.unselectedAddons && pricingInfo.unselectedAddons.length > 0 && (
-        <div className="mb-6">
-          <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">Last-Minute Add-ons</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xl">✨</span>
+            <h3 className="font-black text-gray-900 text-lg">Boost Your Shoot (Optional)</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {pricingInfo.unselectedAddons.map((addon: any) => (
-              <div key={addon.name} className="flex items-center justify-between p-3 border rounded-lg hover:border-black transition">
-                <div>
-                  <p className="font-semibold text-sm">{addon.name}</p>
-                  <p className="text-gray-500 text-xs">+₹{addon.price}</p>
+              <div 
+                key={addon.name} 
+                className="group relative bg-white border-2 border-gray-100 hover:border-blue-500 rounded-2xl p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1 pr-4">
+                    <p className="font-black text-gray-900 leading-tight mb-1">{addon.name}</p>
+                    <p className="text-gray-500 text-xs font-medium line-clamp-2">Make your memories even more special with this premium add-on.</p>
+                  </div>
+                  <div className="bg-blue-50 text-blue-700 font-black text-sm px-3 py-1 rounded-full whitespace-nowrap">
+                    +₹{addon.price.toLocaleString('en-IN')}
+                  </div>
                 </div>
                 <button
                   onClick={() => {
                     const currentAddons = data.addonNames || [];
                     useBookingStore.getState().updateData({ addonNames: [...currentAddons, addon.name] });
                   }}
-                  className="bg-black text-white px-3 py-1 text-xs rounded-full hover:bg-gray-800 transition"
+                  className="w-full bg-gray-900 text-white font-bold py-2.5 rounded-xl group-hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
                 >
-                  Add
+                  <span className="text-lg">+</span> Add to Booking
                 </button>
               </div>
             ))}

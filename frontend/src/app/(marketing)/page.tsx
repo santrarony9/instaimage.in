@@ -132,8 +132,29 @@ export default async function HomePage() {
           <HeroSearchBar />
         </div>
       </div>
+      
+      {/* Signup Hook Banner */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-30 mb-10">
+        <Link href="/login" className="block bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 sm:p-8 text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-110 transition-transform duration-500"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-6 text-center md:text-left">
+              <div className="hidden sm:flex w-16 h-16 bg-white/20 backdrop-blur-md rounded-full items-center justify-center border border-white/30 flex-shrink-0">
+                <span className="text-3xl">🎁</span>
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black mb-1">Claim your ₹500 Welcome Bonus!</h2>
+                <p className="text-emerald-50 font-medium text-sm md:text-base">Sign up today and get ₹500 credited instantly to your InstaImage Wallet for your first shoot.</p>
+              </div>
+            </div>
+            <div className="bg-white text-teal-600 px-8 py-3.5 rounded-full font-black text-lg shadow-lg flex-shrink-0 flex items-center gap-2 group-hover:bg-gray-50">
+              Claim Now <span className="text-xl">→</span>
+            </div>
+          </div>
+        </Link>
+      </div>
 
-      <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+      <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-4">
         
         {/* Premium Category Tiles */}
         {categories.length > 0 && (
