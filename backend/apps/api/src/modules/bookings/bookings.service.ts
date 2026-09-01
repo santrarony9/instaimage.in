@@ -156,22 +156,20 @@ export class BookingsService {
   async verifyPayment(
     bookingId: string,
     payload: {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
+      payment_id: string;
+      payment_request_id?: string;
+      payment_status?: string;
     },
   ) {
-    const isValid = await this.paymentsService.verifyPaymentSignature(
-      payload.razorpay_order_id,
-      payload.razorpay_payment_id,
-      payload.razorpay_signature,
+    const isValid = await this.paymentsService.verifyInstamojoPayment(
+      payload.payment_id
     );
 
     if (!isValid) {
       import('@nestjs/common').then(m => {
-        throw new m.BadRequestException('Invalid payment signature');
+        throw new m.BadRequestException('Invalid or incomplete payment');
       });
-      throw new Error('Invalid payment signature');
+      throw new Error('Invalid or incomplete payment');
     }
 
     const booking = await this.bookingsRepository.model.findById(bookingId);
@@ -181,7 +179,7 @@ export class BookingsService {
 
     booking.status = BookingStatus.CONFIRMED;
     booking.paymentStatus = 'PAID';
-    booking.paymentId = payload.razorpay_payment_id;
+    booking.paymentId = payload.payment_id;
     await booking.save();
 
     return { success: true, booking };

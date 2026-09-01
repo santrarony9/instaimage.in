@@ -7,6 +7,10 @@ import {
   WalletTransaction,
   WalletTransactionSchema,
 } from './schemas/wallet-transaction.schema';
+import {
+  VerificationCoupon,
+  VerificationCouponSchema,
+} from './schemas/verification-coupon.schema';
 import { UsersRepository } from './users.repository';
 
 @Module({
@@ -14,6 +18,7 @@ import { UsersRepository } from './users.repository';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: WalletTransaction.name, schema: WalletTransactionSchema },
+      { name: VerificationCoupon.name, schema: VerificationCouponSchema },
     ]),
   ],
   controllers: [UsersController],
@@ -21,3 +26,4 @@ import { UsersRepository } from './users.repository';
   exports: [UsersService],
 })
 export class UsersModule {}
+

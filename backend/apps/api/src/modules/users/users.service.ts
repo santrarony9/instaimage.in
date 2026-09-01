@@ -9,8 +9,13 @@ import {
   WalletTransaction,
   TransactionType,
 } from './schemas/wallet-transaction.schema';
+import {
+  VerificationCoupon,
+} from './schemas/verification-coupon.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { EmailService } from '../email/email.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +23,9 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     @InjectModel(WalletTransaction.name)
     private walletTransactionModel: Model<WalletTransaction>,
+    @InjectModel(VerificationCoupon.name)
+    private verificationCouponModel: Model<VerificationCoupon>,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(user: Partial<User>): Promise<User> {
@@ -131,4 +139,96 @@ export class UsersService {
       .sort({ createdAt: -1 })
       .exec();
   }
+
+  /**
+   * Issue a ₹500 verification coupon when a user saves their real email for the first time.
+   * Guards: 1 coupon per phone number, 1 coupon per email address.
+   */
+  async sendVerificationCoupon(userId: string, phone: string, email: string) {
+    if (!phone) {
+      throw new BadRequestException('Phone number is required to issue a verification coupon.');
+    }
+
+    // Guard: one coupon per phone number
+    const existingByPhone = await this.verificationCouponModel.findOne({ phone });
+    if (existingByPhone) {
+      throw new BadRequestException('A verification coupon has already been issued for this phone number.');
+    }
+
+    // Guard: one coupon per email address (prevents sharing email between accounts)
+    const existingByEmail = await this.verificationCouponModel.findOne({ email });
+    if (existingByEmail) {
+      throw new BadRequestException('This email address has already been used to claim a verification coupon.');
+    }
+
+    // Generate unique coupon code: "VRFY" + 6 random uppercase chars
+    const suffix = crypto.randomBytes(3).toString('hex').toUpperCase();
+    const code = `VRFY${suffix}`;
+
+    await this.verificationCouponModel.create({
+      userId: new Types.ObjectId(userId),
+      phone,
+      email,
+      code,
+      isRedeemed: false,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
+
+    const user = await this.usersRepository.findById(userId);
+    const displayName = user?.name || 'Customer';
+
+    // Send email asynchronously — don't block the response
+    this.emailService.sendVerificationCouponEmail(email, displayName, code);
+
+    return {
+      success: true,
+      message: 'Coupon code sent to your email! Check your inbox to claim ₹500.',
+    };
+  }
+
+  /**
+   * Redeem a verification coupon — credits ₹500 to the user's wallet.
+   * The coupon must belong to this user's phone number (anti-sharing guard).
+   */
+  async redeemVerificationCoupon(userId: string, code: string) {
+    const coupon = await this.verificationCouponModel.findOne({
+      code: code.trim().toUpperCase(),
+    });
+
+    if (!coupon) {
+      throw new BadRequestException('Invalid coupon code. Please check and try again.');
+    }
+
+    if (coupon.isRedeemed) {
+      throw new BadRequestException('This coupon has already been redeemed.');
+    }
+
+    if (coupon.expiresAt < new Date()) {
+      throw new BadRequestException('This coupon has expired. Verification coupons are valid for 7 days.');
+    }
+
+    // Security: coupon must belong to this user
+    if (coupon.userId.toString() !== userId) {
+      throw new BadRequestException('This coupon does not belong to your account.');
+    }
+
+    // Mark redeemed first (prevent race condition double-spend)
+    await this.verificationCouponModel.findByIdAndUpdate(coupon._id, {
+      isRedeemed: true,
+    });
+
+    // Credit ₹500 to wallet
+    const result = await this.addWalletBalance(
+      userId,
+      500,
+      'Email Verification Bonus',
+    );
+
+    return {
+      success: true,
+      message: '🎉 ₹500 added to your wallet successfully!',
+      walletBalance: result.balance,
+    };
+  }
 }
+

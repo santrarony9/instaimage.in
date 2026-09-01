@@ -205,9 +205,11 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                     className={`flex flex-col items-center justify-center p-4 border rounded-md cursor-pointer transition-all ${pricingMode === 'fixed' ? 'border-black bg-gray-50 ring-1 ring-black' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                     onClick={() => setPricingMode('fixed')}
                   >
-                    <span className="font-bold text-gray-900">Fixed Timing</span>
+                    <span className="font-bold text-gray-900">
+                      {service.deliveryMethod === 'REMOTE' ? 'Per Service' : 'Fixed Timing'}
+                    </span>
                     <span className="text-xs text-gray-500 text-center">
-                      ₹{service.basePrice?.toLocaleString()} {service.duration ? `for ${service.duration} ${service.durationUnit?.toLowerCase() || 'hours'}` : 'flat rate'}
+                      ₹{service.basePrice?.toLocaleString()} {service.deliveryMethod === 'REMOTE' ? (service.duration ? `• Delivered in ${service.duration} ${service.durationUnit?.toLowerCase() || 'hours'}` : '') : (service.duration ? `for ${service.duration} ${service.durationUnit?.toLowerCase() || 'hours'}` : 'flat rate')}
                     </span>
                   </label>
                   
@@ -354,7 +356,9 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
       {/* Mobile Sticky Footer */}
       <div className="lg:hidden fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50 flex items-center justify-between shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
         <div>
-          <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-0.5">{pricingMode}</div>
+          <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-0.5">
+            {service.deliveryMethod === 'REMOTE' ? 'Per Service' : (pricingMode === 'fixed' ? 'Fixed Timing' : 'Flexible Timing')}
+          </div>
           <div className="text-xl font-black text-gray-900">₹{totalPrice.toLocaleString()}</div>
         </div>
         <div className="flex gap-2">

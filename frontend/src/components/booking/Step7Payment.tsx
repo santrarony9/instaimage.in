@@ -51,32 +51,11 @@ export function Step7Payment() {
     fetchPrice();
   }, [data]);
 
-  const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-      if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
-        resolve(true);
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
   const handlePayNow = async () => {
     setIsProcessing(true);
     try {
       const response = await submitBooking();
       const { booking, paymentOrder } = response;
-      
-      const isScriptLoaded = await loadRazorpayScript();
-      if (!isScriptLoaded) {
-        alert('Failed to load Razorpay SDK. Please check your internet connection.');
-        setIsProcessing(false);
-        return;
-      }
       
       if (!paymentOrder || !paymentOrder.id) {
         // If there's no payment required (e.g. 100% wallet paid), directly confirm
@@ -86,49 +65,13 @@ export function Step7Payment() {
         return;
       }
 
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_mock',
-        amount: paymentOrder.amount,
-        currency: paymentOrder.currency,
-        name: 'InstaImage',
-        description: 'Booking Payment',
-        order_id: paymentOrder.id,
-        handler: async function (response: any) {
-          try {
-            const verifyRes = await fetchApi(`/bookings/${booking._id}/verify-payment`, {
-              method: 'POST',
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-            useBookingStore.getState().setConfirmedBooking(verifyRes.booking);
-            nextStep();
-          } catch (err) {
-            alert('Payment verification failed.');
-            setIsProcessing(false);
-          }
-        },
-        prefill: {
-          name: (data.location as any)?.contactName || '',
-        },
-        theme: {
-          color: '#000000',
-        },
-        modal: {
-          ondismiss: function () {
-            setIsProcessing(false);
-          }
-        }
-      };
-
-      const rzp1 = new (window as any).Razorpay(options);
-      rzp1.on('payment.failed', function (response: any) {
-        alert('Payment failed: ' + response.error.description);
+      if (paymentOrder.longurl) {
+        // Redirect to Instamojo hosted payment page
+        window.location.href = paymentOrder.longurl;
+      } else {
+        alert('Failed to get payment link.');
         setIsProcessing(false);
-      });
-      rzp1.open();
+      }
     } catch (err) {
       alert('Failed to create booking order.');
       setIsProcessing(false);
@@ -294,7 +237,7 @@ export function Step7Payment() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center">
             <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Razorpay Checkout</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Secure Checkout</h3>
             <p className="text-gray-500">Processing Payment... Please do not close this window.</p>
           </div>
         </div>

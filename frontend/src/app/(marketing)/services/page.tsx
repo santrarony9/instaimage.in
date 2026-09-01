@@ -50,6 +50,7 @@ export default async function ServicesPage({
       <Suspense fallback={
         <div className="bg-gray-50 min-h-screen py-8">
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-3xl font-black text-gray-900 mb-8">Photography & Videography Services</h1>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="w-full md:w-64 flex-shrink-0 animate-pulse">
                 <div className="h-10 bg-gray-200 rounded mb-4"></div>

@@ -25,6 +25,19 @@ export class UsersController {
     return this.usersService.addAddress(req.user.sub, addressData);
   }
 
+  @Patch('me')
+  async updateProfile(
+    @Req() req: any,
+    @Body() updateData: { name?: string; email?: string; dateOfBirth?: string; profileImage?: string },
+  ) {
+    return this.usersService.update(req.user.sub, {
+      name: updateData.name,
+      email: updateData.email,
+      profileImage: updateData.profileImage,
+      dateOfBirth: updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : undefined,
+    });
+  }
+
   @Get()
   @Roles(Role.ADMIN)
   findAll(@Query('search') search?: string) {
@@ -53,6 +66,27 @@ export class UsersController {
   @Get('me/wallet/transactions')
   getWalletTransactions(@Req() req: any) {
     return this.usersService.getWalletTransactions(req.user.sub);
+  }
+
+  @Post('me/send-verification-coupon')
+  sendVerificationCoupon(
+    @Req() req: any,
+    @Body('email') email: string,
+  ) {
+    const phone = req.user.phone;
+    return this.usersService.sendVerificationCoupon(
+      req.user.sub,
+      phone,
+      email,
+    );
+  }
+
+  @Post('me/redeem-coupon')
+  redeemCoupon(
+    @Req() req: any,
+    @Body('code') code: string,
+  ) {
+    return this.usersService.redeemVerificationCoupon(req.user.sub, code);
   }
 
   @Post(':id/wallet')

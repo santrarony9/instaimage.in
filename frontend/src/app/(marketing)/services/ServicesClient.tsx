@@ -137,6 +137,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
+        <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-6 lg:mb-8">Professional Photography & Videography Services</h1>
         {/* Mobile Filter Toggle */}
         <div className="lg:hidden mb-6 flex justify-between items-center border-b border-gray-100 pb-4">
           <h2 className="font-bold text-lg">{filteredServices.length} Services Found</h2>

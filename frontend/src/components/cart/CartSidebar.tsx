@@ -85,7 +85,7 @@ export function CartSidebar() {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-gray-900 text-sm truncate">{item.serviceName}</h3>
                   <div className="text-xs text-gray-500 mt-1 space-y-1">
-                    <p>Mode: <span className="font-medium text-gray-700 capitalize">{item.pricingMode}</span></p>
+                    <p>Mode: <span className="font-medium text-gray-700 capitalize">{item.deliveryMethod === 'REMOTE' ? 'Per Service' : item.pricingMode}</span></p>
                     <p>Type: <span className="font-medium text-gray-700">{item.deliveryMethod === 'REMOTE' ? 'Remote' : 'On-Spot'}</span></p>
                     {item.extraHoursBooked > 0 && <p>Extra: +{item.extraHoursBooked} hrs</p>}
                     {item.addonNames.length > 0 && <p className="truncate">Addons: {item.addonNames.join(', ')}</p>}

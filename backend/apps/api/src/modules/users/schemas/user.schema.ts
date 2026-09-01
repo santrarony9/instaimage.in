@@ -46,6 +46,12 @@ export class User extends AbstractDocument {
   @Prop()
   phone?: string;
 
+  @Prop()
+  profileImage?: string;
+
+  @Prop()
+  dateOfBirth?: Date;
+
   @Prop({ default: false })
   isWhatsappVerified: boolean;
 

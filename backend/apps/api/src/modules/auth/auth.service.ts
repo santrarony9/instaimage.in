@@ -164,12 +164,7 @@ export class AuthService {
         referredBy,
       });
 
-      // Welcome wallet bonus
-      await this.usersService.addWalletBalance(
-        user._id.toString(),
-        500,
-        'Welcome Bonus',
-      );
+      // No automatic wallet credit — user earns ₹500 by completing email verification
     } else {
       // Mark verified if not already
       if (!user.isWhatsappVerified) {

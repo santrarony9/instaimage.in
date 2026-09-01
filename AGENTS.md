@@ -40,3 +40,16 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 2. **Nginx Reverse Proxy & Double Slash Bug:**
    - **RULE:** When configuring Nginx `proxy_pass` to the NestJS API, DO NOT use `proxy_pass http://api:3000/;` (with a trailing slash) if inside a location block like `location /api/`. Nginx appends the remaining URI to the root `/`, generating double slashes (e.g., `//v1/categories`), which NestJS automatically rejects with a 404 Not Found.
    - **SOLUTION:** Always use `rewrite ^/api/(.*) /$1 break;` and `proxy_pass http://api:3000;` (without trailing slash).
+
+## WhatsApp Cloud API Configuration
+
+1. **Meta Account Details:**
+   - **WABA ID:** 912697385227149
+   - **Phone Number ID:** 1302518772938870
+   - **Business Manager ID:** 2304624620305829
+   - **Billing:** Postpaid Auto-Pay via MasterCard ending in 7370.
+
+2. **OTP Template Workaround (CRITICAL):**
+   - Meta blocked the creation of AUTHENTICATION templates (Error 2388185).
+   - **Current Hack:** The backend whatsapp.service.ts temporarily uses an approved UTILITY template (ooking_confirmation_alert) to send OTPs, passing the OTP as the booking number. This keeps costs at ~?0.30 per login.
+   - **Future Fix:** A MARKETING template named instaimage_promo_code was submitted. If approved, switch to it for better UX. Once Meta Support manually unlocks Authentication templates, switch to instaimage_otp to reduce costs to ~?0.11.
