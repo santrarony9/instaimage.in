@@ -74,7 +74,7 @@ export default function CustomerDashboardOverview() {
     <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
       
       {/* 1. Dynamic Header */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-500" />
@@ -84,6 +84,11 @@ export default function CustomerDashboardOverview() {
             {user?.name?.split(' ')[0] || 'Customer'}
           </h1>
         </div>
+        
+        <Link href="/" className="bg-gray-900 text-white px-6 py-3 rounded-full font-black hover:scale-105 transition-transform flex items-center justify-center gap-2 shadow-lg shadow-gray-900/20 whitespace-nowrap">
+          <Camera className="w-5 h-5" />
+          Book a Shoot
+        </Link>
       </div>
 
       {/* 2. Smart Action Widgets */}
