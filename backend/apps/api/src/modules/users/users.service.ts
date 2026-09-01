@@ -71,7 +71,14 @@ export class UsersService {
   }
 
   async update(id: string, data: Partial<User>) {
-    return this.usersRepository.findOneAndUpdate({ _id: id }, data);
+    try {
+      return await this.usersRepository.findOneAndUpdate({ _id: id }, data);
+    } catch (error: any) {
+      if (error.code === 11000 && error.keyPattern?.email) {
+        throw new BadRequestException('This email is already registered to another account. Please login with Google instead.');
+      }
+      throw error;
+    }
   }
 
   async getAddresses(userId: string) {

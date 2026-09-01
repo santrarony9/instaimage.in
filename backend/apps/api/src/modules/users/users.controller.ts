@@ -30,12 +30,15 @@ export class UsersController {
     @Req() req: any,
     @Body() updateData: { name?: string; email?: string; dateOfBirth?: string; profileImage?: string },
   ) {
-    return this.usersService.update(req.user.sub, {
-      name: updateData.name,
-      email: updateData.email,
-      profileImage: updateData.profileImage,
-      dateOfBirth: updateData.dateOfBirth ? new Date(updateData.dateOfBirth) : undefined,
-    });
+    const payload: any = {};
+    if (updateData.name !== undefined) payload.name = updateData.name;
+    if (updateData.email !== undefined) payload.email = updateData.email;
+    if (updateData.profileImage !== undefined) payload.profileImage = updateData.profileImage;
+    if (updateData.dateOfBirth) {
+      payload.dateOfBirth = new Date(updateData.dateOfBirth);
+    }
+
+    return this.usersService.update(req.user.sub, payload);
   }
 
   @Get()
