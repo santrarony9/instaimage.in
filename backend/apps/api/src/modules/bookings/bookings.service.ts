@@ -236,6 +236,36 @@ export class BookingsService {
       .lean();
   }
 
+  async cancelBookingCustomer(id: string, customerId: string) {
+    const booking = await this.bookingsRepository.model.findOne({ _id: new Types.ObjectId(id), customerId: new Types.ObjectId(customerId) });
+    if (!booking) {
+      throw new BadRequestException('Booking not found');
+    }
+
+    if (booking.status !== BookingStatus.PENDING_PAYMENT && booking.status !== BookingStatus.CONFIRMED) {
+      throw new BadRequestException('Booking cannot be cancelled at this stage.');
+    }
+
+    booking.status = BookingStatus.CANCELLED;
+    booking.timeline.push({
+      status: BookingStatus.CANCELLED,
+      timestamp: new Date(),
+      note: 'Cancelled by customer',
+    });
+
+    // If they paid with wallet (or advance), we should refund wallet balance!
+    // Since this is a quick fix, let's refund walletDiscountApplied if any.
+    if (booking.pricing && booking.pricing.walletDiscountApplied > 0) {
+       await this.usersService.addWalletBalance(
+         customerId,
+         booking.pricing.walletDiscountApplied,
+         `Refund for cancelled booking #${booking.bookingId}`
+       );
+    }
+
+    return booking.save();
+  }
+
   async updateBookingStatus(id: string, status: BookingStatus) {
     const booking = await this.bookingsRepository.update(id, { status });
 

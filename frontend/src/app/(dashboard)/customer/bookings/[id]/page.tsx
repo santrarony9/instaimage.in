@@ -35,6 +35,24 @@ export default function BookingDetailPage() {
     loadBooking();
   }, [id]);
 
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const handleCancel = async () => {
+    if (!confirm('Are you sure you want to cancel this booking? If you paid an advance or used your wallet, it will be refunded.')) return;
+    setIsCancelling(true);
+    try {
+      const { fetchApi: apiWithPatch } = await import('@/lib/api');
+      await apiWithPatch(`/bookings/${id}/cancel`, { method: 'POST' });
+      // Reload booking
+      const data = await apiWithPatch(`/bookings/${id}`);
+      setBooking(data);
+    } catch (err: any) {
+      alert(err.message || 'Failed to cancel booking.');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const handleSubmitReview = async () => {
     if (rating === 0) return;
     setIsSubmittingReview(true);
@@ -137,20 +155,31 @@ export default function BookingDetailPage() {
 
       <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-100">
         <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-          <div>
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              {booking.serviceId?.name || 'Service Details'}
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Personal details and schedule.
-            </p>
+            <div>
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                {booking.serviceId?.name || 'Service Details'}
+              </h3>
+              <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                Personal details and schedule.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              {(booking.status === 'PENDING_PAYMENT' || booking.status === 'CONFIRMED') && (
+                <button 
+                  onClick={handleCancel}
+                  disabled={isCancelling}
+                  className="bg-red-50 text-red-600 px-4 py-2 rounded-md hover:bg-red-100 text-sm font-medium border border-red-100 disabled:opacity-50"
+                >
+                  {isCancelling ? 'Cancelling...' : 'Cancel Booking'}
+                </button>
+              )}
+              {booking.status === 'PENDING_PAYMENT' && (
+                <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm font-medium shadow-sm">
+                  Complete Payment (₹{booking.pricing?.balanceDue})
+                </button>
+              )}
+            </div>
           </div>
-          {booking.status === 'PENDING_PAYMENT' && (
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm font-medium">
-              Complete Payment (₹{booking.pricing?.balanceDue})
-            </button>
-          )}
-        </div>
         <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
           <dl className="sm:divide-y sm:divide-gray-200">
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

@@ -68,6 +68,15 @@ export class BookingsController {
     return this.bookingsService.getBookingById(id);
   }
 
+  @Post(':id/cancel')
+  @Roles(Role.CUSTOMER)
+  cancelBooking(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string
+  ) {
+    return this.bookingsService.cancelBookingCustomer(id, req.user.sub);
+  }
+
   @Post(':id/verify-payment')
   @Roles(Role.CUSTOMER)
   async verifyPayment(

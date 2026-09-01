@@ -187,9 +187,22 @@ export function Step7Payment() {
         )}
 
         {pricingInfo?.matchedAddons?.map((addon: any) => (
-          <div key={addon.name} className="flex justify-between">
-            <span className="text-gray-600">Add-on: {addon.name}</span>
-            <span className="font-medium text-gray-900">₹{addon.price}</span>
+          <div key={addon.name} className="flex justify-between items-center group">
+            <span className="text-gray-600 flex items-center gap-2">
+              Add-on: {addon.name}
+              <button
+                onClick={() => {
+                  const currentAddons = data.addonNames || [];
+                  useBookingStore.getState().updateData({ 
+                    addonNames: currentAddons.filter(name => name !== addon.name) 
+                  });
+                }}
+                className="text-[10px] text-red-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity bg-red-50 px-2 py-0.5 rounded-full hover:bg-red-100"
+              >
+                Remove
+              </button>
+            </span>
+            <span className="font-medium text-gray-900">₹{addon.price.toLocaleString('en-IN')}</span>
           </div>
         ))}
 
