@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/use-auth-store';
@@ -13,20 +13,22 @@ import {
   Image as ImageIcon, 
   Star, 
   User, 
-  LifeBuoy, 
-  Bell,
-  ArrowLeft,
+  LifeBuoy,
   LogOut,
   Wallet,
+  ArrowLeft
 } from 'lucide-react';
 
-const links = [
-  { href: '/customer', label: 'Overview', icon: Home },
-  { href: '/customer/bookings', label: 'My Bookings', icon: Calendar },
-  { href: '/customer/payments', label: 'Payments & Invoices', icon: CreditCard },
-  { href: '/customer/gallery', label: 'Photo Gallery', icon: ImageIcon },
-  { href: '/customer/reviews', label: 'My Reviews', icon: Star },
-  { href: '/customer/profile', label: 'Profile Settings', icon: User },
+const mainLinks = [
+  { href: '/customer', label: 'Home', icon: Home },
+  { href: '/customer/bookings', label: 'Bookings', icon: Calendar },
+  { href: '/customer/gallery', label: 'Gallery', icon: ImageIcon },
+  { href: '/customer/profile', label: 'Profile', icon: User },
+];
+
+const secondaryLinks = [
+  { href: '/customer/payments', label: 'Payments', icon: CreditCard },
+  { href: '/customer/reviews', label: 'Reviews', icon: Star },
   { href: '/customer/support', label: 'Support', icon: LifeBuoy },
 ];
 
@@ -34,7 +36,6 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -42,100 +43,92 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   };
 
   const initial = user?.name ? user.name.charAt(0).toUpperCase() : '?';
-  // Hide auto-generated placeholder emails from display
-  const displayEmail = user?.email && !user.email.includes('@instaimage.in') 
-    ? user.email 
-    : null;
   const walletBalance = user?.walletBalance ?? 0;
 
-  const renderNavContent = () => (
-    <div className="flex flex-col h-full bg-white border-r border-gray-100 w-64 shadow-sm">
-      
-      {/* InstaImage Brand + Back to Website */}
-      <div className="px-4 pt-5 pb-3 border-b border-gray-100">
-        <Link href="/" className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-black">II</span>
+  // Desktop Sidebar Content
+  const DesktopSidebar = () => (
+    <div className="flex flex-col h-[calc(100vh-2rem)] bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl m-4 relative overflow-hidden">
+      <div className="p-6">
+        <Link href="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <span className="text-white text-sm font-black">II</span>
           </div>
-          <span className="font-black text-gray-900 text-base tracking-tight">InstaImage</span>
-        </Link>
-        
-        {/* Back to Website — prominent pill */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl transition-colors w-full"
-        >
-          <ArrowLeft className="h-3.5 w-3.5 flex-shrink-0" />
-          Back to Website
-        </Link>
-      </div>
-
-      {/* User Info + Wallet Balance */}
-      <div className="px-4 py-4 border-b border-gray-100">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-black text-base shadow-md flex-shrink-0 relative overflow-hidden">
-            {user?.profileImage ? (
-              <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              initial
-            )}
-          </div>
-          <div className="overflow-hidden">
-            <p className="font-black text-gray-900 text-sm truncate">
-              {user?.name || 'My Account'}
-            </p>
-            {displayEmail ? (
-              <p className="text-xs text-gray-400 truncate">{displayEmail}</p>
-            ) : user?.phone ? (
-              <p className="text-xs text-gray-400">{user.phone}</p>
-            ) : null}
-          </div>
-        </div>
-
-        {/* Wallet Balance Card */}
-        <Link href="/customer/wallet" className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl px-4 py-3 flex items-center justify-between hover:scale-[1.02] transition-transform shadow-md cursor-pointer block">
-          <div className="flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-emerald-100" />
-            <span className="text-xs font-bold text-emerald-100 uppercase tracking-wider">Wallet History</span>
-          </div>
-          <span className="text-white font-black text-base">
-            ₹{walletBalance.toLocaleString('en-IN')}
+          <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+            InstaImage
           </span>
         </Link>
       </div>
 
-      {/* Nav Links */}
-      <div className="flex-1 overflow-y-auto py-3">
-        <nav className="space-y-0.5 px-2">
-          {links.map((link) => {
-            const isActive = pathname === link.href || 
-              (link.href !== '/customer' && pathname?.startsWith(link.href));
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  isActive
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <link.icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`} />
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+      <div className="px-5 pb-6">
+        <Link href="/customer/wallet" className="block relative overflow-hidden group rounded-2xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 transition-transform duration-500 group-hover:scale-105"></div>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-700"></div>
+          <div className="relative p-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Wallet</p>
+              <p className="text-xl font-black text-white">₹{walletBalance.toLocaleString('en-IN')}</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/10">
+              <Wallet className="w-5 h-5 text-gray-300" />
+            </div>
+          </div>
+        </Link>
       </div>
 
-      {/* Sign Out */}
-      <div className="p-3 border-t border-gray-100">
+      <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+        <p className="px-3 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-wider">Main Menu</p>
+        {mainLinks.map((link) => {
+          const isActive = pathname === link.href || (link.href !== '/customer' && pathname?.startsWith(link.href));
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
+                isActive
+                  ? 'bg-blue-50 text-blue-600 font-bold'
+                  : 'text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <div className={`p-1.5 rounded-lg transition-colors ${isActive ? 'bg-white shadow-sm' : 'group-hover:bg-white group-hover:shadow-sm'}`}>
+                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+              </div>
+              {link.label}
+            </Link>
+          );
+        })}
+
+        <div className="mt-8 mb-2 border-t border-gray-100"></div>
+        <p className="px-3 mb-2 mt-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Settings & Info</p>
+        
+        {secondaryLinks.map((link) => {
+          const isActive = pathname === link.href;
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
+                isActive
+                  ? 'bg-blue-50 text-blue-600 font-bold'
+                  : 'text-gray-500 font-medium hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <div className={`p-1.5 rounded-lg transition-colors ${isActive ? 'bg-white shadow-sm' : 'group-hover:bg-white group-hover:shadow-sm'}`}>
+                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+              </div>
+              {link.label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="p-4 mt-auto">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-bold hover:bg-red-50 hover:text-red-600 w-full transition-colors group"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
           Sign Out
         </button>
       </div>
@@ -143,65 +136,60 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col md:flex-row font-sans selection:bg-blue-200">
       <OnboardingModal />
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:flex-shrink-0">
-        {renderNavContent()}
+      
+      {/* --- DESKTOP SIDEBAR --- */}
+      <div className="hidden md:block w-[280px] shrink-0 sticky top-0 h-screen z-50">
+        <DesktopSidebar />
       </div>
 
-      {/* Mobile Sidebar Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          <div className="fixed inset-y-0 left-0 flex flex-col z-40">
-            {renderNavContent()}
+      {/* --- MOBILE TOP APP BAR --- */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-gray-100 z-40 px-4 flex items-center justify-between shadow-sm">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+            <span className="text-white text-sm font-black">II</span>
           </div>
-        </div>
-      )}
+          <span className="text-lg font-black text-gray-900 tracking-tight">
+            InstaImage
+          </span>
+        </Link>
+        <Link href="/customer/wallet" className="flex items-center gap-1.5 bg-gray-900 text-white px-3 py-1.5 rounded-full shadow-md">
+          <Wallet className="w-3.5 h-3.5 text-gray-300" />
+          <span className="text-xs font-bold">₹{walletBalance}</span>
+        </Link>
+      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Top Bar */}
-        <header className="bg-white border-b border-gray-100 md:hidden flex-shrink-0">
-          <div className="px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="text-gray-500 hover:text-gray-700 p-1"
-                aria-label="Open menu"
-              >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              <span className="font-black text-gray-900 text-base">My Dashboard</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link href="/customer/wallet" className="bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-xs px-3 py-1.5 rounded-full flex items-center gap-1 hover:bg-emerald-100 transition-colors">
-                <Wallet className="h-3 w-3" />
-                ₹{walletBalance.toLocaleString('en-IN')}
-              </Link>
+      {/* --- MAIN CONTENT AREA --- */}
+      <main className="flex-1 w-full max-w-5xl mx-auto pt-20 pb-24 md:py-8 px-4 md:px-8 min-h-screen">
+        {children}
+      </main>
+
+      {/* --- MOBILE BOTTOM NAVIGATION --- */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] pb-[env(safe-area-inset-bottom)]">
+        <nav className="flex justify-around items-center h-16 px-2">
+          {mainLinks.map((link) => {
+            const isActive = pathname === link.href || (link.href !== '/customer' && pathname?.startsWith(link.href));
+            const Icon = link.icon;
+            return (
               <Link
-                href="/"
-                className="flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full"
+                key={link.href}
+                href={link.href}
+                className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
+                  isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'
+                }`}
               >
-                <ArrowLeft className="h-3 w-3" />
-                Website
+                <div className={`relative p-1 rounded-xl transition-all duration-300 ${isActive ? 'bg-blue-50 scale-110' : ''}`}>
+                  <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                </div>
+                <span className={`text-[10px] tracking-wide transition-all ${isActive ? 'font-black' : 'font-medium'}`}>
+                  {link.label}
+                </span>
               </Link>
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-5 md:p-8">
-          {children}
-        </main>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );
-
 }
-
