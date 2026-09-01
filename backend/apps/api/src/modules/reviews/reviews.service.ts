@@ -92,4 +92,13 @@ export class ReviewsService {
       .populate('clientId', 'name')
       .sort({ createdAt: -1 });
   }
+
+  async getMyReviews(clientId: string) {
+    return this.reviewModel
+      .find({ clientId: new Types.ObjectId(clientId) })
+      .populate('serviceId', 'name')
+      .populate('sellerId', 'name')
+      .populate('bookingId', 'scheduledDate pricing')
+      .sort({ createdAt: -1 });
+  }
 }

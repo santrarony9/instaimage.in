@@ -13,6 +13,12 @@ export class ReviewsController {
     return this.reviewsService.create(createReviewDto, req.user.sub);
   }
 
+  @Get('me')
+  @Roles(Role.CUSTOMER)
+  getMyReviews(@Req() req: any) {
+    return this.reviewsService.getMyReviews(req.user.sub);
+  }
+
   @Public()
   @Get('service/:serviceId')
   getReviewsForService(@Param('serviceId') serviceId: string) {

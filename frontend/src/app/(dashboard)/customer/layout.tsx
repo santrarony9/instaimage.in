@@ -27,7 +27,6 @@ const links = [
   { href: '/customer/reviews', label: 'My Reviews', icon: Star },
   { href: '/customer/profile', label: 'Profile Settings', icon: User },
   { href: '/customer/support', label: 'Support', icon: LifeBuoy },
-  { href: '/customer/notifications', label: 'Notifications', icon: Bell },
 ];
 
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {
