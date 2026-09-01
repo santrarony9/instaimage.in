@@ -104,7 +104,20 @@ export default function WalletHistoryPage() {
         </div>
         
         {loading ? (
-          <div className="p-12 text-center text-gray-500 font-medium">Loading history...</div>
+          <div className="divide-y divide-gray-100">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="p-4 sm:p-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 animate-pulse"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-32 bg-gray-200 rounded-full animate-pulse"></div>
+                    <div className="h-3 w-24 bg-gray-100 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+              </div>
+            ))}
+          </div>
         ) : transactions.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">

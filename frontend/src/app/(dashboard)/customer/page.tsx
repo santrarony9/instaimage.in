@@ -36,8 +36,28 @@ export default function CustomerDashboardOverview() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+      <div className="space-y-8 w-full">
+        {/* Header Skeleton */}
+        <div className="flex flex-col gap-3">
+          <div className="h-4 w-32 bg-gray-200 rounded-full animate-pulse"></div>
+          <div className="h-10 w-64 bg-gray-200 rounded-2xl animate-pulse"></div>
+        </div>
+
+        {/* Main Smart Widget Skeleton */}
+        <div className="h-[200px] w-full bg-gray-200 rounded-3xl animate-pulse"></div>
+
+        {/* Recent Memories Skeleton Row */}
+        <div className="pt-4">
+          <div className="flex justify-between items-center mb-6">
+            <div className="h-6 w-48 bg-gray-200 rounded-full animate-pulse"></div>
+            <div className="h-4 w-20 bg-gray-200 rounded-full animate-pulse"></div>
+          </div>
+          <div className="flex gap-4 overflow-hidden">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="min-w-[280px] h-32 bg-gray-200 rounded-3xl animate-pulse shrink-0"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
