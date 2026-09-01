@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/use-auth-store';
+import OnboardingModal from '@/components/auth/OnboardingModal';
 
 import { 
   Home, 
@@ -143,6 +144,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
+      <OnboardingModal />
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
         {renderNavContent()}
