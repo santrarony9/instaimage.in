@@ -9,6 +9,7 @@ export function Step7Payment() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [pricingInfo, setPricingInfo] = useState<any>(null);
   const [isLoadingPrice, setIsLoadingPrice] = useState(true);
+  const [calcError, setCalcError] = useState<string | null>(null);
   const [walletBalance, setWalletBalance] = useState(0);
 
   useEffect(() => {
@@ -31,6 +32,10 @@ export function Step7Payment() {
           serviceId: data.serviceId,
           pricingMode: data.pricingMode || 'fixed',
           addonNames: data.addonNames || [],
+          scheduledDate: data.scheduledDate,
+          startTime: data.startTime,
+          endTime: data.endTime,
+          timeFlexibility: data.timeFlexibility || 'STRICT',
           extraHoursBooked: data.extraHoursBooked || 0,
           location: data.location,
           appliedCouponId: data.appliedCouponId,
@@ -42,8 +47,10 @@ export function Step7Payment() {
           body: JSON.stringify(payload),
         });
         setPricingInfo(res);
-      } catch (error) {
+        setCalcError(null);
+      } catch (error: any) {
         console.error("Failed to calculate price", error);
+        setCalcError(error.message || 'Unknown error');
       } finally {
         setIsLoadingPrice(false);
       }
@@ -86,7 +93,9 @@ export function Step7Payment() {
     return (
       <div className="p-8 text-center">
         <div className="text-red-500 font-bold mb-2">Failed to calculate price</div>
-        <p className="text-gray-500 text-sm mb-4">We couldn&apos;t fetch pricing. Please check your internet connection and try again.</p>
+        <p className="text-gray-500 text-sm mb-4">
+          {calcError ? `Server returned: ${calcError}` : "We couldn't fetch pricing. Please check your internet connection and try again."}
+        </p>
         <div className="flex justify-center gap-3">
           <button onClick={prevStep} className="text-gray-600 px-6 py-2 rounded-md hover:bg-gray-100 transition">Back</button>
           <button onClick={() => window.location.reload()} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">Retry</button>
