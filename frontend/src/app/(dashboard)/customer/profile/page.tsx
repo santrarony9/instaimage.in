@@ -238,45 +238,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-
-      <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-xl px-6 md:px-8 py-8 border border-transparent text-white relative overflow-hidden group mt-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-110 transition-transform duration-500"></div>
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-          <div className="flex-1">
-            <h3 className="text-2xl md:text-3xl font-black text-white mb-3 flex items-center gap-3">
-              <span className="text-4xl">🎁</span> Refer & Earn ₹500
-            </h3>
-            <p className="text-emerald-50 text-sm md:text-base max-w-xl font-medium leading-relaxed">
-              Share your unique referral code with friends. When they sign up, they get ₹500 in their wallet! 
-              Once they complete their first booking, <strong className="text-white font-black bg-emerald-600/50 px-1 rounded">you</strong> instantly get ₹500 in your wallet too!
-            </p>
-          </div>
-          
-          <div className="w-full md:w-auto bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 shadow-inner flex-shrink-0">
-            <label className="block text-xs font-black text-emerald-100 uppercase tracking-wider mb-2">Your Referral Code</label>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <input 
-                type="text" 
-                readOnly 
-                value={user?.referralCode || 'Generate by booking first service'} 
-                className="block w-full min-w-[200px] bg-black/10 border border-white/20 rounded-xl px-4 py-3 text-white font-black placeholder-emerald-200 focus:outline-none focus:border-white/40"
-              />
-              <button 
-                type="button" 
-                onClick={() => {
-                  if (user?.referralCode) {
-                    navigator.clipboard.writeText(user.referralCode);
-                    alert('Referral code copied!');
-                  }
-                }}
-                className="bg-white text-teal-600 px-6 py-3 rounded-xl font-black hover:bg-emerald-50 transition-colors shadow-lg whitespace-nowrap uppercase tracking-wider text-sm"
-              >
-                Copy Code
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
