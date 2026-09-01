@@ -36,8 +36,11 @@ export default function WalletHistoryPage() {
     setCouponError('');
     setCouponSuccess('');
     try {
-      const res = await api.post('/users/me/redeem-coupon', { code: couponCode.trim().toUpperCase() });
-      setCouponSuccess(res.data?.message || '₹500 added to your wallet!');
+      const res = await fetchApi('/users/me/redeem-coupon', { 
+        method: 'POST', 
+        body: JSON.stringify({ code: couponCode.trim().toUpperCase() }) 
+      });
+      setCouponSuccess(res?.message || '₹500 added to your wallet!');
       setCouponCode('');
       // Reload transactions to show the new credit
       const data = await fetchApi('/users/me/wallet/transactions');
