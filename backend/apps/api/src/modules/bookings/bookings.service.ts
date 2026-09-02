@@ -135,9 +135,9 @@ export class BookingsService {
                 (b.serviceId as any).name ||
                 'Service',
               b.scheduledDate.toLocaleDateString(),
-            );
+            ).catch(err => console.error('Background task failed:', err));
           }
-        });
+        }).catch(err => console.error('Background task failed:', err));
 
       return {
         booking,
@@ -250,7 +250,7 @@ export class BookingsService {
     booking.timeline.push({
       status: BookingStatus.CANCELLED,
       timestamp: new Date(),
-      note: 'Cancelled by customer',
+      note: `Cancelled by customer. Wallet refunded: ₹${booking.pricing?.walletDiscountApplied || 0}. Advance paid via gateway: ₹${booking.pricing?.advancePaid || 0} (manual refund required).`,
     });
 
     // If they paid with wallet (or advance), we should refund wallet balance!
@@ -358,8 +358,8 @@ export class BookingsService {
             seller.name,
             s?.name || 'a Service',
             booking.scheduledDate.toLocaleDateString(),
-          );
-        });
+          ).catch(err => console.error('Background task failed:', err));
+        }).catch(err => console.error('Background task failed:', err));
       }
     }
 

@@ -71,6 +71,7 @@ export const useBookingStore = create<BookingState>()(
           appliedCouponId: data.appliedCouponId,
           customerNotes: data.customerNotes,
           isExpressDelivery: data.isExpressDelivery || false,
+          applyWalletBalance: data.applyWalletBalance || false,
         };
 
         const { fetchApi } = await import('@/lib/api');

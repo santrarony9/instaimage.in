@@ -19,7 +19,7 @@ export default function WalletHistoryPage() {
     async function loadTransactions() {
       try {
         const data = await fetchApi('/users/me/wallet/transactions');
-        setTransactions(data);
+        setTransactions(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load wallet history', err);
       } finally {
@@ -44,7 +44,7 @@ export default function WalletHistoryPage() {
       setCouponCode('');
       // Reload transactions to show the new credit
       const data = await fetchApi('/users/me/wallet/transactions');
-      setTransactions(data);
+      setTransactions(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setCouponError(err.message || 'Invalid or expired coupon code.');
     } finally {

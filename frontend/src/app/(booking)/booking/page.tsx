@@ -21,6 +21,8 @@ function BookingFlow() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    if (useBookingStore.getState().currentStep === 8) return;
+    
     const serviceId = searchParams.get('serviceId');
     if (serviceId) {
       // Legacy URL-param based flow

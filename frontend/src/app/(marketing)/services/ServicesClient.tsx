@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
@@ -222,6 +222,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                           const src = raw.startsWith('/') ? `https://api.instaimage.in${raw}` : raw;
                           return (
                             <Image 
+                              unoptimized
                               src={src}
                               alt={service.name}
                               fill

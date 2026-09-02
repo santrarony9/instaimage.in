@@ -4,14 +4,18 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/hooks/use-auth-store';
 import { fetchApi } from '@/lib/api';
 
-export default function InvoicePage({ params }: { params: { id: string } }) {
+import { useParams } from 'next/navigation';
+
+export default function InvoicePage() {
+  const params = useParams();
+  const id = params?.id as string;
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetchApi(`/bookings/${params.id}`);
+        const res = await fetchApi(`/bookings/${id}`);
         setBooking(res.data || res);
       } catch (err) {
         console.error(err);
@@ -19,8 +23,8 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
         setLoading(false);
       }
     }
-    loadData();
-  }, [params.id]);
+    if (id) loadData();
+  }, [id]);
 
   if (loading) return <div className="p-8">Loading Invoice...</div>;
   if (!booking) return <div className="p-8">Booking not found.</div>;

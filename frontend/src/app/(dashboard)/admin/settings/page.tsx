@@ -84,8 +84,8 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
         name: o.name,
         address: o.address,
         coordinates: [
-          parseFloat(o.coordinates ? o.coordinates[0] : o.lng),
-          parseFloat(o.coordinates ? o.coordinates[1] : o.lat)
+          parseFloat(o.coordinates ? o.coordinates[0] : o.lng) || 0,
+          parseFloat(o.coordinates ? o.coordinates[1] : o.lat) || 0
         ]
       }));
       await fetchApi('/settings/officeLocations', {

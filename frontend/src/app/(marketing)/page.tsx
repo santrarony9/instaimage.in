@@ -213,7 +213,7 @@ export default async function HomePage() {
                 <Link href={`/services/${manager.slug || manager._id}`} key={manager._id} className="group flex items-center gap-5 p-4 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all bg-gray-50 hover:bg-white">
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden relative shadow-inner border-4 border-white flex-shrink-0">
                     {manager.images && manager.images[0] ? (
-                      <Image src={manager.images[0].startsWith('/') ? `https://api.instaimage.in${manager.images[0]}` : manager.images[0]} alt={manager.name} fill sizes="96px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <Image unoptimized src={manager.images[0].startsWith('/') ? `https://api.instaimage.in${manager.images[0]}` : manager.images[0]} alt={manager.name} fill sizes="96px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
                     ) : (
                       <div className="w-full h-full bg-blue-100 flex items-center justify-center text-blue-500 text-2xl">👤</div>
                     )}
@@ -268,7 +268,7 @@ export default async function HomePage() {
                       <Link href={`/services/${service.slug || service._id}`} key={i} className="flex-shrink-0 w-28 bg-white rounded-xl overflow-hidden flex flex-col shadow-sm border border-white/20 snap-center group hover:scale-105 transition-transform duration-300">
                         <div className="h-20 w-full bg-gray-100 relative">
                           {src ? (
-                            <Image src={src} alt={service.name} fill sizes="112px" className="object-cover" />
+                            <Image unoptimized src={src} alt={service.name} fill sizes="112px" className="object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-xl">📸</div>
                           )}
@@ -406,6 +406,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
           />
         ) : fullImageUrl ? (
           <Image 
+            unoptimized
             src={fullImageUrl}
             alt={service.name}
             fill

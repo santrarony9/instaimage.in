@@ -41,10 +41,9 @@ export default function BookingDetailPage() {
     if (!confirm('Are you sure you want to cancel this booking? If you paid an advance or used your wallet, it will be refunded.')) return;
     setIsCancelling(true);
     try {
-      const { fetchApi: apiWithPatch } = await import('@/lib/api');
-      await apiWithPatch(`/bookings/${id}/cancel`, { method: 'POST' });
+      await fetchApi(`/bookings/${id}/cancel`, { method: 'POST' });
       // Reload booking
-      const data = await apiWithPatch(`/bookings/${id}`);
+      const data = await fetchApi(`/bookings/${id}`);
       setBooking(data);
     } catch (err: any) {
       alert(err.message || 'Failed to cancel booking.');

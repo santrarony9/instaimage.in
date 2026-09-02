@@ -12,6 +12,11 @@ export function Step8Confirmation() {
   const clearCart = useCartStore((state) => state.clearCart);
   const router = useRouter();
 
+  React.useEffect(() => {
+    // Clear cart immediately on reaching confirmation
+    useCartStore.getState().clearCart();
+  }, []);
+
   const handleDone = () => {
     reset();
     try {

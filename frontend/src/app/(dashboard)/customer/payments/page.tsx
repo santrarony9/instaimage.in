@@ -14,7 +14,7 @@ export default function PaymentsPage() {
       try {
         const data = await fetchApi('/bookings/my-bookings');
         // Filter out bookings that don't have a confirmed payment or pricing total
-        const paidBookings = data.filter((b: any) => 
+        const paidBookings = (Array.isArray(data) ? data : []).filter((b: any) => 
           b.status !== 'PENDING' && b.pricing?.totalPrice > 0
         );
         setPayments(paidBookings);

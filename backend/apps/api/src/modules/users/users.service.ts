@@ -185,7 +185,7 @@ export class UsersService {
     const displayName = user?.name || 'Customer';
 
     // Send email asynchronously — don't block the response
-    this.emailService.sendVerificationCouponEmail(email, displayName, code);
+    this.emailService.sendVerificationCouponEmail(email, displayName, code).catch(err => console.error('Background task failed:', err));
 
     return {
       success: true,

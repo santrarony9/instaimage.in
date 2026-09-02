@@ -18,7 +18,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]); // Storing addon names
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   
-  const [activeTab, setActiveTab] = useState<'details' | 'delivery' | 'process'>('details');
+
   const [allServices, setAllServices] = useState<any[]>([]);
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
               {isVideo(activeMedia) ? (
                 <video src={activeMedia} controls autoPlay loop playsInline className="w-full h-full object-contain" />
               ) : (
-                <Image src={activeMedia} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" priority />
+                <Image unoptimized src={activeMedia} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" priority />
               )}
             </div>
             
@@ -150,7 +150,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                           </div>
                         </>
                       ) : (
-                        <Image src={url} alt={`${service.name} ${idx}`} fill sizes="96px" className="object-cover" />
+                        <Image unoptimized src={url} alt={`${service.name} ${idx}`} fill sizes="96px" className="object-cover" />
                       )}
                     </div>
                   );
@@ -404,7 +404,7 @@ function ServiceCard({ service }: { service: any }) {
             className="w-full h-full object-cover group-hover:scale-105 transition duration-500 absolute inset-0"
           />
         ) : imageUrl ? (
-          <Image src={imageUrl} alt={service.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition duration-500" />
+          <Image unoptimized src={imageUrl} alt={service.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-4xl text-gray-300">📸</span>

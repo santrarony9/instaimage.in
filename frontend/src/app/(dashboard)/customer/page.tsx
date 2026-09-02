@@ -24,7 +24,7 @@ export default function CustomerDashboardOverview() {
     async function loadBookings() {
       try {
         const data = await fetchApi('/bookings/my-bookings');
-        setBookings(data);
+        setBookings(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load bookings:', err);
       } finally {

@@ -21,7 +21,7 @@ export default function SellerRegister() {
         method: 'POST',
         body: JSON.stringify(formData),
       });
-      setAuth(res.user, res.access_token);
+      setAuth(res.access_token, res.user);
       router.push('/seller/dashboard');
     } catch (err: any) {
       setError(err.message || 'Registration failed');

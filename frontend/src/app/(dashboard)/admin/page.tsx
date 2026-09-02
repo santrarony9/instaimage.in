@@ -14,7 +14,7 @@ export default function AdminDashboardPage() {
     setError(null);
     try {
       const res = await fetchApi('/bookings/all');
-      setData(res.data || res || []);
+      setData(Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : []);
     } catch (err: any) {
       setError(err.message || 'Failed to load dashboard data');
     } finally {

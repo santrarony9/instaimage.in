@@ -1,17 +1,22 @@
 "use client";
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useBookingStore } from '@/hooks/use-booking-store';
 import { fetchApi } from '@/lib/api';
+import { useCartStore } from '@/hooks/use-cart-store';
 
 function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { nextStep } = useBookingStore();
   const [error, setError] = useState<string | null>(null);
+  const didInit = useRef(false);
 
   useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+
     const verifyPayment = async () => {
       const paymentId = searchParams.get('payment_id');
       const paymentStatus = searchParams.get('payment_status');
@@ -40,6 +45,7 @@ function CallbackContent() {
 
         // Store confirmed booking and proceed to success screen (Step 8)
         useBookingStore.getState().setConfirmedBooking(verifyRes.booking);
+        useCartStore.getState().clearCart();
         nextStep(); // Assuming nextStep goes to success page
         router.push('/booking'); // Redirect back to booking flow container if needed, or let store handle UI state
       } catch (err) {
@@ -48,12 +54,7 @@ function CallbackContent() {
       }
     };
 
-    // Prevent double execution in React Strict Mode
-    let didInit = false;
-    if (!didInit) {
-      didInit = true;
-      verifyPayment();
-    }
+    verifyPayment();
   }, [searchParams, nextStep, router]);
 
   if (error) {

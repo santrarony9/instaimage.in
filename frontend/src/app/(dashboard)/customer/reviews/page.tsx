@@ -13,7 +13,7 @@ export default function MyReviewsPage() {
     async function loadReviews() {
       try {
         const data = await fetchApi('/reviews/me');
-        setReviews(data);
+        setReviews(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load reviews:', err);
       } finally {

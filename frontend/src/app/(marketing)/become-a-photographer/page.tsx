@@ -1,4 +1,5 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
 title: 'Become a Photographer | InstaImage',
@@ -36,9 +37,9 @@ return (
 <option>Fashion & Portraits</option>
 </select>
 </div>
-<button type="button" className="w-full bg-black text-white font-bold py-3 rounded hover:bg-gray-800">
+<Link href="/seller/register" className="block w-full text-center bg-black text-white font-bold py-3 rounded hover:bg-gray-800">
 Submit Application
-</button>
+</Link>
 </form>
 </div>
 </div>

@@ -20,7 +20,7 @@ export default function SupportPage() {
   const loadTickets = async () => {
     try {
       const data = await fetchApi('/support/my-tickets');
-      setTickets(data);
+      setTickets(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
     } finally {

@@ -24,6 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   React.useEffect(() => {
     let hasToken = false;
@@ -40,7 +41,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!hasToken) {
       router.push('/login');
     }
+    setIsChecking(false);
   }, [router]);
+
+  if (isChecking) {
+    return null;
+  }
 
   const handleLogout = () => {
     logout();

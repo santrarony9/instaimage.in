@@ -34,7 +34,7 @@ export default async function PortfolioPage() {
   }
 
   // Sort array deterministically for a diverse portfolio look (avoid impure Math.random during render)
-  portfolioItems = portfolioItems.sort((a: any, b: any) => (a.url || '').localeCompare(b.url || ''));
+  portfolioItems = portfolioItems.sort((a: any, b: any) => (a.src || '').localeCompare(b.src || ''));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

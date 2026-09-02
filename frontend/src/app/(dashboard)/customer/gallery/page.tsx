@@ -71,7 +71,7 @@ function GalleryContent() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {photos.map((photo: any, i: number) => (
+          {photos.filter((p: any) => p.url).map((photo: any, i: number) => (
             <div key={photo._id || i} className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 shadow-sm border border-gray-200">
               <Image 
                 src={photo.url || ''} 

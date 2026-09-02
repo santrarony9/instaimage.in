@@ -25,7 +25,7 @@ export default function SellerLogin() {
       if (res.user.role !== 'SELLER') {
         throw new Error('This account is not a Seller account.');
       }
-      setAuth(res.user, res.access_token);
+      setAuth(res.access_token, res.user);
       router.push('/seller/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed');
