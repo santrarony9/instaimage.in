@@ -51,5 +51,19 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 
 2. **OTP Template Workaround (CRITICAL):**
    - Meta blocked the creation of AUTHENTICATION templates (Error 2388185).
-   - **Current Hack:** The backend whatsapp.service.ts temporarily uses an approved UTILITY template (ooking_confirmation_alert) to send OTPs, passing the OTP as the booking number. This keeps costs at ~?0.30 per login.
+   - **Current Hack:** The backend whatsapp.service.ts temporarily uses an approved UTILITY template ( ooking_confirmation_alert) to send OTPs, passing the OTP as the booking number. This keeps costs at ~?0.30 per login.
    - **Future Fix:** A MARKETING template named instaimage_promo_code was submitted. If approved, switch to it for better UX. Once Meta Support manually unlocks Authentication templates, switch to instaimage_otp to reduce costs to ~?0.11.
+
+## Current Project State & Memory (Updated Sept 2026)
+
+### 1. Recently Completed (Dashboard 3.0 & Bug Fixes)
+- **Massive Bug Bash:** Fixed Checkout loops, Next 15 Promise crashes on the invoice page, Auth payload mismatches (Seller login), and Dummy/Dead links across the site.
+- **Customer Dashboard 3.0:**
+  - **Master Gallery:** Rebuilt `/customer/gallery` to aggregate all past completed shoots natively without requiring an email link.
+  - **Notifications Engine:** Built a real Mongoose backend schema `Notification` and API endpoints. The frontend now fetches real-time alerts.
+  - **Growth Widgets:** Replaced the oversized Refer & Earn widget with a sleek, compact banner. Added an "Explore Services" CTA banner to funnel dashboard users back to the marketplace.
+  - **Consistent Branding:** Standardized the logo sizes between desktop and mobile across all dashboards (`h-10`).
+
+### 2. Pending / Work-In-Progress
+- **Gallery Watermarking & Client Approval Flow:** The user has a specific design/idea for how clients will approve watermarked preview photos to unlock clean HD downloads. **DO NOT build this yet.** Wait for the user to provide their materials/instructions before modifying the gallery or upload system further.
+- **Service Profile Page Redesign:** Planned upgrade to make the Photographer/Service Profile look like a high-end Instagram masonry grid. (Currently in backlog).

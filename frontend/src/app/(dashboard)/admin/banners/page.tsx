@@ -26,6 +26,7 @@ export default function BannersManagementPage() {
     sortOrder: 0,
     isActive: true,
     time: '',
+    validUntil: '',
     services: [] as string[]
   };
   
@@ -235,6 +236,7 @@ export default function BannersManagementPage() {
                     <option value="COMBO">Combo Deal</option>
                     <option value="HERO">Hero Banner</option>
                     <option value="PROMO">Promo Banner</option>
+                    <option value="FLASH_SALE">Flash Sale</option>
                   </select>
                 </div>
                 
@@ -242,6 +244,19 @@ export default function BannersManagementPage() {
                   <label className="block text-xs font-bold text-gray-700 mb-1">Sort Order</label>
                   <input type="number" value={formData.sortOrder} onChange={e => setFormData({...formData, sortOrder: parseInt(e.target.value)})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
+
+                {formData.type === 'FLASH_SALE' && (
+                  <div className="md:col-span-1">
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Valid Until (Countdown)</label>
+                    <input 
+                      type="datetime-local" 
+                      value={formData.validUntil ? new Date(formData.validUntil).toISOString().slice(0,16) : ''} 
+                      onChange={e => setFormData({...formData, validUntil: new Date(e.target.value).toISOString()})} 
+                      className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" 
+                    />
+                  </div>
+                )}
+                
                 <div className="md:col-span-1">
                   <label className="block text-xs font-bold text-gray-700 mb-1">Duration (Optional)</label>
                   <input type="text" value={formData.time || ''} onChange={e => {

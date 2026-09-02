@@ -113,7 +113,7 @@ export function Navbar() {
               onClick={() => { setSidebarOpen(true); setIsMobileMenuOpen(false); }} 
               className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2 text-left flex items-center justify-between"
             >
-              <span>View Cart</span>
+              <span>View Wishlist</span>
               {mounted && cartItems.length > 0 && (
                 <span className="bg-blue-600 text-white text-xs font-bold h-5 w-5 rounded-full flex items-center justify-center">{cartItems.length}</span>
               )}

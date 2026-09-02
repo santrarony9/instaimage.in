@@ -52,6 +52,10 @@ export class CreateBannerDto {
   @IsOptional()
   sortOrder?: number;
 
+  @IsString()
+  @IsOptional()
+  validUntil?: string;
+
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

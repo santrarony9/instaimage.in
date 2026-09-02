@@ -31,6 +31,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { EmailModule } from './modules/email/email.module';
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { BannersModule } from './modules/banners/banners.module';
+import { LeadsModule } from './modules/leads/leads.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { BannersModule } from './modules/banners/banners.module';
     AuditLogsModule,
     SettingsModule,
     BannersModule,
+    LeadsModule,
   ],
   controllers: [ApiController],
   providers: [ApiService],

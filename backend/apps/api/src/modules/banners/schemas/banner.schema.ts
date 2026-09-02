@@ -34,6 +34,9 @@ export class Banner extends AbstractDocument {
   @Prop()
   redirectUrl?: string;
 
+  @Prop()
+  validUntil?: Date; // Added for Flash Sales / Countdown Timers
+
   @Prop({ default: 0 })
   sortOrder: number;
 

@@ -52,7 +52,7 @@ export function MobileBottomNav() {
               </span>
             )}
           </div>
-          <span className="text-[10px] font-medium">Cart</span>
+          <span className="text-[10px] font-medium">Wishlist</span>
         </button>
 
         <Link 

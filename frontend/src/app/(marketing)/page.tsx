@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { CreditCard, Wallet, Percent, ShieldCheck } from 'lucide-react';
 import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
+import { FlashSaleBanner } from '@/components/ui/FlashSaleBanner';
 import { HeroSearchBar } from '@/components/ui/HeroSearchBar';
 import { HeroMarquee } from '@/components/ui/HeroMarquee';
 
@@ -10,7 +12,7 @@ export const revalidate = 60; // Revalidate every 60 seconds
 
 export const metadata = {
   title: 'InstaImage | Professional Photography On-Demand in Kolkata',
-  description: 'Book trusted photographers, videographers, and drone pilots instantly. Get your memories captured and delivered in as little as 24 hours.',
+  description: 'Book professional photography, videography, and drone services instantly. Get your memories captured and delivered in as little as 24 hours.',
 };
 
 export default async function HomePage() {
@@ -97,7 +99,7 @@ export default async function HomePage() {
     .slice(0, 6);
 
   // Extract all images for the marquee background
-  let allImages = services.flatMap(s => s.images || []).filter(Boolean);
+  let allImages = services.map(s => (s.images && s.images.length > 0) ? s.images[0] : null).filter(Boolean);
   allImages = Array.from(new Set(allImages)).map(img => img.startsWith('/') ? `https://api.instaimage.in${img}` : img);
   
   if (allImages.length === 0) {
@@ -105,6 +107,18 @@ export default async function HomePage() {
     allImages = [
       "/og-image.jpg"
     ];
+  }
+
+  // Find active Flash Sale from backend
+  let flashSaleBanner = banners.find(b => b.type === 'FLASH_SALE' && b.validUntil && new Date(b.validUntil).getTime() > Date.now());
+
+  if (!flashSaleBanner && process.env.NODE_ENV === 'development') {
+    flashSaleBanner = {
+      title: 'Weekend Special: Free Drone Coverage!',
+      subtitle: 'Book any Wedding Combo today and get high-quality drone coverage absolutely free.',
+      validUntil: new Date(Date.now() + 14 * 60 * 60 * 1000).toISOString(),
+      redirectUrl: '/services?category=Photography'
+    };
   }
 
   return (
@@ -126,32 +140,77 @@ export default async function HomePage() {
             Professional Photography.<br className="hidden md:block"/> Delivered On-Demand.
           </h1>
           <p className="text-base md:text-lg text-gray-300 max-w-2xl mx-auto mb-8">
-            Book trusted photographers, drone pilots, and editors instantly. Get your memories captured and delivered in as little as 24 hours.
+            Book professional photography, videography, and drone services instantly. Get your memories captured and delivered in as little as 24 hours.
           </p>
           
           <HeroSearchBar />
         </div>
       </div>
       
-      {/* Signup Hook Banner */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-30 mb-10">
-        <Link href="/login" className="block bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 sm:p-8 text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-110 transition-transform duration-500"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-6 text-center md:text-left">
-              <div className="hidden sm:flex w-16 h-16 bg-white/20 backdrop-blur-md rounded-full items-center justify-center border border-white/30 flex-shrink-0">
-                <span className="text-3xl">🎁</span>
+            {/* E-Commerce Offer Cards (Automatic Marquee) */}
+      <div className="w-full relative z-30 mb-10 overflow-hidden ">
+        <div className="offer-marquee-container flex w-max hover:[animation-play-state:paused]">
+          
+          {[...Array(2)].map((_, idx) => (
+            <div key={idx} className="flex gap-4 pr-4 pl-4 sm:pl-0">
+              
+              {/* Card 1: 20% Down Payment */}
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-indigo-100 transition-colors cursor-default">
+                <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0">
+                  <Percent className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">20% Down Payment</h4>
+                  <p className="text-xs text-gray-500 mt-1 font-medium">Book full events easily</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-black mb-1">Claim your ₹500 Welcome Bonus!</h2>
-                <p className="text-emerald-50 font-medium text-sm md:text-base">Sign up today and get ₹500 credited instantly to your InstaImage Wallet for your first shoot.</p>
+
+              {/* Card 2: No-cost EMI */}
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-blue-100 transition-colors cursor-default">
+                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                  <CreditCard className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">No-Cost EMI Available</h4>
+                  <p className="text-xs text-gray-500 mt-1 font-medium">Pay in flexible installments</p>
+                </div>
               </div>
+
+              {/* Card 3: 500 INR Wallet */}
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-gradient-to-r from-emerald-500 to-teal-500 border border-emerald-400 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center p-3 gap-4 hover:scale-[1.02] transition-transform">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-xl flex items-center justify-center shrink-0">
+                  <Wallet className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-white leading-tight">Get ₹500 Bonus</h4>
+                  <p className="text-xs text-emerald-50 mt-1 font-medium">Sign up & claim in wallet</p>
+                </div>
+              </div>
+
+              {/* Card 4: Verified Professionals */}
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-green-100 transition-colors cursor-default">
+                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">100% Quality Assured</h4>
+                  <p className="text-xs text-gray-500 mt-1 font-medium">In-house professional shoots</p>
+                </div>
+              </div>
+
             </div>
-            <div className="bg-white text-teal-600 px-8 py-3.5 rounded-full font-black text-lg shadow-lg flex-shrink-0 flex items-center gap-2 group-hover:bg-gray-50">
-              Claim Now <span className="text-xl">→</span>
-            </div>
-          </div>
-        </Link>
+          ))}
+          
+        </div>
+        <style dangerouslySetInnerHTML={{__html: `
+          .offer-marquee-container {
+            animation: offers-marquee 25s linear infinite;
+          }
+          @keyframes offers-marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}} />
       </div>
 
       <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-4">
@@ -187,9 +246,53 @@ export default async function HomePage() {
                   </Link>
                 );
               })}
+
             </div>
           </div>
         )}
+
+        {/* Newly Added Section */}
+        <div className="mb-12">
+          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900">✨ Newly Added</h2>
+          </div>
+          
+          <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            {newlyAdded.map(service => (
+              <div key={service._id} className="snap-start flex-shrink-0 w-40 sm:w-48 lg:w-56">
+                <ServiceCard service={service} badge={service.newService ? "New" : undefined} API_URL={PUBLIC_API_URL} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Flash Sale Countdown (Massive Pattern Interrupt) */}
+        {flashSaleBanner && (
+          <div className="my-16 relative z-40">
+            <FlashSaleBanner 
+              title={flashSaleBanner.title}
+              subtitle={flashSaleBanner.subtitle || 'Limited time offer!'}
+              validUntil={flashSaleBanner.validUntil}
+              redirectUrl={flashSaleBanner.redirectUrl}
+            />
+          </div>
+        )}
+
+{/* Popular Services Section */}
+        <div className="mb-12 mt-12">
+          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900">⭐ Popular Packages</h2>
+            <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
+          </div>
+          
+          <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            {popularServices.map(service => (
+              <div key={service._id} className="snap-start flex-shrink-0 w-40 sm:w-48 lg:w-56">
+                <ServiceCard service={service} badge={service.popular ? "Popular" : undefined} API_URL={PUBLIC_API_URL} />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Dedicated Event Managers Section */}
         {eventManagers.length > 0 && (
@@ -299,7 +402,6 @@ export default async function HomePage() {
                 <span className="text-gray-900 font-black text-sm">Combo Price</span>
                 <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">₹{banner.comboPrice?.toLocaleString('en-IN') || 0}</span>
               </div>
-              
 
               <Link 
                 href={banner.redirectUrl || (banner.type === 'COMBO' ? `https://wa.me/918240508915?text=${encodeURIComponent(`Hi, I would like to book the ${banner.title} (${banner.time || '4 Hours'}) for ₹${banner.comboPrice}.`)}` : "/services")}
@@ -315,37 +417,6 @@ export default async function HomePage() {
             </div>
           </div>
         )}
-
-        {/* Popular Services Section */}
-        <div className="mb-12 mt-12">
-          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900">⭐ Popular Packages</h2>
-            <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
-          </div>
-          
-          <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-            {popularServices.map(service => (
-              <div key={service._id} className="snap-start flex-shrink-0 w-40 sm:w-48 lg:w-56">
-                <ServiceCard service={service} badge={service.popular ? "Popular" : undefined} API_URL={PUBLIC_API_URL} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Newly Added Section */}
-        <div className="mb-12">
-          <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900">✨ Newly Added</h2>
-          </div>
-          
-          <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-            {newlyAdded.map(service => (
-              <div key={service._id} className="snap-start flex-shrink-0 w-40 sm:w-48 lg:w-56">
-                <ServiceCard service={service} badge={service.newService ? "New" : undefined} API_URL={PUBLIC_API_URL} />
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Category Specific Rows */}
         {categories.map((category: any) => {
@@ -370,8 +441,6 @@ export default async function HomePage() {
             </div>
           );
         })}
-
-
 
       </div>
     </div>

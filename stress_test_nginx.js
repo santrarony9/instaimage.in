@@ -1,0 +1,16 @@
+const { Client } = require('ssh2');
+const conn = new Client();
+conn.on('ready', () => {
+  console.log('Starting stress test on Nginx...');
+  conn.exec('docker run --rm --network root_default williamyeh/wrk -c 200 -t 4 -d 10s http://nginx:80/api/v1/services', (err, stream) => {
+    stream.on('data', d => process.stdout.write(d));
+    stream.stderr.on('data', d => process.stderr.write(d));
+    stream.on('close', () => conn.end());
+  });
+}).connect({
+  host: '135.125.9.81',
+  port: 20064,
+  username: 'root',
+  password: 'SRhP8Rw_WJD8jZP2',
+  readyTimeout: 60000
+});
