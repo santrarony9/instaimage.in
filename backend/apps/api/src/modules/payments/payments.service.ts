@@ -71,7 +71,7 @@ export class PaymentsService {
     } else {
       this.logger.log(`Mocking Instamojo Order for Booking: ${bookingId}, Amount: ${amount}`);
       
-      const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'https://instaimage.in';
 
       return {
         id: `order_mock_${new Date().getTime()}`,

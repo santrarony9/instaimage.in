@@ -517,8 +517,17 @@ export class BookingsService {
     const surcharges: Array<{ name: string; amount: number; reason?: string }> =
       [];
 
-    const { deliveryCharge, travelDistanceKm, nearestOfficeName } =
-      await this.calculateTravelCharge(createBookingDto.location?.coordinates);
+    let deliveryCharge = 0;
+    let travelDistanceKm = 0;
+    let nearestOfficeName = undefined;
+
+    // Only charge travel for on-spot services
+    if (service.deliveryMethod !== 'REMOTE') {
+      const travelResult = await this.calculateTravelCharge(createBookingDto.location?.coordinates);
+      deliveryCharge = travelResult.deliveryCharge;
+      travelDistanceKm = travelResult.travelDistanceKm;
+      nearestOfficeName = travelResult.nearestOfficeName;
+    }
     let discount = 0;
 
     const travelConfig =
@@ -557,8 +566,9 @@ export class BookingsService {
       expressDeliveryFee -
       totalDiscount;
 
+    const WALLET_MIN_BOOKING = 5000;
     let walletDiscountApplied = 0;
-    if (createBookingDto.applyWalletBalance && customerId) {
+    if (createBookingDto.applyWalletBalance && customerId && totalPrice >= WALLET_MIN_BOOKING) {
       const user = await this.usersService.findById(customerId);
       if (user && user.walletBalance && user.walletBalance > 0) {
         walletDiscountApplied = Math.min(totalPrice, user.walletBalance);
@@ -566,7 +576,8 @@ export class BookingsService {
       }
     }
 
-    const advancePaid = totalPrice * 0.2;
+    const ADVANCE_THRESHOLD = 30000;
+    const advancePaid = totalPrice >= ADVANCE_THRESHOLD ? Math.ceil(totalPrice * 0.2) : totalPrice;
     const balanceDue = totalPrice - advancePaid;
 
     const platformFee = totalPrice * 0.1;

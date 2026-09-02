@@ -169,12 +169,16 @@ export function Step7Payment() {
           <div>
             <h4 className="font-bold text-gray-900">💰 InstaImage Wallet</h4>
             <p className="text-sm text-gray-500">You have ₹{walletBalance} available. Apply it to this booking?</p>
+            {((p?.totalPrice || 0) + (p?.walletDiscountApplied || 0)) < 5000 && (
+              <p className="text-xs text-red-500 mt-1">Wallet can only be applied on bookings ₹5,000+</p>
+            )}
           </div>
           <button
+            disabled={((p?.totalPrice || 0) + (p?.walletDiscountApplied || 0)) < 5000}
             onClick={() => {
               useBookingStore.getState().updateData({ applyWalletBalance: !data.applyWalletBalance });
             }}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${data.applyWalletBalance ? 'bg-green-600' : 'bg-gray-200'}`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${data.applyWalletBalance ? 'bg-green-600' : 'bg-gray-200'} ${((p?.totalPrice || 0) + (p?.walletDiscountApplied || 0)) < 5000 ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.applyWalletBalance ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>
@@ -215,11 +219,14 @@ export function Step7Payment() {
           </div>
         ))}
 
-        {(p?.deliveryCharge > 0 || p?.travelDistanceKm > 0) && (
+        {(p?.deliveryCharge > 0 || p?.travelDistanceKm > 0) && data.deliveryMethod !== 'REMOTE' && (
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">
-              Travel Charge {p.travelDistanceKm ? `(${p.travelDistanceKm} km)` : ''}
-            </span>
+            <div className="text-gray-600 flex flex-col">
+              <span>Travel Charge {p.travelDistanceKm ? `(${p.travelDistanceKm} km)` : ''}</span>
+              {data.deliveryMethod === 'ON_SPOT' && (
+                <span className="text-xs text-gray-400">Round-trip travel from our nearest studio to your location</span>
+              )}
+            </div>
             <span className="font-medium text-gray-900">₹{p.deliveryCharge}</span>
           </div>
         )}
@@ -253,10 +260,12 @@ export function Step7Payment() {
         )}
         
         <div className="border-t pt-3 mt-3 flex justify-between font-bold text-gray-900">
-          <span>Advance Payable (20%)</span>
+          <span>{((p?.totalPrice || 0) + (p?.walletDiscountApplied || 0)) < 30000 ? "Full Payment" : "Advance (20%) — Pay rest after shoot"}</span>
           <span className="text-indigo-700 text-lg">₹{advanceAmount}</span>
         </div>
-        <p className="text-xs text-gray-500 mt-2">Remaining balance (₹{p?.balanceDue}) will be collected after the event.</p>
+        {((p?.totalPrice || 0) + (p?.walletDiscountApplied || 0)) >= 30000 && (
+          <p className="text-xs text-gray-500 mt-2">Remaining balance (₹{p?.balanceDue}) will be collected after the event.</p>
+        )}
       </div>
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6">

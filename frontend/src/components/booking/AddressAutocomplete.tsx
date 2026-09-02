@@ -22,9 +22,10 @@ interface AddressAutocompleteProps {
   onChange: (val: string) => void;
   onSelect: (lat: number, lng: number, addressDetails: any) => void;
   error?: string;
+  placeholder?: string;
 }
 
-export function AddressAutocomplete({ value, onChange, onSelect, error }: AddressAutocompleteProps) {
+export function AddressAutocomplete({ value, onChange, onSelect, error, placeholder }: AddressAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -85,7 +86,7 @@ export function AddressAutocomplete({ value, onChange, onSelect, error }: Addres
         onFocus={() => { if(suggestions.length > 0) setIsOpen(true); }}
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-black focus:border-black"
         rows={2}
-        placeholder="e.g. Green Valley Apartments, MG Road"
+        placeholder={placeholder || "e.g. Green Valley Apartments, MG Road"}
       />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
 

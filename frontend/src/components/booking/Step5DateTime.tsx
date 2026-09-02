@@ -89,7 +89,9 @@ export function Step5DateTime() {
 
   return (
     <div className="">
-      <h2 className="text-xl font-bold mb-4">When is the shoot?</h2>
+      <h2 className="text-xl font-bold mb-4">
+        {data.deliveryMethod === 'REMOTE' ? 'When should we start your project?' : 'When is the shoot?'}
+      </h2>
       
       <div className="space-y-4">
         <div>

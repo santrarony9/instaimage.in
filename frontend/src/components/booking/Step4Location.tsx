@@ -13,13 +13,9 @@ const MapSelector = dynamic(() => import('./MapSelector'), {
 export function Step4Location() {
   const { data, updateData, nextStep, prevStep } = useBookingStore();
   
-  // Try to parse existing address into houseNo and area if possible
+  // Try to parse existing address into fullAddress if possible
   const existingAddress = data.location?.address || '';
-  const initialHouseNo = existingAddress.includes(', ') ? existingAddress.split(', ')[0] : '';
-  const initialArea = existingAddress.includes(', ') ? existingAddress.substring(existingAddress.indexOf(', ') + 2) : existingAddress;
-
-  const [houseNo, setHouseNo] = useState(initialHouseNo);
-  const [area, setArea] = useState(initialArea);
+  const [fullAddress, setFullAddress] = useState(existingAddress);
   const [addressType, setAddressType] = useState<'Home' | 'Work' | 'Other'>('Home');
 
   const [landmark, setLandmark] = useState(data.location?.landmark || '');
@@ -62,8 +58,7 @@ export function Step4Location() {
 
   const handleNext = () => {
     const newErrors: Record<string, string> = {};
-    if (!houseNo.trim()) newErrors.houseNo = 'House/Flat No is required';
-    if (!area.trim()) newErrors.area = 'Area/Road is required';
+    if (!fullAddress.trim()) newErrors.fullAddress = 'Full Address is required';
     if (!pincode.trim() || !/^\d{6}$/.test(pincode)) newErrors.pincode = 'Valid 6-digit pincode is required';
     if (!city.trim()) newErrors.city = 'City is required';
 
@@ -72,12 +67,12 @@ export function Step4Location() {
       return;
     }
 
-    const fullAddress = `${houseNo.trim()}, ${area.trim()}`;
+    const finalAddress = fullAddress.trim();
 
     updateData({ 
       location: { 
         ...(data.location as any || {}),
-        address: fullAddress, 
+        address: finalAddress, 
         landmark, 
         pincode, 
         city, 
@@ -86,13 +81,13 @@ export function Step4Location() {
     });
 
     // Save to user profile in background
-    if (fullAddress && city) {
-      const isExisting = savedAddresses.some(a => a.address === fullAddress);
+    if (finalAddress && city) {
+      const isExisting = savedAddresses.some(a => a.address === finalAddress);
       if (!isExisting) {
         import('@/lib/api').then(({ fetchApi }) => {
           fetchApi('/users/me/addresses', {
             method: 'POST',
-            body: JSON.stringify({ address: fullAddress, landmark, pincode, city, coordinates })
+            body: JSON.stringify({ address: finalAddress, landmark, pincode, city, coordinates })
           }).catch(() => {});
         });
       }
@@ -111,27 +106,20 @@ export function Step4Location() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {savedAddresses.map((addr, idx) => {
               const addrFull = addr.address || '';
-              const isSelected = (`${houseNo}, ${area}` === addrFull || (houseNo === '' && area === addrFull)) && pincode === addr.pincode;
+              const isSelected = (fullAddress === addrFull) && pincode === addr.pincode;
               return (
                 <div 
                   key={idx} 
                   onClick={() => {
                     if (isSelected) {
-                      setHouseNo('');
-                      setArea('');
+                      setFullAddress('');
                       setLandmark('');
                       setPincode('');
                       setCity('');
                       setCoordinates(null);
                     } else {
                       const addrVal = addr.address || '';
-                      if (addrVal.includes(', ')) {
-                        setHouseNo(addrVal.split(', ')[0]);
-                        setArea(addrVal.substring(addrVal.indexOf(', ') + 2));
-                      } else {
-                        setHouseNo('');
-                        setArea(addrVal);
-                      }
+                      setFullAddress(addrVal);
                       setLandmark(addr.landmark || '');
                       setPincode(addr.pincode || '');
                       setCity(addr.city || '');
@@ -182,22 +170,10 @@ export function Step4Location() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">House / Flat / Block No. *</label>
-          <input
-            type="text"
-            value={houseNo}
-            onChange={(e) => setHouseNo(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-black focus:border-black"
-            placeholder="e.g. Flat 4B, Tower 2"
-          />
-          {errors.houseNo && <p className="text-red-500 text-sm mt-1">{errors.houseNo}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Apartment / Road / Area *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Full Address *</label>
           <AddressAutocomplete 
-            value={area}
-            onChange={(val) => setArea(val)}
+            value={fullAddress}
+            onChange={(val) => setFullAddress(val)}
             onSelect={(lat, lng, addressDetails) => {
               setCoordinates([lng, lat]);
               if (addressDetails?.postcode) setPincode(addressDetails.postcode);
@@ -205,7 +181,8 @@ export function Step4Location() {
                 setCity(addressDetails.city || addressDetails.state_district || '');
               }
             }}
-            error={errors.area}
+            error={errors.fullAddress}
+            placeholder="e.g. Flat 302, Sunshine Apartments, MG Road"
           />
         </div>
 
