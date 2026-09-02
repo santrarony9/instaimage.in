@@ -302,13 +302,8 @@ export class AuthService {
       isWhatsappVerified: user.isWhatsappVerified,
     };
 
-    if (user.role === Role.CUSTOMER) {
-      await this.usersService.addWalletBalance(
-        user._id.toString(),
-        500,
-        'Welcome Bonus',
-      );
-    }
+    // REMOVED: No automatic wallet credit here to prevent abuse.
+    // They must verify their email via the dashboard to get 500.
 
     this.emailService.sendWelcomeEmail(user.email, user.name);
 
