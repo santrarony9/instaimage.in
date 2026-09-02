@@ -12,7 +12,8 @@ import {
   Sparkles,
   MapPin,
   Clock,
-  ChevronRight
+  ChevronRight,
+  Gift
 } from 'lucide-react';
 
 export default function CustomerDashboardOverview() {
@@ -201,6 +202,41 @@ export default function CustomerDashboardOverview() {
           </div>
         </div>
       )}
+
+      {/* 4. Refer & Earn Widget */}
+      <div className="relative overflow-hidden rounded-3xl p-8 shadow-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white mt-8">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex items-start gap-6">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shrink-0">
+              <Gift className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl md:text-3xl font-black mb-2 flex items-center gap-2">
+                Refer & Earn ₹500 <Sparkles className="w-6 h-6 text-yellow-300" />
+              </h3>
+              <p className="text-white/90 font-medium max-w-md text-lg">
+                Share the magic of InstaImage with friends. They get ₹500 off, and you earn rewards!
+              </p>
+            </div>
+          </div>
+          
+          <div className="w-full md:w-auto bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/20 flex flex-col gap-3 shrink-0">
+            <div className="text-xs font-bold uppercase tracking-wider text-white/70 text-center">Your Code</div>
+            <div className="bg-white/90 text-indigo-900 font-black text-2xl px-6 py-3 rounded-xl text-center tracking-widest shadow-inner select-all">
+              {user?.referralCode || 'INSTA500'}
+            </div>
+            <a 
+              href={`https://wa.me/?text=${encodeURIComponent(`Hey! I'm using InstaImage. Use my referral code ${user?.referralCode || 'INSTA500'} to get ₹500 off your first booking! https://instaimage.in`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="bg-[#25D366] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 shadow-lg"
+            >
+              Share on WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
 
     </div>
   );

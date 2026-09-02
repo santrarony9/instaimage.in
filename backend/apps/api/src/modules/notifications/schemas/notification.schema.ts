@@ -8,22 +8,19 @@ export class Notification extends AbstractDocument {
   userId: Types.ObjectId;
 
   @Prop({ required: true })
-  type: string;
-
-  @Prop({ required: true })
   title: string;
 
   @Prop({ required: true })
   message: string;
 
-  @Prop({ type: MongooseSchema.Types.Mixed })
-  data?: any;
+  @Prop({ required: true, enum: ['BOOKING', 'SYSTEM', 'PROMO'], default: 'SYSTEM' })
+  type: string;
 
   @Prop({ default: false })
-  read: boolean;
+  isRead: boolean;
 
   @Prop()
-  readAt?: Date;
+  link?: string;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);
