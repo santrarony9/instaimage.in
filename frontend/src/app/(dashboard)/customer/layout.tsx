@@ -51,7 +51,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
     <div className="flex flex-col h-[calc(100vh-2rem)] bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl m-4 relative overflow-hidden">
       <div className="p-6">
         <Link href="/" className="inline-flex items-center hover:opacity-80 transition-opacity">
-          <img src="/logo.png" alt="InstaImage" className="h-8 w-auto" />
+          <img src="/logo.png" alt="InstaImage" className="h-10 w-auto" />
         </Link>
       </div>
 
@@ -196,7 +196,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-gray-100 z-40 px-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center">
-            <img src="/logo.png" alt="InstaImage" className="h-7 w-auto" />
+            <img src="/logo.png" alt="InstaImage" className="h-10 w-auto" />
           </Link>
         </div>
         <div className="flex items-center gap-3">
