@@ -10,19 +10,20 @@ export class NotificationsService {
     private readonly notificationModel: Model<Notification>,
   ) {}
 
-  async createNotification(
+  async create(
     userId: string,
     title: string,
     message: string,
-    type: 'BOOKING' | 'SYSTEM' | 'PROMO' = 'SYSTEM',
-    link?: string,
+    type: string = 'SYSTEM',
+    payload?: any,
   ) {
+    const link = payload?.bookingId ? `/customer/bookings/${payload.bookingId}` : undefined;
     const notification = new this.notificationModel({
       userId: new Types.ObjectId(userId),
       title,
       message,
-      type,
-      link,
+      type: ['BOOKING', 'SYSTEM', 'PROMO'].includes(type) ? type : 'SYSTEM',
+      link: payload?.link || link,
     });
     return notification.save();
   }
