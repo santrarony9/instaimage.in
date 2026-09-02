@@ -59,6 +59,27 @@ export default function CustomerDashboardOverview() {
             ))}
           </div>
         </div>
+
+        {/* 5. Marketplace CTA / Attract to Shop */}
+        <div className="mt-8 bg-gray-900 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-[0_20px_40px_rgb(0,0,0,0.2)] group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full blur-[100px] opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"></div>
+          
+          <div className="relative z-10 text-center md:text-left">
+            <h3 className="text-xl md:text-2xl font-black text-white">Need a Photographer for your next Event?</h3>
+            <p className="text-gray-400 mt-2 text-sm md:text-base max-w-lg">
+              Explore our marketplace of verified professional photographers, videographers, and drone operators in your area.
+            </p>
+          </div>
+          
+          <Link 
+            href="/services" 
+            className="relative z-10 shrink-0 bg-white text-gray-900 px-8 py-3.5 rounded-full font-black hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all flex items-center justify-center gap-2"
+          >
+            Explore Services
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+
       </div>
     );
   }
@@ -203,36 +224,35 @@ export default function CustomerDashboardOverview() {
         </div>
       )}
 
-      {/* 4. Refer & Earn Widget */}
-      <div className="relative overflow-hidden rounded-3xl p-8 shadow-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white mt-8">
+      {/* 4. Refer & Earn Widget (Compact) */}
+      <div className="relative overflow-hidden rounded-2xl p-5 md:p-6 shadow-md bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white mt-8">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shrink-0">
-              <Gift className="w-8 h-8 text-white" />
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md shrink-0">
+              <Gift className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl md:text-3xl font-black mb-2 flex items-center gap-2">
-                Refer & Earn ₹500 <Sparkles className="w-6 h-6 text-yellow-300" />
+              <h3 className="text-lg md:text-xl font-black flex items-center gap-2">
+                Refer & Earn ₹500 <Sparkles className="w-4 h-4 text-yellow-300" />
               </h3>
-              <p className="text-white/90 font-medium max-w-md text-lg">
-                Share the magic of InstaImage with friends. They get ₹500 off, and you earn rewards!
+              <p className="text-white/90 text-sm max-w-sm">
+                Share InstaImage with friends. You both get ₹500!
               </p>
             </div>
           </div>
           
-          <div className="w-full md:w-auto bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/20 flex flex-col gap-3 shrink-0">
-            <div className="text-xs font-bold uppercase tracking-wider text-white/70 text-center">Your Code</div>
-            <div className="bg-white/90 text-indigo-900 font-black text-2xl px-6 py-3 rounded-xl text-center tracking-widest shadow-inner select-all">
+          <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+            <div className="bg-white/90 text-indigo-900 font-black text-lg px-4 py-2 rounded-xl text-center tracking-wider shadow-inner select-all shrink-0">
               {user?.referralCode || 'INSTA500'}
             </div>
             <a 
               href={`https://wa.me/?text=${encodeURIComponent(`Hey! I'm using InstaImage. Use my referral code ${user?.referralCode || 'INSTA500'} to get ₹500 off your first booking! https://instaimage.in`)}`}
               target="_blank"
               rel="noreferrer"
-              className="bg-[#25D366] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 shadow-lg"
+              className="bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-bold hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 shadow-sm shrink-0 whitespace-nowrap text-sm"
             >
-              Share on WhatsApp
+              Share via WhatsApp
             </a>
           </div>
         </div>
