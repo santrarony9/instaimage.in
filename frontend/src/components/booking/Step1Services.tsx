@@ -7,7 +7,7 @@ import { fetchApi } from '@/lib/api';
 export function Step1Services() {
   const { data, updateData, nextStep } = useBookingStore();
   const selectedServiceId = data.serviceId;
-  const setService = (id: string) => updateData({ serviceId: id });
+  
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,7 +26,12 @@ export function Step1Services() {
   }, []);
 
   const handleSelect = (serviceId: string) => {
-    setService(serviceId);
+    const svc = services.find(s => s._id === serviceId);
+    updateData({ 
+      serviceId, 
+      deliveryMethod: svc?.deliveryMethod || 'ON_SPOT',
+      pricingMode: svc?.flexiblePrice ? 'flexible' : 'fixed' 
+    });
     nextStep();
   };
 
