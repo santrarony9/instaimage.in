@@ -172,7 +172,13 @@ export class BookingsService {
       throw new Error('Invalid or incomplete payment');
     }
 
-    const booking = await this.bookingsRepository.model.findById(bookingId);
+    let booking;
+    // Handle both Mongo _id and friendly BKG-XXXX-XXXX formats
+    if (bookingId.startsWith('BKG-')) {
+      booking = await this.bookingsRepository.model.findOne({ bookingId });
+    } else {
+      booking = await this.bookingsRepository.model.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
+    }
     if (!booking) {
       throw new Error('Booking not found');
     }
@@ -187,7 +193,7 @@ export class BookingsService {
 
   async getBookingById(id: string) {
     const booking = await this.bookingsRepository.model
-      .findById(id)
+      .findOne(id.startsWith('BKG-') ? { bookingId: id } : { _id: id })
       .populate('customerId', 'name email phone')
       .populate('serviceId', 'name');
     if (!booking) {
@@ -301,7 +307,7 @@ export class BookingsService {
     id: string,
     surcharge: { name: string; amount: number; reason?: string },
   ) {
-    const booking = await this.bookingsRepository.findById(id);
+    const booking = await this.bookingsRepository.findOne(id.startsWith('BKG-') ? { bookingId: id } : { _id: id });
     if (!booking) throw new NotFoundException('Booking not found');
 
     const newSurcharges = [...booking.pricing.surcharges, surcharge];
@@ -337,7 +343,7 @@ export class BookingsService {
   }
 
   async assignseller(bookingId: string, sellerId: string) {
-    const booking = await this.bookingsRepository.findById(bookingId);
+    const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
 
     const seller = await this.SellersService.findOne(sellerId);
@@ -383,7 +389,7 @@ export class BookingsService {
     const seller = await this.SellersService.findByUserId(userId);
     if (!seller) throw new NotFoundException('seller profile not found');
 
-    const booking = await this.bookingsRepository.findById(bookingId);
+    const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
 
     // Check if this booking is assigned to this seller
@@ -395,7 +401,7 @@ export class BookingsService {
   }
 
   async updateDeliveryLink(bookingId: string, deliveryLink: string) {
-    const booking = await this.bookingsRepository.findById(bookingId);
+    const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
 
     return this.bookingsRepository.update(bookingId, { deliveryLink });
@@ -613,7 +619,7 @@ export class BookingsService {
   }
 
   async uploadToGallery(bookingId: string, sellerId: string, file: Express.Multer.File) {
-    const booking = await this.bookingsRepository.findById(bookingId);
+    const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
     
     // Check if assigned
@@ -676,7 +682,7 @@ export class BookingsService {
   }
 
   async deleteFromGallery(bookingId: string, sellerId: string, imageId: string) {
-    const booking = await this.bookingsRepository.findById(bookingId);
+    const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
     
     if (booking.sellerId?.toString() !== sellerId) {
