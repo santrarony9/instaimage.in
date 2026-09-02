@@ -11,6 +11,7 @@ import { Step8Confirmation } from '@/components/booking/Step8Confirmation';
 
 import { Suspense } from 'react';
 import { useCartStore } from '@/hooks/use-cart-store';
+import { useRouter } from 'next/navigation';
 
 function BookingFlow() {
   const currentStep = useBookingStore((state) => state.currentStep);

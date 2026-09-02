@@ -90,7 +90,7 @@ export function Navbar() {
               ) : null}
             </div>
 
-            <Link href="/booking" className="hidden sm:inline-flex bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-800 transition shadow-sm">
+            <Link href="/#shop" className="hidden sm:inline-flex bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-800 transition shadow-sm">
               Book Now
             </Link>
 
@@ -131,7 +131,7 @@ export function Navbar() {
               <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-lg font-bold text-gray-900 border-b border-gray-50 pb-2">Sign up</Link>
             ) : null}
             
-            <Link href="/booking" onClick={() => setIsMobileMenuOpen(false)} className="bg-black text-white px-6 py-3 rounded-full text-center font-bold mt-4 shadow-sm">
+            <Link href="/#shop" onClick={() => setIsMobileMenuOpen(false)} className="bg-black text-white px-6 py-3 rounded-full text-center font-bold mt-4 shadow-sm">
               Book Now
             </Link>
           </nav>
