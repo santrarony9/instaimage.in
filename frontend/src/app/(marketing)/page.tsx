@@ -155,46 +155,46 @@ export default async function HomePage() {
             <div key={idx} className="flex gap-4 pr-4 pl-4 sm:pl-0">
               
               {/* Card 1: 20% Down Payment */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-indigo-100 transition-colors cursor-default">
-                <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0">
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-purple-50 border border-purple-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-indigo-200 transition-colors cursor-default">
+                <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center shrink-0">
                   <Percent className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">20% Down Payment</h4>
-                  <p className="text-xs text-gray-500 mt-1 font-medium">Book full events easily</p>
+                  <h4 className="font-extrabold text-sm text-purple-950 leading-tight">20% Down Payment</h4>
+                  <p className="text-xs text-purple-700 mt-1 font-medium">Book full events easily</p>
                 </div>
               </div>
 
               {/* Card 2: No-cost EMI */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-blue-100 transition-colors cursor-default">
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-purple-50 border border-purple-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-purple-200 transition-colors cursor-default">
+                <div className="w-12 h-12 bg-purple-100 text-purple-700 rounded-xl flex items-center justify-center shrink-0">
                   <CreditCard className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">No-Cost EMI Available</h4>
-                  <p className="text-xs text-gray-500 mt-1 font-medium">Pay in flexible installments</p>
+                  <h4 className="font-extrabold text-sm text-purple-950 leading-tight">No-Cost EMI Available</h4>
+                  <p className="text-xs text-purple-700 mt-1 font-medium">Pay in flexible installments</p>
                 </div>
               </div>
 
               {/* Card 3: 500 INR Wallet */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-gradient-to-r from-emerald-500 to-teal-500 border border-emerald-400 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center p-3 gap-4 hover:scale-[1.02] transition-transform">
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-gradient-to-r from-purple-600 to-indigo-600 border border-purple-500 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center p-3 gap-4 hover:scale-[1.02] transition-transform">
                 <div className="w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-xl flex items-center justify-center shrink-0">
                   <Wallet className="w-6 h-6" />
                 </div>
                 <div>
                   <h4 className="font-extrabold text-sm text-white leading-tight">Get ₹500 Bonus</h4>
-                  <p className="text-xs text-emerald-50 mt-1 font-medium">Sign up & claim in wallet</p>
+                  <p className="text-xs text-purple-100 mt-1 font-medium">Sign up & claim in wallet</p>
                 </div>
               </div>
 
               {/* Card 4: Verified Professionals */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-green-100 transition-colors cursor-default">
-                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shrink-0">
+              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-purple-50 border border-purple-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-fuchsia-200 transition-colors cursor-default">
+                <div className="w-12 h-12 bg-fuchsia-100 text-fuchsia-700 rounded-xl flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">100% Quality Assured</h4>
-                  <p className="text-xs text-gray-500 mt-1 font-medium">In-house professional shoots</p>
+                  <h4 className="font-extrabold text-sm text-purple-950 leading-tight">100% Quality Assured</h4>
+                  <p className="text-xs text-purple-700 mt-1 font-medium">In-house professional shoots</p>
                 </div>
               </div>
 
@@ -219,7 +219,7 @@ export default async function HomePage() {
         {categories.length > 0 && (
           <div className="mb-16 -mt-8 relative z-30">
             <div className="flex justify-between items-end mb-6">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">Explore Categories</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-purple-950">Explore Categories</h2>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -254,7 +254,7 @@ export default async function HomePage() {
         {/* Newly Added Section */}
         <div className="mb-12">
           <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900">✨ Newly Added</h2>
+            <h2 className="text-lg md:text-xl font-bold text-purple-950">✨ Newly Added</h2>
           </div>
           
           <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -281,7 +281,7 @@ export default async function HomePage() {
 {/* Popular Services Section */}
         <div className="mb-12 mt-12">
           <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900">⭐ Popular Packages</h2>
+            <h2 className="text-lg md:text-xl font-bold text-purple-950">⭐ Popular Packages</h2>
             <Link href="/services" className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
           </div>
           
@@ -301,8 +301,8 @@ export default async function HomePage() {
             
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-gray-100 pb-4 gap-4">
               <div>
-                <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Dedicated Event Managers</h2>
-                <p className="text-gray-500 text-sm md:text-base max-w-2xl">
+                <h2 className="text-2xl md:text-3xl font-black text-purple-950 mb-2">Dedicated Event Managers</h2>
+                <p className="text-purple-700 text-sm md:text-base max-w-2xl">
                   Planning a massive event? Hire a dedicated Event Manager. From planning to deployment, they handle the entire crew, logistics, and shoot so you can just enjoy the day.
                 </p>
               </div>
@@ -323,9 +323,9 @@ export default async function HomePage() {
                   </div>
                   <div className="flex flex-col flex-grow">
                     <span className="text-blue-600 text-[10px] font-black uppercase tracking-wider mb-1">Lead Event Manager</span>
-                    <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight mb-1">{manager.name}</h3>
+                    <h3 className="text-base md:text-lg font-bold text-purple-950 leading-tight mb-1">{manager.name}</h3>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-sm font-black text-gray-900">₹{manager.basePrice?.toLocaleString()}</span>
+                      <span className="text-sm font-black text-purple-950">₹{manager.basePrice?.toLocaleString()}</span>
                       <span className="text-xs font-bold text-blue-600 group-hover:underline">Hire Me &rarr;</span>
                     </div>
                   </div>
@@ -388,7 +388,7 @@ export default async function HomePage() {
 
             <div className="bg-white p-5 md:p-6 rounded-2xl w-full lg:w-auto min-w-[280px] shadow-2xl flex flex-col relative z-10">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-gray-500 font-bold text-sm">Total Value</span>
+                <span className="text-purple-700 font-bold text-sm">Total Value</span>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-400 line-through text-sm font-semibold">₹{banner.originalPrice?.toLocaleString('en-IN') || 0}</span>
                   {banner.originalPrice > banner.comboPrice && (
@@ -399,7 +399,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="flex justify-between items-end mb-4">
-                <span className="text-gray-900 font-black text-sm">Combo Price</span>
+                <span className="text-purple-950 font-black text-sm">Combo Price</span>
                 <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">₹{banner.comboPrice?.toLocaleString('en-IN') || 0}</span>
               </div>
 
@@ -427,7 +427,7 @@ export default async function HomePage() {
           return (
             <div key={`section-${category.name}`} className="mb-12">
               <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900">📸 Top in {category.name}</h2>
+                <h2 className="text-lg md:text-xl font-bold text-purple-950">📸 Top in {category.name}</h2>
                 <Link href={`/services?category=${category.name}`} className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
               </div>
               
@@ -508,7 +508,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
         )}
         {badge === 'New' && (
           <div className="absolute top-2 right-2 z-10">
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md flex items-center border border-emerald-400">
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md flex items-center border border-purple-500">
               NEW
             </div>
           </div>
@@ -518,7 +518,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
       <div className="p-3 flex flex-col flex-grow bg-white">
         <h3 className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-1">{service.name}</h3>
         
-        <p className="text-[10px] sm:text-[11px] text-gray-500 mb-2">{service.category}</p>
+        <p className="text-[10px] sm:text-[11px] text-purple-700 mb-2">{service.category}</p>
         
         <div className="mt-auto flex items-center justify-between">
           <div className="flex flex-col">
@@ -530,7 +530,7 @@ function ServiceCard({ service, badge, API_URL }: { service: any, badge?: string
                 </span>
               </div>
             )}
-            <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
+            <span className="text-sm font-bold text-purple-950">₹{service.basePrice?.toLocaleString()}</span>
           </div>
           <AddToCartButton service={service} />
         </div>
