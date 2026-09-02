@@ -50,13 +50,8 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   const DesktopSidebar = () => (
     <div className="flex flex-col h-[calc(100vh-2rem)] bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl m-4 relative overflow-hidden">
       <div className="p-6">
-        <Link href="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <span className="text-white text-sm font-black">II</span>
-          </div>
-          <span className="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-            InstaImage
-          </span>
+        <Link href="/" className="inline-flex items-center hover:opacity-80 transition-opacity">
+          <img src="/logo.png" alt="InstaImage" className="h-8 w-auto" />
         </Link>
       </div>
 
@@ -200,13 +195,8 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
       {/* --- MOBILE TOP APP BAR --- */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-gray-100 z-40 px-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-              <span className="text-white text-sm font-black">II</span>
-            </div>
-            <span className="text-lg font-black text-gray-900 tracking-tight">
-              InstaImage
-            </span>
+          <Link href="/" className="flex items-center">
+            <img src="/logo.png" alt="InstaImage" className="h-7 w-auto" />
           </Link>
         </div>
         <div className="flex items-center gap-3">
