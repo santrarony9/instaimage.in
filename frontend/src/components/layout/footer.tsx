@@ -17,6 +17,7 @@ export function Footer() {
               <li><Link href="/become-a-photographer" className="hover:text-white transition-colors">Become a Creator</Link></li>
               <li><Link href="/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
               <li><Link href="/seller/login" className="hover:text-white transition-colors">Creator Portal</Link></li>
+              <li><Link href="/admin" className="hover:text-white transition-colors">Admin Portal</Link></li>
             </ul>
           </div>
 
