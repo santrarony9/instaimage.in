@@ -56,6 +56,12 @@ export class BookingsController {
     return this.bookingsService.getsellerAssignments(req.user.sub);
   }
 
+  @Get('follow-ups')
+  @Roles(Role.ADMIN)
+  getFollowUps() {
+    return this.bookingsService.getFollowUps();
+  }
+
   @Get('all')
   @Roles(Role.ADMIN)
   findAllBookings() {
@@ -134,6 +140,20 @@ export class BookingsController {
     @Body() surcharge: { name: string; amount: number; reason?: string },
   ) {
     return this.bookingsService.addSurcharge(id, surcharge);
+  }
+
+  @Post(':id/notes')
+  @Roles(Role.ADMIN)
+  addInternalNote(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: { note: string; followUpDate?: string },
+  ) {
+    return this.bookingsService.addInternalNote(id, {
+      note: body.note,
+      adminName: req.user.email || 'Admin',
+      followUpDate: body.followUpDate ? new Date(body.followUpDate) : undefined,
+    });
   }
 
   @Post(':id/gallery')

@@ -714,4 +714,48 @@ export class BookingsService {
 
     return { success: true, message: 'Image deleted' };
   }
+
+  async addInternalNote(
+    bookingId: string,
+    noteData: { note: string; adminName: string; followUpDate?: Date },
+  ) {
+    const booking = await this.bookingsRepository.findOne(
+      bookingId.startsWith('BKG-') ? { bookingId } : { _id: bookingId },
+    );
+    if (!booking) throw new NotFoundException('Booking not found');
+
+    await this.bookingsRepository.model.updateOne(
+      { _id: booking._id },
+      {
+        $push: {
+          internalNotes: {
+            note: noteData.note,
+            adminName: noteData.adminName,
+            followUpDate: noteData.followUpDate || null,
+            createdAt: new Date(),
+          },
+        },
+      },
+    );
+
+    const updated = await this.bookingsRepository.findOne({ _id: booking._id });
+    return { success: true, internalNotes: updated?.internalNotes };
+  }
+
+  async getFollowUps() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const bookings = await this.bookingsRepository.model
+      .find({
+        isDeleted: false,
+        'internalNotes.followUpDate': { $gte: today },
+      })
+      .populate('customerId', 'name email phone')
+      .populate('serviceId', 'name')
+      .sort({ 'internalNotes.followUpDate': 1 })
+      .lean();
+
+    return bookings;
+  }
 }

@@ -200,6 +200,24 @@ export class Booking extends AbstractDocument {
   @Prop()
   adminNotes?: string;
 
+  @Prop({
+    type: [
+      {
+        note: { type: String, required: true },
+        adminName: { type: String, default: 'Admin' },
+        followUpDate: { type: Date, default: null },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    default: [],
+  })
+  internalNotes: Array<{
+    note: string;
+    adminName: string;
+    followUpDate?: Date;
+    createdAt: Date;
+  }>;
+
   @Prop()
   invoiceUrl?: string;
 
