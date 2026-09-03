@@ -8,6 +8,7 @@ import { useAuthStore } from '@/hooks/use-auth-store';
 const links = [
   { href: '/admin', label: 'Overview' },
   { href: '/admin/bookings', label: 'Bookings' },
+  { href: '/admin/follow-ups', label: '📅 Follow-ups' },
   { href: '/admin/categories', label: 'Categories' },
   { href: '/admin/services', label: 'Catalog' },
   { href: '/admin/banners', label: 'Banners & Combos' },
