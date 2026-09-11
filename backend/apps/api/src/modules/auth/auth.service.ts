@@ -286,10 +286,7 @@ export class AuthService {
       name: registerDto.name,
       email: registerDto.email,
       passwordHash,
-      role:
-        registerDto.email === 'admin@instaimage.com'
-          ? Role.ADMIN
-          : Role.CUSTOMER,
+      role: Role.CUSTOMER,
       referralCode,
       referredBy,
     });

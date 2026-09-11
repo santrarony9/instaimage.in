@@ -22,7 +22,7 @@ export class NotificationsService {
       userId: new Types.ObjectId(userId),
       title,
       message,
-      type: ['BOOKING', 'SYSTEM', 'PROMO'].includes(type) ? type : 'SYSTEM',
+      type: ['BOOKING', 'BOOKING_ASSIGNED', 'SYSTEM', 'PROMO'].includes(type) ? type : 'SYSTEM',
       link: payload?.link || link,
     });
     return notification.save();

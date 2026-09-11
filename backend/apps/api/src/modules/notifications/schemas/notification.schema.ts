@@ -13,7 +13,7 @@ export class Notification extends AbstractDocument {
   @Prop({ required: true })
   message: string;
 
-  @Prop({ required: true, enum: ['BOOKING', 'SYSTEM', 'PROMO'], default: 'SYSTEM' })
+  @Prop({ required: true, enum: ['BOOKING', 'BOOKING_ASSIGNED', 'SYSTEM', 'PROMO'], default: 'SYSTEM' })
   type: string;
 
   @Prop({ default: false })

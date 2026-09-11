@@ -31,20 +31,24 @@ export class UploadsController {
     @InjectModel(Service.name) private readonly serviceModel: Model<Service>,
     @InjectModel(Banner.name) private readonly bannerModel: Model<Banner>,
   ) {
+    const b2KeyId = process.env.B2_KEY_ID;
+    const b2AppKey = process.env.B2_APPLICATION_KEY;
+    if (!b2KeyId || !b2AppKey) {
+      throw new Error('B2_KEY_ID and B2_APPLICATION_KEY environment variables are required');
+    }
     this.s3 = new S3Client({
       endpoint:
         process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com',
       region: process.env.B2_REGION || 'eu-central-003',
       credentials: {
-        accessKeyId: process.env.B2_KEY_ID || 'f87ad6faa8b3',
-        secretAccessKey:
-          process.env.B2_APPLICATION_KEY ||
-          '0031697847c74883ae60204a0d5fd410f394a59adf',
+        accessKeyId: b2KeyId,
+        secretAccessKey: b2AppKey,
       },
     });
   }
 
   @Post()
+  @Roles(Role.ADMIN, Role.SELLER)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),

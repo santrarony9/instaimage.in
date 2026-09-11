@@ -49,17 +49,35 @@ export class BookingsService {
     private readonly settingsService: SettingsService,
     private readonly usersService: UsersService,
   ) {
+    const b2KeyId = process.env.B2_KEY_ID;
+    const b2AppKey = process.env.B2_APPLICATION_KEY;
+    if (!b2KeyId || !b2AppKey) {
+      throw new Error('B2_KEY_ID and B2_APPLICATION_KEY environment variables are required');
+    }
     this.s3 = new S3Client({
       endpoint: process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com',
       region: process.env.B2_REGION || 'eu-central-003',
       credentials: {
-        accessKeyId: process.env.B2_KEY_ID || 'f87ad6faa8b3',
-        secretAccessKey: process.env.B2_APPLICATION_KEY || '0031697847c74883ae60204a0d5fd410f394a59adf',
+        accessKeyId: b2KeyId,
+        secretAccessKey: b2AppKey,
       },
     });
   }
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
+    // Prevent duplicate bookings: same customer + service + date
+    const existingBooking = await this.bookingsRepository.model.findOne({
+      customerId: new Types.ObjectId(customerId),
+      serviceId: new Types.ObjectId(createBookingDto.serviceId),
+      scheduledDate: new Date(createBookingDto.scheduledDate),
+      status: { $nin: ['CANCELLED', 'REFUNDED', 'EXPIRED'] },
+    });
+    if (existingBooking) {
+      throw new BadRequestException(
+        'You already have an active booking for this service on this date. Please cancel it first or choose a different date.',
+      );
+    }
+
     const date = new Date();
     const year = date.getFullYear();
     const count = await this.bookingsRepository.countDocuments({
@@ -166,10 +184,7 @@ export class BookingsService {
     );
 
     if (!isValid) {
-      import('@nestjs/common').then(m => {
-        throw new m.BadRequestException('Invalid or incomplete payment');
-      });
-      throw new Error('Invalid or incomplete payment');
+      throw new BadRequestException('Invalid or incomplete payment');
     }
 
     let booking;
@@ -177,10 +192,10 @@ export class BookingsService {
     if (bookingId.startsWith('BKG-')) {
       booking = await this.bookingsRepository.model.findOne({ bookingId });
     } else {
-      booking = await this.bookingsRepository.model.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
+      booking = await this.bookingsRepository.model.findById(bookingId);
     }
     if (!booking) {
-      throw new Error('Booking not found');
+      throw new NotFoundException('Booking not found');
     }
 
     booking.status = BookingStatus.CONFIRMED;

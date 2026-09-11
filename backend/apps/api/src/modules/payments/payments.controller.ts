@@ -3,13 +3,20 @@ import {
   Post,
   Body,
   BadRequestException,
+  InternalServerErrorException,
+  Inject,
 } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { PaymentsService } from './payments.service';
+import { BookingsService } from '../bookings/bookings.service';
 import { Public } from '@app/auth';
 
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(
+    private readonly paymentsService: PaymentsService,
+    @Inject('BookingsServiceToken') private readonly bookingsService: BookingsService,
+  ) {}
 
   @Post('verify')
   async verifyPayment(
@@ -39,14 +46,15 @@ export class PaymentsController {
       throw new BadRequestException('Missing MAC signature');
     }
 
-    const crypto = require('crypto');
-    const salt = process.env.INSTAMOJO_SALT || '';
+    const salt = process.env.INSTAMOJO_SALT;
+    if (!salt) {
+      throw new InternalServerErrorException('Webhook not configured');
+    }
 
-    // Instamojo MAC generation logic:
-    // Sort keys, concatenate values with pipe, generate HMAC SHA1 using salt
+    // Instamojo MAC validation
     const data = { ...payload };
     delete data.mac;
-    
+
     const keys = Object.keys(data).sort();
     const values = keys.map(k => data[k]).join('|');
 
@@ -60,10 +68,18 @@ export class PaymentsController {
     }
 
     if (payload.status === 'Credit' || payload.status === 'Successful') {
-        // Handle success
-        // e.g. update booking status
-    } else {
-        // Handle failure
+      // Update booking status via bookings service
+      const paymentRequestId = payload.payment_request_id;
+      if (paymentRequestId) {
+        try {
+          await this.bookingsService.verifyPayment(paymentRequestId, {
+            payment_id: payload.payment_id,
+            payment_status: payload.status,
+          });
+        } catch (err) {
+          console.error('Webhook booking update failed:', err);
+        }
+      }
     }
 
     return { received: true };

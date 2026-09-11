@@ -14,8 +14,10 @@ export class WhatsappService {
       this.configService.get<string>('WHATSAPP_PHONE_NUMBER_ID') ||
       '1302518772938870';
     this.accessToken =
-      this.configService.get<string>('WHATSAPP_ACCESS_TOKEN') ||
-      'EAAPBkN377kUBSUqAlZCZBo6Hd4RZCIqsMyfaj1QOme00sndfnn0Xqml7RRDab60zRi5NZAx4z92b4e4cjyT3OXZAEnut8gz5V7hgxfRI24xe4JXVSsx0GoZCiHqeqZA8mXMrSSco6zQ64X8cWVwpK4AF38yHiZCLqZAzmC5XQsX8yeF71HXqcpirKw5oGVlDAmQZDZD';
+      this.configService.get<string>('WHATSAPP_ACCESS_TOKEN') || '';
+    if (!this.accessToken) {
+      this.logger.warn('WHATSAPP_ACCESS_TOKEN is not set — WhatsApp messages will fail');
+    }
     this.apiVersion =
       this.configService.get<string>('WHATSAPP_API_VERSION') || 'v20.0';
   }
