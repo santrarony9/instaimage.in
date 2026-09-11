@@ -200,7 +200,7 @@ export class UploadsController {
     }
   }
 
-  @Public()
+  @Roles(Role.ADMIN)
   @Get('fix-old-images')
   async fixOldImages() {
     console.log('Starting legacy image compression job...');

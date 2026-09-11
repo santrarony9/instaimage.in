@@ -91,8 +91,8 @@ export class BookingsController {
 
   @Get(':id')
   @Roles(Role.CUSTOMER, Role.ADMIN, Role.SELLER)
-  findOne(@Param('id') id: string) {
-    return this.bookingsService.getBookingById(id);
+  findOne(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+    return this.bookingsService.getBookingById(id, req.user.sub, req.user.role);
   }
 
   @Post(':id/cancel')
@@ -150,8 +150,9 @@ export class BookingsController {
   updateDeliveryLink(
     @Param('id') id: string,
     @Body('deliveryLink') deliveryLink: string,
+    @Request() req: AuthenticatedRequest,
   ) {
-    return this.bookingsService.updateDeliveryLink(id, deliveryLink);
+    return this.bookingsService.updateDeliveryLink(id, deliveryLink, req.user.sub, req.user.role);
   }
 
   @Post(':id/surcharge')

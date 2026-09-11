@@ -214,8 +214,15 @@ export class AuthService {
       throw new BadRequestException('OTP has expired or was not requested. Please request a new code.');
     }
 
+    if (otpRecord.attempts >= 5) {
+      await this.otpModel.deleteMany({ phone });
+      throw new BadRequestException('Too many incorrect attempts. Please request a new OTP.');
+    }
+
     const isMatch = await bcrypt.compare(dto.otp.trim(), otpRecord.otpHash);
     if (!isMatch) {
+      otpRecord.attempts += 1;
+      await otpRecord.save();
       throw new BadRequestException('Invalid verification code.');
     }
 
@@ -331,12 +338,13 @@ export class AuthService {
       email: registerDto.email,
       passwordHash,
       role: Role.SELLER,
+      phone: registerDto.phone,
     });
 
     await this.SellersService.create({
       name: user.name,
       email: user.email,
-      phone: '0000000000',
+      phone: registerDto.phone || '0000000000',
       bankDetails: 'Pending',
       isActive: true,
       // @ts-ignore

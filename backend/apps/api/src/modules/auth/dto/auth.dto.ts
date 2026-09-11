@@ -22,6 +22,10 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   referralCode?: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string;
 }
 
 export class LoginDto {

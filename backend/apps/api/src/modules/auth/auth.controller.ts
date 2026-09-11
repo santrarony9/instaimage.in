@@ -16,6 +16,7 @@ import {
   SendWhatsappOtpDto,
   VerifyWhatsappOtpDto,
   LinkWhatsappPhoneDto,
+  ResetPasswordDto,
 } from './dto/auth.dto';
 
 @Controller('auth')
@@ -94,7 +95,7 @@ export class AuthController {
 
   @Public()
   @Post('reset-password')
-  resetPassword(@Body() resetPasswordDto: any) {
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(
       resetPasswordDto.email,
       resetPasswordDto.token,

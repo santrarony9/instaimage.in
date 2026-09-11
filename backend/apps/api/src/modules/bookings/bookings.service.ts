@@ -18,6 +18,7 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import sharp from 'sharp';
 import * as crypto from 'crypto';
+import { Role } from '@app/auth';
 
 import { ServicesService } from '../services/services.service';
 import { CouponsService } from '../coupons/coupons.service';
@@ -70,7 +71,7 @@ export class BookingsService {
       customerId: new Types.ObjectId(customerId),
       serviceId: new Types.ObjectId(createBookingDto.serviceId),
       scheduledDate: new Date(createBookingDto.scheduledDate),
-      status: { $nin: ['CANCELLED', 'REFUNDED', 'EXPIRED'] },
+      status: { $nin: [BookingStatus.CANCELLED, BookingStatus.REFUNDED] },
     });
     if (existingBooking) {
       throw new BadRequestException(
@@ -80,13 +81,8 @@ export class BookingsService {
 
     const date = new Date();
     const year = date.getFullYear();
-    const count = await this.bookingsRepository.countDocuments({
-      createdAt: {
-        $gte: new Date(year, 0, 1),
-        $lt: new Date(year + 1, 0, 1),
-      },
-    });
-    const bookingId = `BKG-${year}-${String(count + 1).padStart(4, '0')}`;
+    const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
+    const bookingId = `BKG-${year}-${randomSuffix}`;
 
     await this.availabilityService.lockSlot(
       new Date(createBookingDto.scheduledDate),
@@ -122,22 +118,28 @@ export class BookingsService {
         customerNotes: createBookingDto.customerNotes,
       });
 
-      // Deduct wallet balance if applied
-      if (walletDiscountApplied && walletDiscountApplied > 0) {
-        await this.usersService.addWalletBalance(
-          customerId,
-          -walletDiscountApplied,
-          `Applied to booking ${bookingId}`,
-          booking._id.toString(),
+      // 3. Handle Payment Order Mock or Direct Confirmation
+      let paymentOrder = null;
+      if (pricing.advancePaid > 0) {
+        paymentOrder = await this.paymentsService.createPaymentOrder(
+          bookingId,
+          pricing.advancePaid,
+          'INR',
         );
+      } else {
+        // If 100% paid via wallet, confirm immediately and deduct balance
+        if (walletDiscountApplied && walletDiscountApplied > 0) {
+          await this.usersService.addWalletBalance(
+            customerId,
+            -walletDiscountApplied,
+            `Applied to booking ${bookingId}`,
+            booking._id.toString(),
+          );
+        }
+        booking.status = BookingStatus.CONFIRMED;
+        booking.paymentStatus = 'PAID';
+        await booking.save();
       }
-
-      // 3. Create Payment Order Mock
-      const paymentOrder = await this.paymentsService.createPaymentOrder(
-        bookingId,
-        pricing.advancePaid,
-        'INR',
-      );
 
       // Async email sending (no await)
       this.bookingsRepository.model
@@ -198,6 +200,20 @@ export class BookingsService {
       throw new NotFoundException('Booking not found');
     }
 
+    // If there is a wallet discount and it hasn't been deducted yet, deduct it now
+    if (
+      booking.pricing &&
+      booking.pricing.walletDiscountApplied > 0 &&
+      booking.paymentStatus !== 'PAID'
+    ) {
+      await this.usersService.addWalletBalance(
+        booking.customerId.toString(),
+        -booking.pricing.walletDiscountApplied,
+        `Applied to booking ${booking.bookingId}`,
+        booking._id.toString(),
+      );
+    }
+
     booking.status = BookingStatus.CONFIRMED;
     booking.paymentStatus = 'PAID';
     booking.paymentId = payload.payment_id;
@@ -206,13 +222,26 @@ export class BookingsService {
     return { success: true, booking };
   }
 
-  async getBookingById(id: string) {
+  async getBookingById(id: string, userId?: string, userRole?: string) {
     const booking = await this.bookingsRepository.model
       .findOne(id.startsWith('BKG-') ? { bookingId: id } : { _id: id })
       .populate('customerId', 'name email phone')
       .populate('serviceId', 'name');
     if (!booking) {
       throw new NotFoundException('Booking not found');
+    }
+
+    if (userId && userRole !== Role.ADMIN) {
+      if (userRole === Role.CUSTOMER) {
+        if (booking.customerId._id.toString() !== userId) {
+          throw new ForbiddenException('You do not have permission to view this booking');
+        }
+      } else if (userRole === Role.SELLER) {
+        const seller = await this.SellersService.findByUserId(userId);
+        if (!seller || booking.sellerId?.toString() !== seller._id.toString()) {
+          throw new ForbiddenException('You do not have permission to view this booking');
+        }
+      }
     }
 
     // Generate pre-signed URLs for gallery
@@ -415,9 +444,17 @@ export class BookingsService {
     return this.bookingsRepository.update(bookingId, { status });
   }
 
-  async updateDeliveryLink(bookingId: string, deliveryLink: string) {
+  async updateDeliveryLink(bookingId: string, deliveryLink: string, userId: string, userRole: string) {
     const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
+
+    if (userRole !== Role.ADMIN) {
+      const seller = await this.SellersService.findByUserId(userId);
+      if (!seller) throw new NotFoundException('Seller profile not found');
+      if (booking.sellerId?.toString() !== seller._id.toString()) {
+        throw new ForbiddenException('You are not assigned to this booking');
+      }
+    }
 
     return this.bookingsRepository.update(bookingId, { deliveryLink });
   }

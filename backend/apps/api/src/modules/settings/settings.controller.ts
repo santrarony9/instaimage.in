@@ -14,6 +14,8 @@ export class SettingsController {
   }
 
   @Get(':key')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async getSetting(@Param('key') key: string) {
     const value = await this.settingsService.getSetting(key);
     return { value };

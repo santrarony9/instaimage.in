@@ -6,13 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CouponsService } from './coupons.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
-import { Roles, Role, Public } from '@app/auth';
+import { Roles, Role, Public, JwtAuthGuard, RolesGuard } from '@app/auth';
 
 @Controller('coupons')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class CouponsController {
   constructor(private readonly couponsService: CouponsService) {}
 
@@ -22,7 +24,7 @@ export class CouponsController {
     return this.couponsService.create(createCouponDto);
   }
 
-  @Public()
+  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.couponsService.findAll();
