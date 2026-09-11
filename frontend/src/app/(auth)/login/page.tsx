@@ -21,6 +21,8 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
 
+  const returnUrl = searchParams?.get('returnUrl') || '/';
+
   const [authMethod, setAuthMethod] = useState<'OTP' | 'PASSWORD'>('OTP');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
@@ -53,14 +55,14 @@ function LoginContent() {
       })
         .then((res) => {
           setAuth(token, res.user || res);
-          router.push('/');
+          router.push(returnUrl);
         })
         .catch(() => {
           setError('Failed to fetch profile from Google login. Please try again.');
           setLoading(false);
         });
     }
-  }, [searchParams, router, setAuth]);
+  }, [searchParams, router, setAuth, returnUrl]);
 
   // Handle WhatsApp Send OTP
   const handleSendOtp = async (e: React.FormEvent) => {
@@ -105,7 +107,7 @@ function LoginContent() {
       });
 
       setAuth(response.access_token, response.user);
-      router.push('/');
+      router.push(returnUrl);
     } catch (err: any) {
       setError(err.message || 'Invalid or expired OTP code');
     } finally {
@@ -126,7 +128,7 @@ function LoginContent() {
       });
 
       setAuth(response.access_token, response.user);
-      router.push('/');
+      router.push(returnUrl);
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {

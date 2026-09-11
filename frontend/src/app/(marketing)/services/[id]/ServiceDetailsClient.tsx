@@ -48,14 +48,14 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
     mediaList.push(...service.images);
   }
   if (mediaList.length === 0) {
-    mediaList.push('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop');
+    mediaList.push('/og-image.jpg');
   }
 
   // Deduplicate in case videoUrl was also in images
   const uniqueMediaList = Array.from(new Set(mediaList));
 
   let activeMedia = uniqueMediaList[activeImageIndex] || uniqueMediaList[0];
-  if (activeMedia.startsWith('/')) {
+  if (activeMedia.startsWith('/') && !activeMedia.startsWith('//')) {
     activeMedia = `https://api.instaimage.in${activeMedia}`;
   }
 
@@ -84,34 +84,29 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
     .reduce((sum: number, a: any) => sum + Number(a.price), 0);
   const totalPrice = basePrice + addonsCost;
 
+  const buildCartItem = () => ({
+    serviceId: service._id,
+    serviceName: service.name,
+    serviceImage: service.images?.[0],
+    pricingMode,
+    deliveryMethod: service.deliveryMethod === 'REMOTE' ? 'REMOTE' as const : 'ON_SPOT' as const,
+    addonNames: selectedAddons,
+    extraHoursBooked: extraHours,
+    basePrice: totalPrice,
+  });
 
   const handleAddToCart = () => {
-    addItem({
-      serviceId: service._id,
-      serviceName: service.name,
-      serviceImage: service.images?.[0],
-      pricingMode,
-      deliveryMethod: service.deliveryMethod === 'REMOTE' ? 'REMOTE' : 'ON_SPOT',
-      addonNames: selectedAddons,
-      extraHoursBooked: extraHours,
-      basePrice: totalPrice,
-    });
+    addItem(buildCartItem());
   };
 
   const handleCheckout = () => {
-    // If they click Book Now, maybe we just clear the cart and add this one item to cart, then go to booking
-    // OR we pass via URL as before for a single item checkout. We'll use cart store now for single checkout too.
-    addItem({
-      serviceId: service._id,
-      serviceName: service.name,
-      serviceImage: service.images?.[0],
-      pricingMode,
-      deliveryMethod: service.deliveryMethod === 'REMOTE' ? 'REMOTE' : 'ON_SPOT',
-      addonNames: selectedAddons,
-      extraHoursBooked: extraHours,
-      basePrice: totalPrice,
-    });
-    router.push(`/booking`);
+    // Add to cart only if not already there, then navigate
+    const { items } = useCartStore.getState();
+    const alreadyInCart = items.some(i => i.serviceId === service._id);
+    if (!alreadyInCart) {
+      addItem(buildCartItem());
+    }
+    router.push('/booking');
   };
 
   return (

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
 export default function ServicesClient({ initialServices }: { initialServices: any[] }) {
   const [services] = useState<any[]>(initialServices);
@@ -263,9 +264,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
                         
                         <div className="mt-auto flex items-center justify-between">
                           <span className="text-sm font-bold text-gray-900">₹{service.basePrice?.toLocaleString()}</span>
-                          <div className="border border-blue-600 text-blue-700 bg-blue-50 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            ADD
-                          </div>
+                          <AddToCartButton service={service} />
                         </div>
                       </div>
                     </Link>

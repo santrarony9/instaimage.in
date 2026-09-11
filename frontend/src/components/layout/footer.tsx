@@ -17,7 +17,6 @@ export function Footer() {
               <li><Link href="/become-a-photographer" className="hover:text-white transition-colors">Become a Creator</Link></li>
               <li><Link href="/portfolio" className="hover:text-white transition-colors">Portfolio</Link></li>
               <li><Link href="/seller/login" className="hover:text-white transition-colors">Creator Portal</Link></li>
-              <li><Link href="/admin" className="hover:text-white transition-colors">Admin Portal</Link></li>
             </ul>
           </div>
 
@@ -25,7 +24,7 @@ export function Footer() {
             <h4 className="text-white font-bold mb-3 text-xs uppercase tracking-wider">Support</h4>
             <ul className="space-y-2 text-xs">
               <li><Link href="/faq" className="hover:text-white transition-colors">Help Center & FAQ</Link></li>
-              <li><a href="mailto:info.instaimage@gmail.com" className="hover:text-white transition-colors">info.instaimage@gmail.com</a></li>
+              <li><a href="mailto:support@instaimage.in" className="hover:text-white transition-colors">support@instaimage.in</a></li>
               <li><a href="tel:+918240508915" className="hover:text-white transition-colors">+91 8240508915</a></li>
             </ul>
           </div>

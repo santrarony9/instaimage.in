@@ -1,14 +1,17 @@
 ﻿const { Client } = require('ssh2');
 const conn = new Client();
 conn.on('ready', () => {
-  const cmd = `cat /root/docker-compose.yml | grep -A10 mongo`;
-  conn.exec(cmd, (err, stream) => {
+  console.log('Connected!');
+  // The .ts files I uploaded earlier may have caused issues with the source compilation
+  // Let's check what's actually crashing and restore if needed
+  // First: get the actual crash reason from docker logs
+  conn.exec('docker logs --tail=80 root-api-1 2>&1', (err, stream) => {
     if (err) throw err;
     let out = '';
     stream.on('data', d => out += d);
     stream.stderr.on('data', d => out += d);
     stream.on('close', () => {
-      console.log('Compose output:\n', out);
+      console.log('CRASH LOGS:', out.slice(-3000));
       conn.end();
       process.exit(0);
     });

@@ -1,14 +1,13 @@
 ﻿const { Client } = require('ssh2');
 const conn = new Client();
 conn.on('ready', () => {
-  const cmd = `cat /root/docker-compose.yml | grep -A10 mongo`;
-  conn.exec(cmd, (err, stream) => {
+  conn.exec('docker logs root-api-1 --tail=30 2>&1', (err, stream) => {
     if (err) throw err;
     let out = '';
     stream.on('data', d => out += d);
     stream.stderr.on('data', d => out += d);
     stream.on('close', () => {
-      console.log('Compose output:\n', out);
+      console.log('Recent API logs:\n', out);
       conn.end();
       process.exit(0);
     });

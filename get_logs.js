@@ -1,14 +1,14 @@
 ﻿const { Client } = require('ssh2');
 const conn = new Client();
 conn.on('ready', () => {
-  const cmd = `cat /root/docker-compose.yml | grep -A10 mongo`;
+  const cmd = `cd ~/backend && docker compose logs --tail=50 api`;
   conn.exec(cmd, (err, stream) => {
     if (err) throw err;
     let out = '';
     stream.on('data', d => out += d);
     stream.stderr.on('data', d => out += d);
-    stream.on('close', () => {
-      console.log('Compose output:\n', out);
+    stream.on('close', (code) => {
+      console.log('Logs:\n', out);
       conn.end();
       process.exit(0);
     });
@@ -21,5 +21,5 @@ conn.on('ready', () => {
   port: 20064,
   username: 'root',
   password: 'SRhP8Rw_WJD8jZP2',
-  readyTimeout: 30000
+  readyTimeout: 10000
 });

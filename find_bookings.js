@@ -1,25 +1,20 @@
 ﻿const { Client } = require('ssh2');
 const conn = new Client();
 conn.on('ready', () => {
-  const cmd = `cat /root/docker-compose.yml | grep -A10 mongo`;
-  conn.exec(cmd, (err, stream) => {
+  conn.exec('find /root -name "bookings.service.ts"', (err, stream) => {
     if (err) throw err;
     let out = '';
     stream.on('data', d => out += d);
-    stream.stderr.on('data', d => out += d);
     stream.on('close', () => {
-      console.log('Compose output:\n', out);
+      console.log('Found:', out);
       conn.end();
       process.exit(0);
     });
   });
-}).on('error', err => {
-  console.error('SSH Error:', err.message);
-  process.exit(1);
 }).connect({
   host: '135.125.9.81',
   port: 20064,
   username: 'root',
   password: 'SRhP8Rw_WJD8jZP2',
-  readyTimeout: 30000
+  readyTimeout: 10000
 });

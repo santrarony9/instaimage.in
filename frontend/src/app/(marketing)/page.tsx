@@ -224,21 +224,27 @@ export default async function HomePage() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {categories.map((category: any, idx: number) => {
-                const gradients = [
-                  'from-purple-500 to-indigo-600',
-                  'from-rose-400 to-red-500',
-                  'from-emerald-400 to-teal-500',
-                  'from-amber-400 to-orange-500'
-                ];
-                const emojis = ['📸', '🎥', '🎪', '✂️'];
+                const categoryConfig: Record<string, { gradient: string; emoji: string }> = {
+                  'Photography': { gradient: 'from-purple-500 to-indigo-600', emoji: '📸' },
+                  'Videography': { gradient: 'from-rose-400 to-red-500', emoji: '🎬' },
+                  'Event Management': { gradient: 'from-emerald-400 to-teal-500', emoji: '🎪' },
+                  'Post Production': { gradient: 'from-amber-400 to-orange-500', emoji: '✂️' },
+                  'Drone': { gradient: 'from-sky-400 to-blue-600', emoji: '🚁' },
+                  'Live Stream': { gradient: 'from-pink-400 to-rose-600', emoji: '📡' },
+                };
+                const fallbackGradients = ['from-violet-500 to-purple-600', 'from-cyan-400 to-blue-500', 'from-lime-400 to-green-500', 'from-fuchsia-400 to-pink-600'];
+                const config = categoryConfig[category.name] || {
+                  gradient: fallbackGradients[idx % fallbackGradients.length],
+                  emoji: '🌟',
+                };
                 return (
-                  <Link key={category._id} href={`/services?category=${category.name}`} className={`relative bg-gradient-to-br ${gradients[idx % gradients.length]} rounded-2xl p-6 overflow-hidden group shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
+                  <Link key={category._id} href={`/services?category=${category.name}`} className={`relative bg-gradient-to-br ${config.gradient} rounded-2xl p-6 overflow-hidden group shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
                     <div className="absolute right-0 bottom-0 opacity-20 transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform duration-500 text-8xl">
-                      {emojis[idx % emojis.length]}
+                      {config.emoji}
                     </div>
                     <div className="relative z-10">
                       <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 text-2xl">
-                        {emojis[idx % emojis.length]}
+                        {config.emoji}
                       </div>
                       <h3 className="text-white text-lg sm:text-xl font-bold">{category.name}</h3>
                       <p className="text-white/80 text-sm mt-1 font-medium">Explore &rarr;</p>
@@ -246,7 +252,6 @@ export default async function HomePage() {
                   </Link>
                 );
               })}
-
             </div>
           </div>
         )}
@@ -424,10 +429,19 @@ export default async function HomePage() {
           // Skip if no services or if it's Event Management (since they already have a dedicated block above)
           if (categoryServices.length === 0 || category.name === 'Event Management') return null;
           
+          const categoryEmojis: Record<string, string> = {
+            'Photography': '📸',
+            'Videography': '🎬',
+            'Post Production': '✂️',
+            'Drone': '🚁',
+            'Live Stream': '📡',
+          };
+          const emoji = categoryEmojis[category.name] || '🌟';
+
           return (
             <div key={`section-${category.name}`} className="mb-12">
               <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
-                <h2 className="text-lg md:text-xl font-bold text-purple-950">📸 Top in {category.name}</h2>
+                <h2 className="text-lg md:text-xl font-bold text-gray-900">{emoji} Top in {category.name}</h2>
                 <Link href={`/services?category=${category.name}`} className="text-blue-600 font-semibold hover:underline text-sm md:text-base">View All</Link>
               </div>
               
