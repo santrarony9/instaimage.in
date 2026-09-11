@@ -44,6 +44,27 @@ export class BookingsController {
     return this.bookingsService.createBooking(req.user.sub, createBookingDto);
   }
 
+  @Post('multi')
+  @Roles(Role.CUSTOMER)
+  async createMultiple(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: { items: CreateBookingDto[] },
+  ) {
+    if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
+      throw new BadRequestException('items array is required and must not be empty');
+    }
+    // Create bookings in parallel, collect results including failures
+    const results = await Promise.allSettled(
+      body.items.map(item => this.bookingsService.createBooking(req.user.sub, item))
+    );
+    return results.map((result, index) => ({
+      index,
+      serviceId: body.items[index].serviceId,
+      status: result.status,
+      ...(result.status === 'fulfilled' ? { booking: result.value } : { error: (result as PromiseRejectedResult).reason?.message || 'Failed' }),
+    }));
+  }
+
   @Get('my-bookings')
   @Roles(Role.CUSTOMER)
   findMyBookings(@Request() req: AuthenticatedRequest) {

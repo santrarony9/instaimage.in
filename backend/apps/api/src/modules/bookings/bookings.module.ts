@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BookingsService } from './bookings.service';
 import { BookingsController } from './bookings.controller';
@@ -26,7 +26,7 @@ import { WhatsappModule } from '../whatsapp/whatsapp.module';
     ServicesModule,
     CouponsModule,
     ServiceZonesModule,
-    PaymentsModule,
+    forwardRef(() => PaymentsModule),
     AvailabilityModule,
     SellersModule,
     NotificationsModule,

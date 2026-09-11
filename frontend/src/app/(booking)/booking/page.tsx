@@ -61,7 +61,7 @@ function BookingFlow() {
         setStep(4);
       }
     } else if (cartItems.length > 0) {
-      // Cart-based flow — only processes first item
+      // Cart-based flow — use first item for location/datetime, submit all at payment
       const firstItem = cartItems[0];
       updateData({
         serviceId: firstItem.serviceId,

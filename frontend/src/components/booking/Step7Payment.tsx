@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useBookingStore } from '@/hooks/use-booking-store';
+import { useCartStore } from '@/hooks/use-cart-store';
 import { fetchApi } from '@/lib/api';
 
 export function Step7Payment() {
-  const { nextStep, prevStep, submitBooking, data } = useBookingStore();
+  const { nextStep, prevStep, submitBooking, submitMultiBooking, data, setConfirmedBooking } = useBookingStore();
+  const cartItems = useCartStore((state) => state.items);
+  const clearCart = useCartStore((state) => state.clearCart);
   const [isProcessing, setIsProcessing] = useState(false);
   const [pricingInfo, setPricingInfo] = useState<any>(null);
   const [isLoadingPrice, setIsLoadingPrice] = useState(true);
@@ -61,26 +64,45 @@ export function Step7Payment() {
   const handlePayNow = async () => {
     setIsProcessing(true);
     try {
+      if (cartItems.length > 1) {
+        // Multi-item: create all bookings at once, no per-item payment redirect
+        const results = await submitMultiBooking(cartItems);
+        const successCount = results.filter((r: any) => r.status === 'fulfilled').length;
+        const failCount = results.filter((r: any) => r.status === 'rejected').length;
+        
+        // Confirm all succeeded ones, then move to confirmation
+        clearCart();
+        setConfirmedBooking({
+          multi: true,
+          results,
+          summary: `${successCount} booking${successCount !== 1 ? 's' : ''} confirmed${failCount > 0 ? `, ${failCount} failed` : ''}`,
+        });
+        nextStep();
+        setIsProcessing(false);
+        return;
+      }
+
+      // Single-item flow: standard Instamojo payment
       const response = await submitBooking();
       const { booking, paymentOrder } = response;
       
       if (!paymentOrder || !paymentOrder.id) {
-        // If there's no payment required (e.g. 100% wallet paid), directly confirm
-        useBookingStore.getState().setConfirmedBooking(booking);
+        setConfirmedBooking(booking);
+        clearCart();
         nextStep();
         setIsProcessing(false);
         return;
       }
 
       if (paymentOrder.longurl) {
-        // Redirect to Instamojo hosted payment page
+        clearCart();
         window.location.href = paymentOrder.longurl;
       } else {
         alert('Failed to get payment link.');
         setIsProcessing(false);
       }
-    } catch (err) {
-      alert('Failed to create booking order.');
+    } catch (err: any) {
+      alert(err?.message || 'Failed to create booking. Please try again.');
       setIsProcessing(false);
     }
   };

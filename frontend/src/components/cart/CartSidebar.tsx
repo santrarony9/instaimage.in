@@ -90,7 +90,7 @@ export function CartSidebar() {
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div className="flex items-center space-x-2">
             <ShoppingBag className="w-5 h-5 text-gray-900" />
-            <h2 className="text-lg font-bold text-gray-900">Your Wishlist</h2>
+            <h2 className="text-lg font-bold text-gray-900">Booking Cart</h2>
             <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-0.5 rounded-full">
               {items.length}
             </span>
@@ -231,7 +231,7 @@ export function CartSidebar() {
             {!user && (
               <p className="text-center text-xs text-gray-400">
                 Already have an account?{' '}
-                <Link href="/login" className="text-blue-600 font-semibold hover:underline" onClick={() => setSidebarOpen(false)}>
+                <Link href="/login?returnUrl=/booking" className="text-blue-600 font-semibold hover:underline" onClick={() => setSidebarOpen(false)}>
                   Sign in for instant checkout
                 </Link>
               </p>

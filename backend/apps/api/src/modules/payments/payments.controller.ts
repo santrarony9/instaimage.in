@@ -5,6 +5,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
   Inject,
+  forwardRef,
 } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { PaymentsService } from './payments.service';
@@ -15,7 +16,7 @@ import { Public } from '@app/auth';
 export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,
-    @Inject('BookingsServiceToken') private readonly bookingsService: BookingsService,
+    @Inject(forwardRef(() => BookingsService)) private readonly bookingsService: BookingsService,
   ) {}
 
   @Post('verify')

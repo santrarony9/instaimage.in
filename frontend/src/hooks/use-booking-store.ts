@@ -40,6 +40,7 @@ interface BookingState {
   nextStep: () => void;
   prevStep: () => void;
   submitBooking: () => Promise<any>;
+  submitMultiBooking: (cartItems: any[]) => Promise<any>;
   reset: () => void;
 }
 
@@ -79,6 +80,32 @@ export const useBookingStore = create<BookingState>()(
         const response = await fetchApi('/bookings', {
           method: 'POST',
           body: JSON.stringify(payload),
+        });
+        return response;
+      },
+      submitMultiBooking: async (cartItems: any[]) => {
+        const { data } = get();
+        const { fetchApi } = await import('@/lib/api');
+
+        // Build booking payload for each cart item using the shared location/datetime from booking store
+        const items = cartItems.map(item => ({
+          serviceId: item.serviceId,
+          pricingMode: item.pricingMode || 'fixed',
+          addonNames: item.addonNames || [],
+          scheduledDate: data.scheduledDate,
+          startTime: data.startTime,
+          endTime: data.endTime,
+          timeFlexibility: data.timeFlexibility || 'STRICT',
+          extraHoursBooked: item.extraHoursBooked || 0,
+          location: data.location,
+          customerNotes: data.customerNotes,
+          isExpressDelivery: data.isExpressDelivery || false,
+          applyWalletBalance: data.applyWalletBalance || false,
+        }));
+
+        const response = await fetchApi('/bookings/multi', {
+          method: 'POST',
+          body: JSON.stringify({ items }),
         });
         return response;
       },
