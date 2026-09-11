@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useBookingStore } from '@/hooks/use-booking-store';
 import { useCartStore } from '@/hooks/use-cart-store';
+import { useAuthStore } from '@/hooks/use-auth-store';
 import { fetchApi } from '@/lib/api';
 
 export function Step7Payment() {
-  const { nextStep, prevStep, submitBooking, submitMultiBooking, data, setConfirmedBooking } = useBookingStore();
+  const { nextStep, prevStep, setStep, submitBooking, submitMultiBooking, data, setConfirmedBooking } = useBookingStore();
   const cartItems = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -310,7 +311,20 @@ export function Step7Payment() {
       </div>
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between mt-6">
-        <button onClick={prevStep} className="w-full sm:w-auto text-gray-600 px-6 py-3 sm:py-1.5 border border-gray-300 sm:border-0 rounded-md hover:bg-gray-100 transition" disabled={isProcessing}>Back</button>
+        <button 
+          onClick={() => {
+            const { user } = useAuthStore.getState();
+            if (user) {
+              setStep(5);
+            } else {
+              prevStep();
+            }
+          }} 
+          className="w-full sm:w-auto text-gray-600 px-6 py-3 sm:py-1.5 border border-gray-300 sm:border-0 rounded-md hover:bg-gray-100 transition" 
+          disabled={isProcessing}
+        >
+          Back
+        </button>
         <button onClick={handlePayNow} className="w-full sm:w-auto bg-black text-white px-6 py-3 sm:py-1.5 rounded-md hover:bg-gray-800 transition" disabled={isProcessing}>
           {isProcessing ? 'Processing...' : 'Pay Now'}
         </button>
