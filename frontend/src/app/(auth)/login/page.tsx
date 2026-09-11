@@ -36,6 +36,9 @@ function LoginContent() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Show a banner if the user was redirected due to a stale session
+  const sessionExpired = searchParams?.get('reason') === 'session_expired';
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (resendTimer > 0) {
@@ -200,6 +203,12 @@ function LoginContent() {
               🔑 Password
             </button>
           </div>
+
+          {sessionExpired && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-xs font-semibold text-center">
+              🔒 Your session has expired. Please sign in again to continue your booking.
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-semibold border border-red-100 text-center">

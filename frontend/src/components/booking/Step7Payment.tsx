@@ -14,6 +14,7 @@ export function Step7Payment() {
   const [isLoadingPrice, setIsLoadingPrice] = useState(true);
   const [calcError, setCalcError] = useState<string | null>(null);
   const [walletBalance, setWalletBalance] = useState(0);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchWallet = async () => {
@@ -63,6 +64,7 @@ export function Step7Payment() {
 
   const handlePayNow = async () => {
     setIsProcessing(true);
+    setBookingError(null);
     try {
       if (cartItems.length > 1) {
         // Multi-item: create all bookings at once, no per-item payment redirect
@@ -98,11 +100,18 @@ export function Step7Payment() {
         clearCart();
         window.location.href = paymentOrder.longurl;
       } else {
-        alert('Failed to get payment link.');
+        setBookingError('Failed to get payment link. Please try again.');
         setIsProcessing(false);
       }
     } catch (err: any) {
-      alert(err?.message || 'Failed to create booking. Please try again.');
+      const message = err?.message || 'Failed to create booking. Please try again.';
+      // If it's a role/auth error, the user's session is stale — force re-login
+      if (message.toLowerCase().includes('requires one of roles') || message.toLowerCase().includes('forbidden') || message.includes('401')) {
+        localStorage.removeItem('auth-storage');
+        window.location.href = `/login?returnUrl=/booking&reason=session_expired`;
+        return;
+      }
+      setBookingError(message);
       setIsProcessing(false);
     }
   };
@@ -204,6 +213,16 @@ export function Step7Payment() {
           >
             <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${data.applyWalletBalance ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>
+        </div>
+      )}
+
+      {bookingError && (
+        <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4 text-sm flex items-start gap-2">
+          <span className="text-lg">⚠️</span>
+          <div>
+            <p className="font-semibold">Booking Failed</p>
+            <p>{bookingError}</p>
+          </div>
         </div>
       )}
 
