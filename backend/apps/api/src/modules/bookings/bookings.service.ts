@@ -66,12 +66,23 @@ export class BookingsService {
   }
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
-    // Prevent duplicate bookings: same customer + service + date
+    // Prevent duplicate bookings: same customer + service + date — but only if a booking
+    // is already confirmed/active. A PENDING_PAYMENT booking means payment never completed,
+    // so we should allow a fresh attempt rather than blocking the customer.
     const existingBooking = await this.bookingsRepository.model.findOne({
       customerId: new Types.ObjectId(customerId),
       serviceId: new Types.ObjectId(createBookingDto.serviceId),
       scheduledDate: new Date(createBookingDto.scheduledDate),
-      status: { $nin: [BookingStatus.CANCELLED, BookingStatus.REFUNDED] },
+      status: {
+        $in: [
+          BookingStatus.CONFIRMED,
+          BookingStatus.ASSIGNED,
+          BookingStatus.IN_PROGRESS,
+          BookingStatus.COMPLETED,
+          BookingStatus.EDITING,
+          BookingStatus.DELIVERED,
+        ],
+      },
     });
     if (existingBooking) {
       throw new BadRequestException(
