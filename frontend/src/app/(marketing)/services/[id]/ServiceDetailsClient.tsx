@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/hooks/use-cart-store';
 
@@ -20,6 +21,24 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   
 
   const [allServices, setAllServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).RazorpayAffordabilitySuite) {
+      const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (key) {
+        try {
+          const widgetConfig = { key: key, amount: totalPrice * 100 };
+          const rzpAffordabilitySuite = new (window as any).RazorpayAffordabilitySuite(widgetConfig);
+          // Wait for DOM to catch up just in case
+          setTimeout(() => {
+            rzpAffordabilitySuite.render();
+          }, 100);
+        } catch (e) {
+          console.error("Affordability widget error:", e);
+        }
+      }
+    }
+  }, [totalPrice]);
 
   useEffect(() => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
@@ -281,7 +300,27 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                   </div>
                 )}
                 <div className="text-3xl font-black text-gray-900">₹{totalPrice.toLocaleString()}</div>
+                <div id="razorpay-affordability-widget" className="mt-4"></div>
               </div>
+
+              <Script 
+                src="https://cdn.razorpay.com/widgets/affordability/affordability.js" 
+                strategy="lazyOnload" 
+                onLoad={() => {
+                  if (typeof window !== 'undefined' && (window as any).RazorpayAffordabilitySuite) {
+                    const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+                    if (key) {
+                      try {
+                        const widgetConfig = { key: key, amount: totalPrice * 100 };
+                        const rzpAffordabilitySuite = new (window as any).RazorpayAffordabilitySuite(widgetConfig);
+                        rzpAffordabilitySuite.render();
+                      } catch (e) {
+                        console.error("Affordability widget error on load:", e);
+                      }
+                    }
+                  }
+                }}
+              />
 
               {/* Pricing Mode Selector */}
               <div className="mb-8 border-t border-gray-100 pt-6">
