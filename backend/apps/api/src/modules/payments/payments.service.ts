@@ -7,14 +7,27 @@ export class PaymentsService {
   private apiKey: string | undefined;
   private authToken: string | undefined;
 
+  private razorpay: any;
+
   constructor(private readonly configService: ConfigService) {
     this.apiKey = this.configService.get<string>('INSTAMOJO_API_KEY');
     this.authToken = this.configService.get<string>('INSTAMOJO_AUTH_TOKEN');
     
-    if (this.apiKey && this.authToken) {
+    const rzpKeyId = this.configService.get<string>('RAZORPAY_KEY_ID');
+    const rzpSecret = this.configService.get<string>('RAZORPAY_KEY_SECRET');
+
+    if (rzpKeyId && rzpSecret) {
+      // Need to require razorpay inline or import it at top
+      const Razorpay = require('razorpay');
+      this.razorpay = new Razorpay({
+        key_id: rzpKeyId,
+        key_secret: rzpSecret,
+      });
+      this.logger.log('Razorpay initialized.');
+    } else if (this.apiKey && this.authToken) {
       this.logger.log('Instamojo keys found in environment. Initialized.');
     } else {
-      this.logger.warn('Instamojo keys not found in environment. Payments will run in mock mode.');
+      this.logger.warn('No payment keys found in environment. Payments will run in mock mode.');
     }
   }
 
@@ -23,16 +36,37 @@ export class PaymentsService {
     amount: number,
     currency: string = 'INR',
   ) {
-    if (this.apiKey && this.authToken) {
+    // Prefer Razorpay if configured
+    if (this.razorpay) {
       try {
-        // Build the callback URL (adjust domain based on environment)
+        const options = {
+          amount: Math.round(amount * 100), // paise
+          currency: currency,
+          receipt: bookingId,
+        };
+
+        const order = await this.razorpay.orders.create(options);
+        this.logger.log(`Razorpay Order created: ${order.id} for booking: ${bookingId}`);
+        
+        return {
+          id: order.id,
+          amount: amount,
+          currency: currency,
+          provider: 'razorpay'
+        };
+      } catch (err) {
+        this.logger.error(`Error creating Razorpay order: ${err.message}`, err.stack);
+        throw err;
+      }
+    } else if (this.apiKey && this.authToken) {
+      try {
         const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'https://instaimage.in';
         const redirectUrl = `${frontendUrl}/booking/callback?bookingId=${bookingId}`;
 
         const payload = new URLSearchParams({
           purpose: `Booking ${bookingId}`,
           amount: amount.toString(),
-          buyer_name: 'Customer', // We can enhance this if customer name is passed, but generic is fine for Instamojo
+          buyer_name: 'Customer',
           send_email: 'false',
           send_sms: 'false',
           redirect_url: redirectUrl,
@@ -57,29 +91,38 @@ export class PaymentsService {
 
         this.logger.log(`Instamojo Payment Request created: ${data.payment_request.id} for booking: ${bookingId}`);
         
-        // Match the return structure expected by the frontend
         return {
           id: data.payment_request.id,
           amount: amount,
           currency: currency,
           longurl: data.payment_request.longurl,
+          provider: 'instamojo'
         };
       } catch (err) {
         this.logger.error(`Error creating Instamojo payment request: ${err.message}`, err.stack);
         throw err;
       }
     } else {
-      this.logger.log(`Mocking Instamojo Order for Booking: ${bookingId}, Amount: ${amount}`);
-      
-      const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'https://instaimage.in';
-
+      this.logger.log(`Mocking Order for Booking: ${bookingId}, Amount: ${amount}`);
       return {
         id: `order_mock_${new Date().getTime()}`,
         amount: amount,
         currency,
-        longurl: `${frontendUrl}/booking/callback?payment_id=mock_payment_${new Date().getTime()}&payment_status=Credit&payment_request_id=mock_req&bookingId=${bookingId}`,
+        provider: 'mock'
       };
     }
+  }
+
+  verifyRazorpaySignature(razorpay_order_id: string, razorpay_payment_id: string, razorpay_signature: string): boolean {
+    const key_secret = this.configService.get<string>('RAZORPAY_KEY_SECRET');
+    if (!key_secret) return true; // mock mode
+    
+    const crypto = require('crypto');
+    const hmac = crypto.createHmac('sha256', key_secret);
+    hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+    const generatedSignature = hmac.digest('hex');
+    
+    return generatedSignature === razorpay_signature;
   }
 
   async verifyInstamojoPayment(paymentId: string) {

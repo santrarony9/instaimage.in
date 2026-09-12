@@ -85,7 +85,7 @@ export function Step7Payment() {
         return;
       }
 
-      // Single-item flow: standard Instamojo payment
+      // Single-item flow
       const response = await submitBooking();
       const { booking, paymentOrder } = response;
       
@@ -97,7 +97,81 @@ export function Step7Payment() {
         return;
       }
 
-      if (paymentOrder.longurl) {
+      if (paymentOrder.provider === 'razorpay') {
+        const loadScript = (src: string) => {
+          return new Promise((resolve) => {
+            if (document.querySelector(`script[src="${src}"]`)) {
+              resolve(true);
+              return;
+            }
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+          });
+        };
+
+        const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
+        if (!res) {
+          setBookingError('Razorpay SDK failed to load. Are you offline?');
+          setIsProcessing(false);
+          return;
+        }
+
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '', // Needs to be added to .env.local
+          amount: Math.round(paymentOrder.amount * 100), // paise
+          currency: paymentOrder.currency,
+          name: 'InstaImage',
+          description: `Booking ${booking.bookingId}`,
+          order_id: paymentOrder.id,
+          handler: async function (response: any) {
+            try {
+              setIsProcessing(true);
+              await fetchApi(`/bookings/${booking._id}/verify-razorpay-payment`, {
+                method: 'POST',
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
+              
+              setConfirmedBooking(booking);
+              clearCart();
+              nextStep();
+            } catch (err: any) {
+              setBookingError(err?.message || 'Payment verification failed');
+            } finally {
+              setIsProcessing(false);
+            }
+          },
+          prefill: {
+            name: booking.customerId?.name || 'Customer',
+            email: booking.customerId?.email || '',
+            contact: booking.customerId?.phone || '',
+          },
+          theme: {
+            color: '#000000',
+          },
+          modal: {
+            ondismiss: function () {
+              setBookingError('Payment cancelled by user. You can try again.');
+            }
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (response: any) {
+          setBookingError(response.error.description || 'Payment failed');
+        });
+        
+        rzp.open();
+        // Since modal is open, we stop the local processing spinner 
+        // to let the user interact with the modal. We show it again in handler.
+        setIsProcessing(false); 
+      } else if (paymentOrder.longurl) {
         clearCart();
         window.location.href = paymentOrder.longurl;
       } else {

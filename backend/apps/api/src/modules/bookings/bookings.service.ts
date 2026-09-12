@@ -213,6 +213,57 @@ export class BookingsService {
     return { success: true, booking };
   }
 
+  async verifyRazorpayPayment(
+    bookingId: string,
+    payload: {
+      razorpay_order_id: string;
+      razorpay_payment_id: string;
+      razorpay_signature: string;
+    },
+  ) {
+    const isValid = this.paymentsService.verifyRazorpaySignature(
+      payload.razorpay_order_id,
+      payload.razorpay_payment_id,
+      payload.razorpay_signature
+    );
+
+    if (!isValid) {
+      throw new BadRequestException('Invalid Razorpay signature');
+    }
+
+    let booking;
+    if (bookingId.startsWith('BKG-')) {
+      booking = await this.bookingsRepository.model.findOne({ bookingId });
+    } else {
+      booking = await this.bookingsRepository.model.findById(bookingId);
+    }
+    
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+
+    // Deduct wallet discount if applicable
+    if (
+      booking.pricing &&
+      booking.pricing.walletDiscountApplied > 0 &&
+      booking.paymentStatus !== 'PAID'
+    ) {
+      await this.usersService.addWalletBalance(
+        booking.customerId.toString(),
+        -booking.pricing.walletDiscountApplied,
+        `Applied to booking ${booking.bookingId}`,
+        booking._id.toString(),
+      );
+    }
+
+    booking.status = BookingStatus.CONFIRMED;
+    booking.paymentStatus = 'PAID';
+    booking.paymentId = payload.razorpay_payment_id;
+    await booking.save();
+
+    return { success: true, booking };
+  }
+
   async getBookingById(id: string, userId?: string, userRole?: string) {
     const booking = await this.bookingsRepository.model
       .findOne(id.startsWith('BKG-') ? { bookingId: id } : { _id: id })
