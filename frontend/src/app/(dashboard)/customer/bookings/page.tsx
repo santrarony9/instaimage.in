@@ -135,6 +135,25 @@ export default function MyBookingsPage() {
                   <span className="text-lg font-black text-gray-900">₹{booking.pricing?.totalPrice?.toLocaleString('en-IN') || 0}</span>
                 </div>
                 <div className="flex items-center gap-3">
+                  {booking.status === 'PENDING_PAYMENT' && (
+                    <button
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        if (confirm('Are you sure you want to cancel this pending booking?')) {
+                          try {
+                            const { fetchApi } = await import('@/lib/api');
+                            await fetchApi(`/bookings/${booking._id}/cancel`, { method: 'POST' });
+                            setBookings(prev => prev.map(b => b._id === booking._id ? { ...b, status: 'CANCELLED' } : b));
+                          } catch (err) {
+                            alert('Failed to cancel booking.');
+                          }
+                        }
+                      }}
+                      className="text-xs font-bold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1"
+                    >
+                      Cancel
+                    </button>
+                  )}
                   {booking.status === 'COMPLETED' && (
                     <button
                       onClick={(e) => {

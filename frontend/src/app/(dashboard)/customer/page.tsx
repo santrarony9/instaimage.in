@@ -142,9 +142,26 @@ export default function CustomerDashboardOverview() {
                 <p className="text-red-100 text-sm font-medium">Invoice #{pendingPayments[0].bookingId} needs your attention.</p>
               </div>
             </div>
-            <Link href="/customer/payments" className="bg-white text-red-600 px-5 py-2.5 rounded-xl font-bold hover:bg-red-50 transition-colors whitespace-nowrap w-full sm:w-auto text-center">
-              Pay Now
-            </Link>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <button 
+                onClick={async () => {
+                  if (confirm('Are you sure you want to cancel this booking?')) {
+                    try {
+                      await fetchApi(`/bookings/${pendingPayments[0]._id}/cancel`, { method: 'POST' });
+                      setBookings(prev => prev.filter(b => b._id !== pendingPayments[0]._id));
+                    } catch (err) {
+                      alert('Failed to cancel booking. Please try again.');
+                    }
+                  }
+                }}
+                className="bg-transparent border border-white/30 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-white/10 transition-colors whitespace-nowrap flex-1 sm:flex-none text-center"
+              >
+                Cancel
+              </button>
+              <Link href="/customer/payments" className="bg-white text-red-600 px-5 py-2.5 rounded-xl font-bold hover:bg-red-50 transition-colors whitespace-nowrap flex-1 sm:flex-none text-center">
+                Pay Now
+              </Link>
+            </div>
           </div>
         )}
 
