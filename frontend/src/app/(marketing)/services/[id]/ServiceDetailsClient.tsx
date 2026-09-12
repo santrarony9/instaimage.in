@@ -16,7 +16,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
   const [flexibleHours, setFlexibleHours] = useState<number>(2); // Default to 2 hours for flexible
   const [extraHours, setExtraHours] = useState<number>(0);
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]); // Storing addon names
-  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(-1);
   
 
   const [allServices, setAllServices] = useState<any[]>([]);
@@ -116,40 +116,131 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
           
           {/* Left Column: Media & Details */}
           <div className="w-full lg:w-7/12">
-            {/* Main Media Gallery */}
-            <div className="w-full h-[500px] md:h-[600px] bg-black rounded-xl overflow-hidden mb-6 relative flex items-center justify-center shadow-lg">
-              {isVideo(activeMedia) ? (
-                <video src={activeMedia} controls autoPlay loop playsInline className="w-full h-full object-contain" />
-              ) : (
-                <Image unoptimized src={activeMedia} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" priority />
-              )}
-            </div>
-            
-            {/* Thumbnails */}
-            {uniqueMediaList.length > 1 && (
-              <div className="flex gap-4 mb-12 overflow-x-auto pb-2 snap-x hide-scrollbar">
-                {uniqueMediaList.map((media: string, idx: number) => {
-                  const url = media.startsWith('/') ? `https://api.instaimage.in${media}` : media;
-                  const isVid = isVideo(url);
-                  return (
-                    <div 
-                      key={idx} 
-                      onClick={() => setActiveImageIndex(idx)}
-                      className={`w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer border-2 transition relative ${activeImageIndex === idx ? 'border-blue-600 shadow-md scale-105' : 'hover:border-gray-400 border-transparent opacity-80 hover:opacity-100'}`}
-                    >
-                      {isVid ? (
-                        <>
-                          <video src={url} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <span className="text-white text-3xl drop-shadow-lg">▶</span>
-                          </div>
-                        </>
-                      ) : (
-                        <Image unoptimized src={url} alt={`${service.name} ${idx}`} fill sizes="96px" className="object-cover" />
-                      )}
+            {/* Masonry Media Gallery */}
+            <div className="mb-8 relative">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg">
+                
+                {/* Left Large Image/Video */}
+                <div className="relative w-full h-full cursor-pointer group" onClick={() => setActiveImageIndex(0)}>
+                  {isVideo(uniqueMediaList[0]) ? (
+                    <video src={uniqueMediaList[0].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[0]}` : uniqueMediaList[0]} autoPlay muted loop playsInline className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                  ) : (
+                    <Image unoptimized src={uniqueMediaList[0].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[0]}` : uniqueMediaList[0]} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition duration-700" priority />
+                  )}
+                  {isVideo(uniqueMediaList[0]) && (
+                    <div className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-sm">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </div>
-                  );
-                })}
+                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition duration-300" />
+                </div>
+
+                {/* Right Grid (Hidden on very small screens, visible on md+) */}
+                <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2 h-full">
+                  {uniqueMediaList.slice(1, 5).map((media, idx) => {
+                    const isVid = isVideo(media);
+                    const isLast = idx === 3 && uniqueMediaList.length > 5;
+                    const url = media.startsWith('/') ? `https://api.instaimage.in${media}` : media;
+
+                    return (
+                      <div 
+                        key={idx + 1} 
+                        className="relative w-full h-full cursor-pointer group overflow-hidden"
+                        onClick={() => setActiveImageIndex(idx + 1)}
+                      >
+                        {isVid ? (
+                          <video src={url} autoPlay muted loop playsInline className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+                        ) : (
+                          <Image unoptimized src={url} alt={`${service.name} ${idx + 1}`} fill sizes="25vw" className="object-cover group-hover:scale-110 transition duration-700" />
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition duration-300" />
+                        
+                        {/* Overlay for "View All" on the last image if more than 5 */}
+                        {isLast && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-lg backdrop-blur-sm hover:bg-black/40 transition">
+                            +{uniqueMediaList.length - 5} More
+                          </div>
+                        )}
+                        {isVid && !isLast && (
+                           <div className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full backdrop-blur-sm">
+                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                           </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {/* Fill empty slots if less than 5 images to keep the grid intact */}
+                  {uniqueMediaList.length < 5 && Array.from({ length: 5 - uniqueMediaList.length }).map((_, i) => (
+                    <div key={`empty-${i}`} className="bg-gray-100 w-full h-full flex items-center justify-center">
+                       <span className="text-gray-300 text-3xl">📸</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setActiveImageIndex(0)}
+                className="md:hidden absolute bottom-4 right-4 bg-white/90 backdrop-blur text-black font-bold px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                View all {uniqueMediaList.length} media
+              </button>
+            </div>
+
+            {/* Fullscreen Lightbox Modal */}
+            {activeImageIndex !== -1 && (
+              <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col">
+                <div className="flex justify-between items-center p-4 sm:p-6 text-white absolute top-0 left-0 right-0 z-10">
+                  <div className="text-sm font-bold bg-black/50 px-3 py-1 rounded-full">{activeImageIndex + 1} / {uniqueMediaList.length}</div>
+                  <button onClick={() => setActiveImageIndex(-1)} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+                
+                <div className="flex-1 flex items-center justify-center relative px-4 sm:px-12">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setActiveImageIndex(prev => prev > 0 ? prev - 1 : uniqueMediaList.length - 1); }}
+                    className="absolute left-4 sm:left-8 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+
+                  <div className="w-full max-w-5xl h-[70vh] sm:h-[80vh] relative flex items-center justify-center">
+                    {isVideo(uniqueMediaList[activeImageIndex]) ? (
+                      <video src={uniqueMediaList[activeImageIndex].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[activeImageIndex]}` : uniqueMediaList[activeImageIndex]} controls autoPlay className="max-w-full max-h-full object-contain" />
+                    ) : (
+                      <Image unoptimized src={uniqueMediaList[activeImageIndex].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[activeImageIndex]}` : uniqueMediaList[activeImageIndex]} alt={service.name} fill sizes="100vw" className="object-contain" />
+                    )}
+                  </div>
+
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setActiveImageIndex(prev => prev < uniqueMediaList.length - 1 ? prev + 1 : 0); }}
+                    className="absolute right-4 sm:right-8 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
+                
+                {/* Thumbnail strip in lightbox */}
+                <div className="h-24 sm:h-32 p-4 flex justify-center gap-2 overflow-x-auto">
+                  {uniqueMediaList.map((media, idx) => {
+                    const isVid = isVideo(media);
+                    const url = media.startsWith('/') ? `https://api.instaimage.in${media}` : media;
+                    return (
+                      <div 
+                        key={idx} 
+                        onClick={() => setActiveImageIndex(idx)}
+                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer border-2 transition relative ${activeImageIndex === idx ? 'border-white opacity-100 scale-105' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                      >
+                        {isVid ? (
+                          <video src={url} className="w-full h-full object-cover" />
+                        ) : (
+                          <Image unoptimized src={url} alt="" fill sizes="80px" className="object-cover" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

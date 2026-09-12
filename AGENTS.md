@@ -56,8 +56,10 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 
 ## Current Project State & Memory (Updated Sept 2026)
 
-### 1. Recently Completed (Dashboard 3.0 & Bug Fixes)
+### 1. Recently Completed (Dashboard 3.0, Bug Fixes & Sept 2026 Upgrades)
 - **Massive Bug Bash:** Fixed Checkout loops, Next 15 Promise crashes on the invoice page, Auth payload mismatches (Seller login), and Dummy/Dead links across the site.
+- **Service Profile Redesign:** Built a modern, high-end Airbnb/Instagram style masonry grid for service media with a full-screen lightbox.
+- **Razorpay Integration:** Fixed environment config bugs to fully enable the Razorpay payment gateway for automated booking checkouts.
 - **Customer Dashboard 3.0:**
   - **Master Gallery:** Rebuilt `/customer/gallery` to aggregate all past completed shoots natively without requiring an email link.
   - **Notifications Engine:** Built a real Mongoose backend schema `Notification` and API endpoints. The frontend now fetches real-time alerts.
@@ -66,4 +68,3 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 
 ### 2. Pending / Work-In-Progress
 - **Gallery Watermarking & Client Approval Flow:** The user has a specific design/idea for how clients will approve watermarked preview photos to unlock clean HD downloads. **DO NOT build this yet.** Wait for the user to provide their materials/instructions before modifying the gallery or upload system further.
-- **Service Profile Page Redesign:** Planned upgrade to make the Photographer/Service Profile look like a high-end Instagram masonry grid. (Currently in backlog).
