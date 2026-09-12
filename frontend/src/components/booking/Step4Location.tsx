@@ -177,13 +177,10 @@ export function Step4Location() {
           </button>
           
           <MapSelector 
-            key={coordinates ? `${coordinates[0]}-${coordinates[1]}` : 'default'}
             defaultPosition={coordinates ? [coordinates[1], coordinates[0]] : undefined}
             onLocationSelect={(lat, lng) => setCoordinates([lng, lat])}
           />
-          {coordinates && (
-            <p className="text-xs text-green-600 mt-2 font-medium">✓ Location pinned exactly on the map!</p>
-          )}
+          <p className="text-xs text-indigo-600 mt-2 font-medium">💡 Drag the pin to adjust your exact location</p>
         </div>
 
           <div>

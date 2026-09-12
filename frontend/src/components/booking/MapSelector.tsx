@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -24,6 +24,8 @@ function LocationMarker({ onLocationSelect, defaultPosition }: MapSelectorProps)
     defaultPosition ? L.latLng(defaultPosition[0], defaultPosition[1]) : null
   );
 
+  const markerRef = React.useRef<any>(null);
+
   const map = useMapEvents({
     click(e) {
       setPosition(e.latlng);
@@ -32,8 +34,39 @@ function LocationMarker({ onLocationSelect, defaultPosition }: MapSelectorProps)
     },
   });
 
+  React.useEffect(() => {
+    if (defaultPosition) {
+      const newPos = L.latLng(defaultPosition[0], defaultPosition[1]);
+      // Only flyTo if position actually changed significantly from outside
+      if (!position || position.distanceTo(newPos) > 10) {
+        setPosition(newPos);
+        map.flyTo(newPos, 16);
+      }
+    }
+  }, [defaultPosition, map]);
+
+  const eventHandlers = React.useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          const latlng = marker.getLatLng();
+          setPosition(latlng);
+          onLocationSelect(latlng.lat, latlng.lng);
+        }
+      },
+    }),
+    [onLocationSelect],
+  );
+
   return position === null ? null : (
-    <Marker position={position} icon={icon}></Marker>
+    <Marker 
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={position} 
+      icon={icon}
+      ref={markerRef}
+    ></Marker>
   );
 }
 
