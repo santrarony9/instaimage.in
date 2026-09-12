@@ -60,6 +60,7 @@ The core database, API endpoints, Authentication (Local + Google OAuth), Dashboa
 6. **Comprehensive SEO Overhaul**: Fixed a critical global canonical URL bug in `layout.tsx`, added dynamic canonicals to service pages, replaced empty `alt` tags, updated sitemap/JsonLD to prioritize slugs over Object IDs, and expanded thin content pages (Privacy, Terms, Refund) with rich, Tailwind-styled content.
 7. **Service Profile Masonry Redesign**: Upgraded the Photographer/Service details page to use a high-end Instagram/Airbnb style masonry grid for media instead of old thumbnails.
 8. **Razorpay Payment Gateway**: Fixed backend environment configurations to successfully initialize and integrate Razorpay for direct checkout payments instead of manual WhatsApp transfers.
+9. **VPS Environment Recovery & Crash-Proofing**: Recovered from a fatal deployment crash caused by a wiped-out `.env` file. Reconstructed MONGODB_URI, B2 keys, WhatsApp keys, and generated a new JWT_SECRET. Patched `google.strategy.ts` and `email.service.ts` to use dummy placeholder text if keys are missing to ensure the API never enters a fatal crash loop due to missing OAuth credentials.
 
 **Next Immediate Steps for the NEW AI to Execute:**
 1. **Iterative UI Refinements**: Final polish on the booking flow and dashboards.

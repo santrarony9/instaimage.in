@@ -41,6 +41,10 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
    - **RULE:** When configuring Nginx `proxy_pass` to the NestJS API, DO NOT use `proxy_pass http://api:3000/;` (with a trailing slash) if inside a location block like `location /api/`. Nginx appends the remaining URI to the root `/`, generating double slashes (e.g., `//v1/categories`), which NestJS automatically rejects with a 404 Not Found.
    - **SOLUTION:** Always use `rewrite ^/api/(.*) /$1 break;` and `proxy_pass http://api:3000;` (without trailing slash).
 
+3. **Environment Variable & Secret Loss Prevention (CRITICAL):**
+   - **RULE:** NEVER overwrite `backend/.env` entirely when adding new keys. Always carefully append. If `.env` is wiped, the `root-api-1` and `root-workers-1` containers will crash instantly.
+   - **OAuth Strategy Crash Loop:** `passport-google-oauth20` will throw a fatal `TypeError: OAuth2Strategy requires a clientID option` if `GOOGLE_CLIENT_ID` is missing from the `.env`. `google.strategy.ts` has been patched to use dummy placeholders if keys are missing to prevent this from taking down the entire API.
+
 ## WhatsApp Cloud API Configuration
 
 1. **Meta Account Details:**
