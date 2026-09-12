@@ -15,7 +15,8 @@ export function Step4Location() {
   
   // Try to parse existing address into fullAddress if possible
   const existingAddress = data.location?.address || '';
-  const [fullAddress, setFullAddress] = useState(existingAddress);
+  const [houseNo, setHouseNo] = useState('');
+  const [area, setArea] = useState(existingAddress);
   const [addressType, setAddressType] = useState<'Home' | 'Work' | 'Other'>('Home');
 
   const [landmark, setLandmark] = useState(data.location?.landmark || '');
@@ -44,9 +45,24 @@ export function Step4Location() {
     }
     
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
         setCoordinates([longitude, latitude]);
+        
+        // Reverse geocode
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+          const geoData = await res.json();
+          if (geoData) {
+            setArea(geoData.display_name);
+            if (geoData.address?.postcode) setPincode(geoData.address.postcode);
+            if (geoData.address?.city || geoData.address?.state_district) {
+              setCity(geoData.address.city || geoData.address.state_district || '');
+            }
+          }
+        } catch (err) {
+          console.error("Reverse geocoding failed", err);
+        }
       },
       (error) => {
         console.error("Geolocation error:", error);
@@ -58,7 +74,8 @@ export function Step4Location() {
 
   const handleNext = () => {
     const newErrors: Record<string, string> = {};
-    if (!fullAddress.trim()) newErrors.fullAddress = 'Full Address is required';
+    if (!houseNo.trim()) newErrors.houseNo = 'House / Flat No. is required';
+    if (!area.trim()) newErrors.area = 'Area / Locality is required';
     if (!pincode.trim() || !/^\d{6}$/.test(pincode)) newErrors.pincode = 'Valid 6-digit pincode is required';
     if (!city.trim()) newErrors.city = 'City is required';
 
@@ -67,7 +84,7 @@ export function Step4Location() {
       return;
     }
 
-    const finalAddress = fullAddress.trim();
+    const finalAddress = `${houseNo.trim()}, ${area.trim()}`;
 
     updateData({ 
       location: { 
@@ -169,33 +186,45 @@ export function Step4Location() {
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Full Address *</label>
-          <AddressAutocomplete 
-            value={fullAddress}
-            onChange={(val) => setFullAddress(val)}
-            onSelect={(lat, lng, addressDetails) => {
-              setCoordinates([lng, lat]);
-              if (addressDetails?.postcode) setPincode(addressDetails.postcode);
-              if (addressDetails?.city || addressDetails?.state_district) {
-                setCity(addressDetails.city || addressDetails.state_district || '');
-              }
-            }}
-            error={errors.fullAddress}
-            placeholder="e.g. Flat 302, Sunshine Apartments, MG Road"
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Flat, House no., Building, Company, Apartment *</label>
+            <input
+              type="text"
+              value={houseNo}
+              onChange={(e) => setHouseNo(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-black focus:border-black"
+              placeholder="e.g. Flat 302, Sunshine Apartments"
+            />
+            {errors.houseNo && <p className="text-red-500 text-sm mt-1">{errors.houseNo}</p>}
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Landmark (Optional)</label>
-          <input
-            type="text"
-            value={landmark}
-            onChange={(e) => setLandmark(e.target.value)}
-            className="w-full px-4 py-1.5 border rounded-lg focus:ring-black focus:border-black"
-            placeholder="Any nearby landmark"
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Area, Street, Sector, Village *</label>
+            <AddressAutocomplete 
+              value={area}
+              onChange={(val) => setArea(val)}
+              onSelect={(lat, lng, addressDetails) => {
+                setCoordinates([lng, lat]);
+                if (addressDetails?.postcode) setPincode(addressDetails.postcode);
+                if (addressDetails?.city || addressDetails?.state_district) {
+                  setCity(addressDetails.city || addressDetails.state_district || '');
+                }
+              }}
+              error={errors.area}
+              placeholder="e.g. MG Road, Mumbai"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Landmark (Optional)</label>
+            <input
+              type="text"
+              value={landmark}
+              onChange={(e) => setLandmark(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-black focus:border-black"
+              placeholder="e.g. Near Apollo Hospital"
+            />
+          </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
