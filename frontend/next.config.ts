@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; connect-src 'self' https: http: wss:; font-src 'self' data:; frame-src 'self' https:;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: http:; connect-src 'self' https: http: wss: https://api.razorpay.com; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https: https://api.razorpay.com;",
           },
         ],
       },
