@@ -22,23 +22,6 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
 
   const [allServices, setAllServices] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).RazorpayAffordabilitySuite) {
-      const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-      if (key) {
-        try {
-          const widgetConfig = { key: key, amount: totalPrice * 100 };
-          const rzpAffordabilitySuite = new (window as any).RazorpayAffordabilitySuite(widgetConfig);
-          // Wait for DOM to catch up just in case
-          setTimeout(() => {
-            rzpAffordabilitySuite.render();
-          }, 100);
-        } catch (e) {
-          console.error("Affordability widget error:", e);
-        }
-      }
-    }
-  }, [totalPrice]);
 
   useEffect(() => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
@@ -102,6 +85,23 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
     .filter((a: any) => selectedAddons.includes(a.name))
     .reduce((sum: number, a: any) => sum + Number(a.price), 0);
   const totalPrice = basePrice + addonsCost;
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).RazorpayAffordabilitySuite) {
+      const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (key) {
+        try {
+          const widgetConfig = { key: key, amount: totalPrice * 100 };
+          const rzpAffordabilitySuite = new (window as any).RazorpayAffordabilitySuite(widgetConfig);
+          setTimeout(() => {
+            rzpAffordabilitySuite.render();
+          }, 100);
+        } catch (e) {
+          console.error("Affordability widget error:", e);
+        }
+      }
+    }
+  }, [totalPrice]);
 
   const buildCartItem = () => ({
     serviceId: service._id,

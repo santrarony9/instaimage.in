@@ -12,7 +12,7 @@ export class EmailService {
     if (!apiKey) {
       this.logger.warn('RESEND_API_KEY not set — emails will not be sent');
     }
-    this.resend = new Resend(apiKey || '');
+    this.resend = new Resend(apiKey || 're_dummy_123456789');
   }
 
   async sendWelcomeEmail(to: string, name: string) {
