@@ -6,7 +6,9 @@ export function Footer() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-4 mb-6">
           <div className="col-span-2 lg:col-span-2 pr-4">
-            <h3 className="text-white text-base font-bold mb-3 tracking-tight">InstaImage</h3>
+            <Link href="/" className="inline-block mb-3">
+              <img src="/logo.png" alt="InstaImage" className="h-8 w-auto brightness-0 invert opacity-90 hover:opacity-100 transition-opacity" />
+            </Link>
             <p className="text-xs max-w-xs leading-relaxed">Capturing moments, creating memories. Book professional photographers, drone operators, and editors instantly.</p>
           </div>
           
@@ -24,7 +26,7 @@ export function Footer() {
             <h4 className="text-white font-bold mb-3 text-xs uppercase tracking-wider">Support</h4>
             <ul className="space-y-2 text-xs">
               <li><Link href="/faq" className="hover:text-white transition-colors">Help Center & FAQ</Link></li>
-              <li><a href="mailto:support@instaimage.in" className="hover:text-white transition-colors">support@instaimage.in</a></li>
+              <li><a href="mailto:info@instaimage.in" className="hover:text-white transition-colors">info@instaimage.in</a></li>
               <li><a href="tel:+918240508915" className="hover:text-white transition-colors">+91 8240508915</a></li>
             </ul>
           </div>

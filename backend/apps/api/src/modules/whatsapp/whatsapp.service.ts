@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Conversation, ConversationDocument } from './schemas/conversation.schema';
 
 @Injectable()
 export class WhatsappService {
@@ -9,7 +12,10 @@ export class WhatsappService {
   private readonly accessToken: string;
   private readonly apiVersion: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @InjectModel(Conversation.name) private readonly conversationModel: Model<ConversationDocument>,
+  ) {
     this.phoneNumberId =
       this.configService.get<string>('WHATSAPP_PHONE_NUMBER_ID') ||
       '1302518772938870';
@@ -174,13 +180,92 @@ export class WhatsappService {
    * Send OTP Verification Message
    */
   async sendOtpMessage(to: string, otp: string, customerName: string = 'User') {
-    // Using an already-approved UTILITY template to completely bypass Meta's block.
-    // The message will read: "Hi Customer, your booking #<OTP> with InstaImage has been confirmed for today."
     return this.sendTemplateMessage(
       to,
-      'booking_confirmation_alert',
-      ['Customer', `#${otp}`, 'today'],
+      'instaimage_otp',
+      [otp],
       'en_US',
+    );
+  }
+  
+  /**
+   * Handle incoming message from Meta Webhook
+   */
+  async handleIncomingWebhookMessage(phone: string, name: string, messageObj: any) {
+    const formattedPhone = this.formatPhoneNumber(phone);
+    const content = messageObj.text?.body || `[Received ${messageObj.type} message]`;
+    
+    const message = {
+      messageId: messageObj.id,
+      direction: 'INCOMING',
+      content,
+      type: messageObj.type,
+      timestamp: new Date(messageObj.timestamp * 1000),
+      status: 'delivered',
+    };
+
+    await this.conversationModel.findOneAndUpdate(
+      { phone: formattedPhone },
+      {
+        $setOnInsert: { customerName: name },
+        $push: { messages: message },
+        $inc: { unreadCount: 1 },
+        $set: {
+          lastMessageAt: new Date(messageObj.timestamp * 1000),
+          lastMessagePreview: content.substring(0, 50),
+        }
+      },
+      { upsert: true, new: true }
+    );
+    this.logger.log(`Received incoming WhatsApp message from ${formattedPhone}`);
+  }
+
+  /**
+   * Fetch conversations for Admin Dashboard
+   */
+  async getConversations() {
+    return this.conversationModel.find().sort({ lastMessageAt: -1 }).exec();
+  }
+
+  /**
+   * Admin Dashboard manual reply
+   */
+  async sendManualReply(phone: string, text: string) {
+    const response = await this.sendTextMessage(phone, text);
+    
+    if (response.success) {
+      const message = {
+        messageId: response.messageId,
+        direction: 'OUTGOING',
+        content: text,
+        type: 'text',
+        timestamp: new Date(),
+        status: 'sent',
+      };
+
+      await this.conversationModel.findOneAndUpdate(
+        { phone },
+        {
+          $push: { messages: message },
+          $set: {
+            lastMessageAt: new Date(),
+            lastMessagePreview: text.substring(0, 50),
+          }
+        },
+        { upsert: true }
+      );
+    }
+    return response;
+  }
+
+  /**
+   * Mark conversation as read
+   */
+  async markConversationAsRead(phone: string) {
+    return this.conversationModel.findOneAndUpdate(
+      { phone },
+      { $set: { unreadCount: 0 } },
+      { new: true }
     );
   }
 }

@@ -83,7 +83,7 @@ export default function PrivacyPage() {
           <p><strong>Proprietor / Grievance Officer:</strong> Priyanka Santra</p>
           <p><strong>Udyam Registration Number:</strong> UDYAM-WB-18-0211603</p>
           <p><strong>Registered Address:</strong> 85, Tilottama Plaza, Karunamoyee Ghat Road, Kolkata, South 24 Parganas, West Bengal - 700082, India</p>
-          <p><strong>Official Email:</strong> <a href="mailto:support@instaimage.in" className="text-black font-semibold underline">support@instaimage.in</a></p>
+          <p><strong>Official Email:</strong> <a href="mailto:info@instaimage.in" className="text-black font-semibold underline">info@instaimage.in</a></p>
           <p><strong>Official Contact / WhatsApp:</strong> +91 94778 33176</p>
           <p><strong>Website:</strong> <a href="https://instaimage.in" className="text-black font-semibold underline">https://instaimage.in</a></p>
         </div>
