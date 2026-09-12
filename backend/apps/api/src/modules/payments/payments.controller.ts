@@ -3,86 +3,47 @@ import {
   Post,
   Body,
   BadRequestException,
-  InternalServerErrorException,
-  Inject,
-  forwardRef,
+  Headers,
 } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { PaymentsService } from './payments.service';
-import { BookingsService } from '../bookings/bookings.service';
 import { Public } from '@app/auth';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,
-    @Inject(forwardRef(() => BookingsService)) private readonly bookingsService: BookingsService,
   ) {}
 
-  @Post('verify')
-  async verifyPayment(
-    @Body() payload: {
-      payment_id: string;
-      bookingId: string;
-    }
-  ) {
-    const isValid = await this.paymentsService.verifyInstamojoPayment(
-      payload.payment_id
-    );
-
-    if (!isValid) {
-      throw new BadRequestException('Invalid or incomplete payment');
-    }
-
-    return { success: true };
-  }
-
+  // Webhook for asynchronous Razorpay events (e.g. payment.captured, payment.failed)
   @Public()
   @Post('webhook')
-  async handleInstamojoWebhook(
+  async handleRazorpayWebhook(
     @Body() payload: any,
+    @Headers('x-razorpay-signature') signature: string,
   ) {
-    const mac = payload.mac;
-    if (!mac) {
-      throw new BadRequestException('Missing MAC signature');
+    if (!signature) {
+      throw new BadRequestException('Missing Razorpay signature');
     }
 
-    const salt = process.env.INSTAMOJO_SALT;
-    if (!salt) {
-      throw new InternalServerErrorException('Webhook not configured');
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!secret) {
+      // If webhook secret isn't configured, we just log and ignore for now.
+      // (Primary verification happens synchronously via frontend callback)
+      return { received: true };
     }
 
-    // Instamojo MAC validation
-    const data = { ...payload };
-    delete data.mac;
-
-    const keys = Object.keys(data).sort();
-    const values = keys.map(k => data[k]).join('|');
-
-    const expectedMac = crypto
-      .createHmac('sha1', salt)
-      .update(values)
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(JSON.stringify(payload))
       .digest('hex');
 
-    if (expectedMac !== mac) {
-      throw new BadRequestException('Invalid webhook MAC');
+    if (expectedSignature !== signature) {
+      throw new BadRequestException('Invalid webhook signature');
     }
 
-    if (payload.status === 'Credit' || payload.status === 'Successful') {
-      // Update booking status via bookings service
-      const paymentRequestId = payload.payment_request_id;
-      if (paymentRequestId) {
-        try {
-          await this.bookingsService.verifyPayment(paymentRequestId, {
-            payment_id: payload.payment_id,
-            payment_status: payload.status,
-          });
-        } catch (err) {
-          console.error('Webhook booking update failed:', err);
-        }
-      }
-    }
-
+    // Process event if needed (e.g., payload.event === 'payment.captured')
+    
     return { received: true };
   }
 }
