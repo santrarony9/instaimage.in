@@ -66,41 +66,21 @@ export class BookingsService {
   }
 
   async createBooking(customerId: string, createBookingDto: CreateBookingDto) {
-    // Prevent duplicate bookings: same customer + service + date — but only if a booking
-    // is already confirmed/active. A PENDING_PAYMENT booking means payment never completed,
-    // so we should allow a fresh attempt rather than blocking the customer.
-    const existingBooking = await this.bookingsRepository.model.findOne({
-      customerId: new Types.ObjectId(customerId),
-      serviceId: new Types.ObjectId(createBookingDto.serviceId),
-      scheduledDate: new Date(createBookingDto.scheduledDate),
-      status: {
-        $in: [
-          BookingStatus.CONFIRMED,
-          BookingStatus.ASSIGNED,
-          BookingStatus.IN_PROGRESS,
-          BookingStatus.COMPLETED,
-          BookingStatus.EDITING,
-          BookingStatus.DELIVERED,
-        ],
-      },
-    });
-    if (existingBooking) {
-      throw new BadRequestException(
-        'You already have an active booking for this service on this date. Please cancel it first or choose a different date.',
-      );
-    }
-
     const date = new Date();
     const year = date.getFullYear();
     const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
     const bookingId = `BKG-${year}-${randomSuffix}`;
 
-    await this.availabilityService.lockSlot(
-      new Date(createBookingDto.scheduledDate),
-      createBookingDto.startTime,
-      createBookingDto.endTime,
-      bookingId,
-    );
+    // Allow multiple bookings for the same day (e.g., morning and evening shoots, or multiple services)
+    // Removed the existingBooking duplicate check to allow customers to book whatever they need.
+
+    // Bypass strict global time slot locking for now so multiple customers or multiple services can be booked
+    // await this.availabilityService.lockSlot(
+    //   new Date(createBookingDto.scheduledDate),
+    //   createBookingDto.startTime,
+    //   createBookingDto.endTime,
+    //   bookingId,
+    // );
 
     try {
       const { pricing, matchedAddons, walletDiscountApplied } =
