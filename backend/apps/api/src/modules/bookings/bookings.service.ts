@@ -137,7 +137,7 @@ export class BookingsService {
         this.bookingsRepository.model
           .findById(booking._id)
           .populate('customerId', 'name email')
-          .populate('serviceId', 'title name')
+          .populate('serviceId', 'title name images')
           .then((b) => {
             if (b && b.customerId && (b.customerId as any).email) {
               this.emailService.sendBookingConfirmation(
@@ -219,7 +219,7 @@ export class BookingsService {
     this.bookingsRepository.model
       .findById(booking._id)
       .populate('customerId', 'name email')
-      .populate('serviceId', 'title name')
+      .populate('serviceId', 'title name images')
       .then((b) => {
         if (b && b.customerId && (b.customerId as any).email) {
           this.emailService.sendBookingConfirmation(
@@ -238,7 +238,7 @@ export class BookingsService {
     const booking = await this.bookingsRepository.model
       .findOne(id.startsWith('BKG-') ? { bookingId: id } : { _id: id })
       .populate('customerId', 'name email phone')
-      .populate('serviceId', 'name');
+      .populate('serviceId', 'name images');
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
@@ -283,7 +283,7 @@ export class BookingsService {
   async getUserBookings(customerId: string) {
     return this.bookingsRepository.model
       .find({ customerId: new Types.ObjectId(customerId), isDeleted: false })
-      .populate('serviceId', 'name')
+      .populate('serviceId', 'name images')
       .sort({ createdAt: -1 })
       .lean();
   }
@@ -292,7 +292,7 @@ export class BookingsService {
     return this.bookingsRepository.model
       .find({ isDeleted: false })
       .populate('customerId', 'name email phone isWhatsappVerified')
-      .populate('serviceId', 'name')
+      .populate('serviceId', 'name images')
       .populate('sellerId', 'name bankDetails')
       .sort({ createdAt: -1 })
       .lean();
@@ -393,7 +393,7 @@ export class BookingsService {
         isDeleted: false,
       })
       .populate('customerId', 'name email phone')
-      .populate('serviceId', 'name')
+      .populate('serviceId', 'name images')
       .sort({ scheduledDate: 1 })
       .lean();
   }
@@ -816,7 +816,7 @@ export class BookingsService {
         'internalNotes.followUpDate': { $gte: today },
       })
       .populate('customerId', 'name email phone')
-      .populate('serviceId', 'name')
+      .populate('serviceId', 'name images')
       .sort({ 'internalNotes.followUpDate': 1 })
       .lean();
 

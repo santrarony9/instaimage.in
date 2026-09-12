@@ -177,8 +177,18 @@ export default function CustomerDashboardOverview() {
               
               <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                 <div className="flex-1">
-                  <h4 className="text-2xl font-black mb-4 truncate">{upcomingBookings[0].serviceId?.name || 'Photography Shoot'}</h4>
-                  
+                  <div className="flex items-center gap-4 mb-4">
+                    {upcomingBookings[0].serviceId?.images?.[0] ? (
+                      <div className="w-16 h-16 rounded-xl overflow-hidden shadow-sm shrink-0 border border-white/20">
+                        <img 
+                          src={upcomingBookings[0].serviceId.images[0]} 
+                          alt="Service" 
+                          className="w-full h-full object-cover" 
+                        />
+                      </div>
+                    ) : null}
+                    <h4 className="text-2xl font-black truncate">{upcomingBookings[0].serviceId?.name || 'Photography Shoot'}</h4>
+                  </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-blue-100 text-sm font-medium">
                       <CalendarDays className="w-4 h-4" />
@@ -219,9 +229,19 @@ export default function CustomerDashboardOverview() {
               <Link key={booking._id} href={`/customer/bookings/${booking._id}`} className="min-w-[280px] sm:min-w-[320px] snap-start shrink-0 group">
                 <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                      <Camera className="w-6 h-6" />
-                    </div>
+                    {booking.serviceId?.images?.[0] ? (
+                      <div className="w-12 h-12 bg-gray-50 rounded-2xl overflow-hidden">
+                        <img 
+                          src={booking.serviceId.images[0]} 
+                          alt="Service" 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                        <Camera className="w-6 h-6" />
+                      </div>
+                    )}
                     <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full ${
                       booking.status === 'COMPLETED' ? 'bg-green-50 text-green-600' :
                       booking.status === 'CONFIRMED' ? 'bg-blue-50 text-blue-600' :
