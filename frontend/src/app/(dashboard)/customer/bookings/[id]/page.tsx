@@ -154,13 +154,24 @@ export default function BookingDetailPage() {
 
       <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-100">
         <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-            <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                {booking.serviceId?.name || 'Service Details'}
-              </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Personal details and schedule.
-              </p>
+            <div className="flex items-center gap-4">
+              {booking.serviceId?.images?.[0] && (
+                <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-gray-100 bg-gray-50">
+                  <img 
+                    src={booking.serviceId.images[0]} 
+                    alt="Service" 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+              )}
+              <div>
+                <h3 className="text-lg leading-6 font-bold text-gray-900">
+                  {booking.serviceId?.name || 'Service Details'}
+                </h3>
+                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                  Personal details and schedule.
+                </p>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
               {(booking.status === 'PENDING_PAYMENT' || booking.status === 'CONFIRMED') && (
