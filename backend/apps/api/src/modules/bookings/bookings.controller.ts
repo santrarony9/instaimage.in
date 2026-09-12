@@ -104,19 +104,6 @@ export class BookingsController {
     return this.bookingsService.cancelBookingCustomer(id, req.user.sub);
   }
 
-  @Post(':id/verify-payment')
-  @Roles(Role.CUSTOMER)
-  async verifyPayment(
-    @Param('id') id: string,
-    @Body() payload: {
-      payment_id: string;
-      payment_request_id?: string;
-      payment_status?: string;
-    },
-  ) {
-    return this.bookingsService.verifyPayment(id, payload);
-  }
-
   @Post(':id/verify-razorpay-payment')
   @Roles(Role.CUSTOMER)
   async verifyRazorpayPayment(

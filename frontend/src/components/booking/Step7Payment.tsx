@@ -100,10 +100,17 @@ export function Step7Payment() {
       if (paymentOrder.provider === 'razorpay') {
         const loadScript = (src: string) => {
           return new Promise((resolve) => {
-            if (document.querySelector(`script[src="${src}"]`)) {
+            if ((window as any).Razorpay) {
               resolve(true);
               return;
             }
+            
+            // Remove existing broken script tags if any
+            const existing = document.querySelector(`script[src="${src}"]`);
+            if (existing) {
+              existing.remove();
+            }
+
             const script = document.createElement('script');
             script.src = src;
             script.onload = () => resolve(true);
@@ -171,11 +178,8 @@ export function Step7Payment() {
         // Since modal is open, we stop the local processing spinner 
         // to let the user interact with the modal. We show it again in handler.
         setIsProcessing(false); 
-      } else if (paymentOrder.longurl) {
-        clearCart();
-        window.location.href = paymentOrder.longurl;
       } else {
-        setBookingError('Failed to get payment link. Please try again.');
+        setBookingError('Failed to initialize Razorpay payment. Please try again.');
         setIsProcessing(false);
       }
     } catch (err: any) {
