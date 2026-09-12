@@ -123,20 +123,32 @@ export function Step4Location() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {savedAddresses.map((addr, idx) => {
               const addrFull = addr.address || '';
-              const isSelected = (fullAddress === addrFull) && pincode === addr.pincode;
+              // Reconstruct the full address from the current state to check if it's selected
+              const currentFullAddress = houseNo && area ? `${houseNo}, ${area}` : area || houseNo;
+              const isSelected = (currentFullAddress === addrFull) && pincode === addr.pincode;
               return (
                 <div 
                   key={idx} 
                   onClick={() => {
                     if (isSelected) {
-                      setFullAddress('');
+                      setHouseNo('');
+                      setArea('');
                       setLandmark('');
                       setPincode('');
                       setCity('');
                       setCoordinates(null);
                     } else {
                       const addrVal = addr.address || '';
-                      setFullAddress(addrVal);
+                      // Attempt to split the saved address back into houseNo and area
+                      const parts = addrVal.split(',');
+                      if (parts.length > 1) {
+                        setHouseNo(parts.shift()?.trim() || '');
+                        setArea(parts.join(',')?.trim() || '');
+                      } else {
+                        setHouseNo('');
+                        setArea(addrVal);
+                      }
+                      
                       setLandmark(addr.landmark || '');
                       setPincode(addr.pincode || '');
                       setCity(addr.city || '');
