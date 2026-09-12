@@ -132,23 +132,25 @@ export class BookingsService {
         await booking.save();
       }
 
-      // Async email sending (no await)
-      this.bookingsRepository.model
-        .findById(booking._id)
-        .populate('customerId', 'name email')
-        .populate('serviceId', 'title name')
-        .then((b) => {
-          if (b && b.customerId && (b.customerId as any).email) {
-            this.emailService.sendBookingConfirmation(
-              (b.customerId as any).email,
-              (b.customerId as any).name,
-              (b.serviceId as any).title ||
-                (b.serviceId as any).name ||
-                'Service',
-              b.scheduledDate.toLocaleDateString(),
-            ).catch(err => console.error('Background task failed:', err));
-          }
-        }).catch(err => console.error('Background task failed:', err));
+      if (pricing.advancePaid === 0) {
+        // If 100% paid via wallet, confirm immediately and send email
+        this.bookingsRepository.model
+          .findById(booking._id)
+          .populate('customerId', 'name email')
+          .populate('serviceId', 'title name')
+          .then((b) => {
+            if (b && b.customerId && (b.customerId as any).email) {
+              this.emailService.sendBookingConfirmation(
+                (b.customerId as any).email,
+                (b.customerId as any).name,
+                (b.serviceId as any).title ||
+                  (b.serviceId as any).name ||
+                  'Service',
+                b.scheduledDate.toLocaleDateString(),
+              ).catch(err => console.error('Background task failed:', err));
+            }
+          }).catch(err => console.error('Background task failed:', err));
+      }
 
       return {
         booking,
@@ -210,6 +212,22 @@ export class BookingsService {
     booking.paymentId = payload.payment_id;
     await booking.save();
 
+    // Async email sending upon successful payment
+    this.bookingsRepository.model
+      .findById(booking._id)
+      .populate('customerId', 'name email')
+      .populate('serviceId', 'title name')
+      .then((b) => {
+        if (b && b.customerId && (b.customerId as any).email) {
+          this.emailService.sendBookingConfirmation(
+            (b.customerId as any).email,
+            (b.customerId as any).name,
+            (b.serviceId as any).title || (b.serviceId as any).name || 'Service',
+            b.scheduledDate.toLocaleDateString(),
+          ).catch(err => console.error('Background task failed:', err));
+        }
+      }).catch(err => console.error('Background task failed:', err));
+
     return { success: true, booking };
   }
 
@@ -260,6 +278,22 @@ export class BookingsService {
     booking.paymentStatus = 'PAID';
     booking.paymentId = payload.razorpay_payment_id;
     await booking.save();
+
+    // Async email sending upon successful payment
+    this.bookingsRepository.model
+      .findById(booking._id)
+      .populate('customerId', 'name email')
+      .populate('serviceId', 'title name')
+      .then((b) => {
+        if (b && b.customerId && (b.customerId as any).email) {
+          this.emailService.sendBookingConfirmation(
+            (b.customerId as any).email,
+            (b.customerId as any).name,
+            (b.serviceId as any).title || (b.serviceId as any).name || 'Service',
+            b.scheduledDate.toLocaleDateString(),
+          ).catch(err => console.error('Background task failed:', err));
+        }
+      }).catch(err => console.error('Background task failed:', err));
 
     return { success: true, booking };
   }
