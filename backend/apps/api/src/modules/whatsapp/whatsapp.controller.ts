@@ -1,9 +1,7 @@
 import { Controller, Get, Post, Body, Query, Res, HttpStatus, UseGuards, Param } from '@nestjs/common';
 import { WhatsappService } from './whatsapp.service';
 import { Response } from 'express';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard, Roles } from '@app/auth';
 
 @Controller('v1/whatsapp')
 export class WhatsappController {
