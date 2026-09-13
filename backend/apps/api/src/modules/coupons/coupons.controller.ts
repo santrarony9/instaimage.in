@@ -31,6 +31,17 @@ export class CouponsController {
   }
 
   @Public()
+  @Post('validate')
+  async validate(@Body() body: { code: string; orderValue: number }) {
+    try {
+      const coupon = await this.couponsService.validateCoupon(body.code, body.orderValue);
+      return { success: true, coupon };
+    } catch (error: any) {
+      return { success: false, message: error.message };
+    }
+  }
+
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.couponsService.findOne(id);

@@ -295,6 +295,63 @@ export function Step7Payment() {
         </div>
       )}
 
+      {/* Promo Code Section */}
+      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm mb-6">
+        <h4 className="font-bold text-gray-900 mb-2">🎟️ Have a Promo Code?</h4>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Enter code"
+            className="flex-1 border rounded-lg px-3 py-2 text-sm font-bold uppercase focus:ring-2 focus:ring-indigo-500 outline-none"
+            id="promo-input"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('apply-promo-btn')?.click();
+              }
+            }}
+          />
+          <button
+            id="apply-promo-btn"
+            onClick={async () => {
+              const input = document.getElementById('promo-input') as HTMLInputElement;
+              const code = input.value.trim();
+              if (!code) return;
+              try {
+                const orderVal = (p?.totalPrice || 0) + (p?.walletDiscountApplied || 0) + (p?.discount || 0);
+                const res = await fetchApi('/coupons/validate', {
+                  method: 'POST',
+                  body: JSON.stringify({ code, orderValue: orderVal })
+                });
+                if (res.success) {
+                  useBookingStore.getState().updateData({ appliedCouponId: res.coupon._id });
+                  alert(`Coupon applied: ₹${res.coupon.discountValue}${res.coupon.discountType === 'PERCENTAGE' ? '%' : ''} off!`);
+                  input.value = '';
+                } else {
+                  alert(res.message || 'Invalid coupon code');
+                }
+              } catch (err: any) {
+                alert(err.message || 'Failed to apply coupon');
+              }
+            }}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-colors"
+          >
+            Apply
+          </button>
+        </div>
+        {data.appliedCouponId && (
+          <div className="mt-3 flex items-center justify-between bg-green-50 px-3 py-2 rounded border border-green-200">
+            <span className="text-sm font-bold text-green-700">✅ Promo Code Applied</span>
+            <button 
+              onClick={() => useBookingStore.getState().updateData({ appliedCouponId: undefined })}
+              className="text-xs font-bold text-red-600 hover:underline"
+            >
+              Remove
+            </button>
+          </div>
+        )}
+      </div>
+
       {bookingError && (
         <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4 text-sm flex items-start gap-2">
           <span className="text-lg">⚠️</span>

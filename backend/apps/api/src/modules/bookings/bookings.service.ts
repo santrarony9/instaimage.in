@@ -109,6 +109,10 @@ export class BookingsService {
         customerNotes: createBookingDto.customerNotes,
       });
 
+      if (createBookingDto.appliedCouponId && pricing.discount > 0) {
+        await this.couponsService.incrementUsage(createBookingDto.appliedCouponId).catch(e => this.logger.error(`Failed to increment coupon usage: ${e.message}`));
+      }
+
       // 3. Handle Payment Order Mock or Direct Confirmation
       let paymentOrder = null;
       if (pricing.advancePaid > 0) {
@@ -599,26 +603,35 @@ export class BookingsService {
       nearestOfficeName = travelResult.nearestOfficeName;
     }
     let discount = 0;
+    
+    // First calculate total before discount to validate minOrderValue
+    let preDiscountTotal = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge + (createBookingDto.isExpressDelivery ? (service.expressDeliveryFee || 0) : 0);
 
-    const travelConfig =
-      await this.settingsService.getSetting('travelChargeConfig');
+    const travelConfig = await this.settingsService.getSetting('travelChargeConfig');
     let deliveryDiscount = 0;
     if (travelConfig?.isFreeOfferActive) {
       deliveryDiscount = deliveryCharge;
     }
 
     if (createBookingDto.appliedCouponId) {
-      const coupon = await this.couponsService.findOne(
-        createBookingDto.appliedCouponId,
-      );
-      if (coupon && coupon.isActive) {
-        if (coupon.discountType === 'PERCENTAGE') {
-          discount = (basePrice + addonsPrice) * (coupon.discountValue / 100);
-          if (coupon.maxDiscount && discount > coupon.maxDiscount)
-            discount = coupon.maxDiscount;
-        } else {
-          discount = coupon.discountValue;
+      try {
+        const coupon = await this.couponsService.findOne(createBookingDto.appliedCouponId);
+        if (coupon) {
+          await this.couponsService.validateCoupon(coupon.code, preDiscountTotal);
+          
+          if (coupon.discountType === 'PERCENTAGE') {
+            discount = (basePrice + addonsPrice) * (coupon.discountValue / 100);
+            if (coupon.maxDiscount && discount > coupon.maxDiscount)
+              discount = coupon.maxDiscount;
+          } else {
+            discount = coupon.discountValue;
+          }
         }
+      } catch (err) {
+        // Coupon invalid - ignore discount silently or could throw. 
+        // For checkout robust calculation, ignoring invalid coupon is safer, 
+        // but throwing ensures UI catches it. Let's ignore it here to allow checkout to proceed without discount.
+        this.logger.warn(`Failed to apply coupon: ${err.message}`);
       }
     }
 

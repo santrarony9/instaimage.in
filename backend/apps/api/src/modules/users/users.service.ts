@@ -178,7 +178,7 @@ export class UsersService {
       email,
       code,
       isRedeemed: false,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     });
 
     const user = await this.usersRepository.findById(userId);
@@ -211,7 +211,7 @@ export class UsersService {
     }
 
     if (coupon.expiresAt < new Date()) {
-      throw new BadRequestException('This coupon has expired. Verification coupons are valid for 7 days.');
+      throw new BadRequestException('This coupon has expired. Verification coupons are valid for 30 days.');
     }
 
     // Security: coupon must belong to this user
