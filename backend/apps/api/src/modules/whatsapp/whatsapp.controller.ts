@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Query, Res, HttpStatus, UseGuards, Param } from '@nestjs/common';
 import { WhatsappService } from './whatsapp.service';
 import { Response } from 'express';
-import { JwtAuthGuard, RolesGuard, Roles } from '@app/auth';
+import { JwtAuthGuard, RolesGuard, Roles, Role } from '@app/auth';
 
 @Controller('v1/whatsapp')
 export class WhatsappController {
@@ -50,7 +50,7 @@ export class WhatsappController {
   // 3. Admin Dashboard: Get all conversations
   @Get('conversations')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   async getConversations() {
     return this.whatsappService.getConversations();
   }
@@ -58,7 +58,7 @@ export class WhatsappController {
   // 4. Admin Dashboard: Send a manual reply
   @Post('conversations/:phone/reply')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   async sendReply(@Param('phone') phone: string, @Body('message') message: string) {
     return this.whatsappService.sendManualReply(phone, message);
   }
@@ -66,7 +66,7 @@ export class WhatsappController {
   // 5. Admin Dashboard: Mark conversation as read
   @Post('conversations/:phone/read')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles(Role.ADMIN)
   async markAsRead(@Param('phone') phone: string) {
     return this.whatsappService.markConversationAsRead(phone);
   }
