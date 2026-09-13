@@ -30,21 +30,31 @@ async function bootstrap() {
   app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
 
   // CORS
-  app.enableCors({ origin: true, credentials: true });
-
-  // OpenAPI Swagger Setup
-  const config = new DocumentBuilder()
-    .setTitle('Photography Marketplace API')
-    .setDescription('Enterprise Photography & Media Fulfillment Platform API')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  app.enableCors({
+    origin: [
+      'https://instaimage.in',
+      'https://www.instaimage.in',
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ],
+    credentials: true,
+  });
 
   const port = process.env.PORT || 4000;
   await app.listen(port);
   console.log(`🚀 API Application running on http://localhost:${port}/v1`);
-  console.log(`📚 Swagger Docs available at http://localhost:${port}/api/docs`);
+
+  // OpenAPI Swagger Setup (disabled in production)
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Photography Marketplace API')
+      .setDescription('Enterprise Photography & Media Fulfillment Platform API')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+    console.log(`📚 Swagger Docs available at http://localhost:${port}/api/docs`);
+  }
 }
 bootstrap();
