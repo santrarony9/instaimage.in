@@ -49,27 +49,4 @@ export class WhatsappController {
     }
   }
 
-  // 3. Admin Dashboard: Get all conversations
-  @Get('conversations')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  async getConversations() {
-    return this.whatsappService.getConversations();
-  }
-
-  // 4. Admin Dashboard: Send a manual reply
-  @Post('conversations/:phone/reply')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  async sendReply(@Param('phone') phone: string, @Body('message') message: string) {
-    return this.whatsappService.sendManualReply(phone, message);
-  }
-
-  // 5. Admin Dashboard: Mark conversation as read
-  @Post('conversations/:phone/read')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  async markAsRead(@Param('phone') phone: string) {
-    return this.whatsappService.markConversationAsRead(phone);
-  }
 }
