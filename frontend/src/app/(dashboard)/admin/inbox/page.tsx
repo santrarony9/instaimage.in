@@ -40,7 +40,8 @@ export default function WhatsAppInbox() {
   const fetchConversations = async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/conversations`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
       });
       if (res.ok) {
         const data = await res.json();
