@@ -1,13 +1,14 @@
 import { Controller, Get, Post, Body, Query, Res, HttpStatus, UseGuards, Param } from '@nestjs/common';
 import { WhatsappService } from './whatsapp.service';
 import { Response } from 'express';
-import { JwtAuthGuard, RolesGuard, Roles, Role } from '@app/auth';
+import { JwtAuthGuard, RolesGuard, Roles, Role, Public } from '@app/auth';
 
-@Controller('v1/whatsapp')
+@Controller('whatsapp')
 export class WhatsappController {
   constructor(private readonly whatsappService: WhatsappService) {}
 
   // 1. Webhook Verification (Meta requires this)
+  @Public()
   @Get('webhook')
   verifyWebhook(@Query() query: any, @Res() res: Response) {
     const mode = query['hub.mode'];
@@ -27,6 +28,7 @@ export class WhatsappController {
   }
 
   // 2. Webhook Message Receiver
+  @Public()
   @Post('webhook')
   async handleIncomingMessage(@Body() body: any, @Res() res: Response) {
     // Return 200 OK immediately to acknowledge receipt to Meta
