@@ -127,7 +127,7 @@ export function Step7Payment() {
         }
 
         const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '', // Needs to be added to .env.local
+          key: 'rzp_live_Tb5eAjWbqWtFcS', // Hardcoded live key to bypass Vercel env cache
           amount: Math.round(paymentOrder.amount * 100), // paise
           currency: paymentOrder.currency,
           name: 'InstaImage',

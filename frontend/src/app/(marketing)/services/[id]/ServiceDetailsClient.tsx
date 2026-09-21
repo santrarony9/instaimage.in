@@ -88,7 +88,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
 
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).RazorpayAffordabilitySuite) {
-      const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      const key = 'rzp_live_Tb5eAjWbqWtFcS';
       if (key) {
         try {
           const widgetConfig = { key: key, amount: totalPrice * 100 };
@@ -308,7 +308,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
                 strategy="lazyOnload" 
                 onLoad={() => {
                   if (typeof window !== 'undefined' && (window as any).RazorpayAffordabilitySuite) {
-                    const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+                    const key = 'rzp_live_Tb5eAjWbqWtFcS';
                     if (key) {
                       try {
                         const widgetConfig = { key: key, amount: totalPrice * 100 };
