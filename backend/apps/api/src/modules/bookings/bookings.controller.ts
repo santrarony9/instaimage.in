@@ -17,6 +17,12 @@ import { memoryStorage } from 'multer';
 import { Request as ExpressRequest } from 'express';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import {
+  CreateMultipleBookingsDto,
+  VerifyRazorpayPaymentDto,
+  AddSurchargeDto,
+  AddInternalNoteDto,
+} from './dto/bookings.dto';
 import { JwtAuthGuard, RolesGuard, Roles, Role, Public } from '@app/auth';
 import { BookingStatus } from './schemas/booking.schema';
 
@@ -48,7 +54,7 @@ export class BookingsController {
   @Roles(Role.CUSTOMER)
   async createMultiple(
     @Request() req: AuthenticatedRequest,
-    @Body() body: { items: CreateBookingDto[] },
+    @Body() body: CreateMultipleBookingsDto,
   ) {
     if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
       throw new BadRequestException('items array is required and must not be empty');
@@ -108,11 +114,7 @@ export class BookingsController {
   @Roles(Role.CUSTOMER)
   async verifyRazorpayPayment(
     @Param('id') id: string,
-    @Body() payload: {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
-    },
+    @Body() payload: VerifyRazorpayPaymentDto,
   ) {
     return this.bookingsService.verifyRazorpayPayment(id, payload);
   }
@@ -159,7 +161,7 @@ export class BookingsController {
   @Roles(Role.ADMIN)
   addSurcharge(
     @Param('id') id: string,
-    @Body() surcharge: { name: string; amount: number; reason?: string },
+    @Body() surcharge: AddSurchargeDto,
   ) {
     return this.bookingsService.addSurcharge(id, surcharge);
   }
@@ -169,7 +171,7 @@ export class BookingsController {
   addInternalNote(
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() body: { note: string; followUpDate?: string },
+    @Body() body: AddInternalNoteDto,
   ) {
     return this.bookingsService.addInternalNote(id, {
       note: body.note,

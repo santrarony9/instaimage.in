@@ -18,3 +18,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 ENV NODE_ENV=production
+
+# Run as non-root user for security
+USER node

@@ -200,24 +200,30 @@ export class BookingsService {
       throw new NotFoundException('Booking not found');
     }
 
-    // Deduct wallet discount if applicable
-    if (
-      booking.pricing &&
-      booking.pricing.walletDiscountApplied > 0 &&
-      booking.paymentStatus !== 'PAID'
-    ) {
-      await this.usersService.addWalletBalance(
-        booking.customerId.toString(),
-        -booking.pricing.walletDiscountApplied,
-        `Applied to booking ${booking.bookingId}`,
-        booking._id.toString(),
-      );
-    }
-
+    // IMPORTANT: Save booking status FIRST, then deduct wallet.
+    // This prevents "money loss" bug where wallet is deducted but booking save fails.
     booking.status = BookingStatus.CONFIRMED;
     booking.paymentStatus = 'PAID';
     booking.paymentId = payload.razorpay_payment_id;
     await booking.save();
+
+    // Deduct wallet discount after booking is safely confirmed
+    if (
+      booking.pricing &&
+      booking.pricing.walletDiscountApplied > 0
+    ) {
+      try {
+        await this.usersService.addWalletBalance(
+          booking.customerId.toString(),
+          -booking.pricing.walletDiscountApplied,
+          `Applied to booking ${booking.bookingId}`,
+          booking._id.toString(),
+        );
+      } catch (error) {
+        this.logger.error(`Failed to deduct wallet for booking ${booking.bookingId}: ${error.message}`);
+        // Booking is confirmed — admin can manually adjust wallet if needed
+      }
+    }
 
     // Async email sending upon successful payment
     this.bookingsRepository.model
@@ -319,17 +325,25 @@ export class BookingsService {
       note: `Cancelled by customer. Wallet refunded: ₹${booking.pricing?.walletDiscountApplied || 0}. Advance paid via gateway: ₹${booking.pricing?.advancePaid || 0} (manual refund required).`,
     });
 
-    // If they paid with wallet (or advance), we should refund wallet balance!
-    // Since this is a quick fix, let's refund walletDiscountApplied if any.
+    // IMPORTANT: Save booking status FIRST, then refund wallet.
+    // This prevents the "free money" bug where wallet is refunded but booking save fails.
+    await booking.save();
+
+    // Refund wallet balance after booking is safely marked as cancelled
     if (booking.pricing && booking.pricing.walletDiscountApplied > 0) {
-       await this.usersService.addWalletBalance(
-         customerId,
-         booking.pricing.walletDiscountApplied,
-         `Refund for cancelled booking #${booking.bookingId}`
-       );
+      try {
+        await this.usersService.addWalletBalance(
+          customerId,
+          booking.pricing.walletDiscountApplied,
+          `Refund for cancelled booking #${booking.bookingId}`
+        );
+      } catch (error) {
+        this.logger.error(`Failed to refund wallet for booking ${booking.bookingId}: ${error.message}`);
+        // Booking is already cancelled — admin can manually issue wallet credit if needed
+      }
     }
 
-    return booking.save();
+    return booking;
   }
 
   async updateBookingStatus(id: string, status: BookingStatus) {

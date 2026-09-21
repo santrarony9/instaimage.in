@@ -1,13 +1,17 @@
 import { NestFactory, Reflector } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ApiModule } from './api.module';
 import { JwtAuthGuard, RolesGuard } from '@app/auth';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule, {
     bufferLogs: true,
   });
+
+  // Security Headers
+  app.use(helmet());
 
   // API Versioning
   app.enableVersioning({
@@ -42,7 +46,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 4000;
   await app.listen(port);
-  console.log(`🚀 API Application running on http://localhost:${port}/v1`);
+  Logger.log(`🚀 API Application running on http://localhost:${port}/v1`, 'Bootstrap');
 
   // OpenAPI Swagger Setup (disabled in production)
   if (process.env.NODE_ENV !== 'production') {

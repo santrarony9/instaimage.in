@@ -93,3 +93,9 @@ export class LinkWhatsappPhoneDto {
   @MinLength(4)
   otp: string;
 }
+
+export class AdminRegisterDto extends RegisterDto {
+  @IsString()
+  @IsNotEmpty()
+  role: string;
+}

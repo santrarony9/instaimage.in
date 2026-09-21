@@ -17,6 +17,8 @@ import {
   VerifyWhatsappOtpDto,
   LinkWhatsappPhoneDto,
   ResetPasswordDto,
+  ForgotPasswordDto,
+  AdminRegisterDto,
 } from './dto/auth.dto';
 
 @Controller('auth')
@@ -83,13 +85,13 @@ export class AuthController {
 
   @Post('admin-register')
   @Roles(Role.ADMIN)
-  adminRegister(@Body() registerDto: RegisterDto & { role: string }) {
+  adminRegister(@Body() registerDto: AdminRegisterDto) {
     return this.authService.adminRegister(registerDto);
   }
 
   @Public()
   @Post('forgot-password')
-  forgotPassword(@Body() forgotPasswordDto: { email: string }) {
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 

@@ -81,6 +81,17 @@ export class UsersService {
     }
   }
 
+  async unsetFields(id: string, fields: string[]) {
+    const unsetObj: Record<string, 1> = {};
+    for (const field of fields) {
+      unsetObj[field] = 1;
+    }
+    return this.usersRepository.model.updateOne(
+      { _id: new Types.ObjectId(id) },
+      { $unset: unsetObj },
+    );
+  }
+
   async getAddresses(userId: string) {
     const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');

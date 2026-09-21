@@ -16,6 +16,7 @@ import {
   SendWhatsappOtpDto,
   VerifyWhatsappOtpDto,
   LinkWhatsappPhoneDto,
+  AdminRegisterDto,
 } from './dto/auth.dto';
 import { Role } from '@app/auth';
 import { SellersService } from '../sellers/sellers.service';
@@ -84,13 +85,17 @@ export class AuthService {
     });
 
     // Send via WhatsApp API
-    const sendResult = await this.whatsappService.sendOtpMessage(
-      phone,
-      otp,
-      dto.name || 'Customer',
-    );
-
-    this.logger.log(`WhatsApp OTP sent to ${phone} (Result: ${JSON.stringify(sendResult)})`);
+    try {
+      const sendResult = await this.whatsappService.sendOtpMessage(
+        phone,
+        otp,
+        dto.name || 'Customer',
+      );
+      this.logger.log(`WhatsApp OTP sent to ${phone} (Result: ${JSON.stringify(sendResult)})`);
+    } catch (error) {
+      this.logger.error(`Failed to send WhatsApp OTP to ${phone}: ${error.message}`);
+      throw new BadRequestException('Failed to send OTP. Please try again in a moment.');
+    }
 
     return {
       success: true,
@@ -309,7 +314,7 @@ export class AuthService {
     // REMOVED: No automatic wallet credit here to prevent abuse.
     // They must verify their email via the dashboard to get 500.
 
-    this.emailService.sendWelcomeEmail(user.email, user.name);
+    this.emailService.sendWelcomeEmail(user.email, user.name).catch(err => this.logger.error(`Failed to send welcome email: ${err.message}`));
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -359,7 +364,7 @@ export class AuthService {
       isWhatsappVerified: user.isWhatsappVerified,
     };
 
-    this.emailService.sendWelcomeEmail(user.email, user.name);
+    this.emailService.sendWelcomeEmail(user.email, user.name).catch(err => this.logger.error(`Failed to send welcome email: ${err.message}`));
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -406,7 +411,7 @@ export class AuthService {
     };
   }
 
-  async adminRegister(registerDto: RegisterDto & { role: string }) {
+  async adminRegister(registerDto: AdminRegisterDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
@@ -438,7 +443,7 @@ export class AuthService {
       });
     }
 
-    this.emailService.sendWelcomeEmail(user.email, user.name);
+    this.emailService.sendWelcomeEmail(user.email, user.name).catch(err => this.logger.error(`Failed to send welcome email: ${err.message}`));
 
     return {
       success: true,
@@ -472,7 +477,7 @@ export class AuthService {
         500,
         'Welcome Bonus',
       );
-      this.emailService.sendWelcomeEmail(user.email, user.name);
+      this.emailService.sendWelcomeEmail(user.email, user.name).catch(err => this.logger.error(`Failed to send welcome email: ${err.message}`));
     }
 
     const payload = {
@@ -514,7 +519,7 @@ export class AuthService {
     });
 
     const resetLink = `https://instaimage.in/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
-    this.emailService.sendPasswordResetEmail(user.email, resetLink);
+    this.emailService.sendPasswordResetEmail(user.email, resetLink).catch(err => this.logger.error(`Failed to send password reset email: ${err.message}`));
 
     return {
       success: true,
@@ -543,9 +548,10 @@ export class AuthService {
 
     await this.usersService.update(user._id.toString(), {
       passwordHash,
-      resetPasswordToken: undefined,
-      resetPasswordExpires: undefined,
     });
+
+    // Use $unset to properly remove reset tokens — Mongoose ignores `undefined` in updates
+    await this.usersService.unsetFields(user._id.toString(), ['resetPasswordToken', 'resetPasswordExpires']);
 
     return { success: true, message: 'Password has been reset successfully' };
   }
