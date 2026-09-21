@@ -71,6 +71,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased bg-gray-50 font-sans`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                      registration.unregister();
+                    }
+                  });
+                }
+                const currentVersion = '1.0.1'; // Update to bust cache
+                if (localStorage.getItem('app_version') !== currentVersion) {
+                  localStorage.setItem('app_version', currentVersion);
+                  window.location.reload(true);
+                }
+              }
+            `,
+          }}
+        />
         <OrganizationJsonLd />
         {children}
         <WhatsappVerificationModal />
