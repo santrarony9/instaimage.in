@@ -51,8 +51,6 @@ export const metadata: Metadata = {
     images: ["/og-image.jpg"],
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
   manifest: "/manifest.webmanifest",
