@@ -182,7 +182,7 @@ export class WhatsappService {
   async sendOtpMessage(to: string, otp: string, customerName: string = 'User') {
     return this.sendTemplateMessage(
       to,
-      'instaimage_otp',
+      'instaimage_promo_code',
       [otp],
       'en_US',
     );
