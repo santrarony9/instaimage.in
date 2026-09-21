@@ -17,6 +17,11 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 3. **Vercel Paid Features:**
    - **RULE:** DO NOT install or configure `@vercel/analytics` or `@vercel/speed-insights`.
 
+## UI / Branding (CRITICAL)
+
+1. **Favicon and Icons:**
+   - **RULE:** The site favicon (`favicon.ico`, `icon-192.png`, `icon-512.png`, etc.) MUST NEVER be changed or modified without explicit permission and confirmation from the user.
+
 ## Codebase Nuances & Known Bugs
 
 1. **Backend Validation (`whitelist: true`):**

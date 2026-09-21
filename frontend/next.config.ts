@@ -9,6 +9,9 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  env: {
+    NEXT_PUBLIC_RAZORPAY_KEY_ID: 'rzp_live_Tb5eAjWbqWtFcS',
+  },
   output: process.env.VERCEL ? undefined : 'standalone',
   images: {
     unoptimized: true,
