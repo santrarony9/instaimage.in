@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ServicesRepository } from './services.repository';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { Types } from 'mongoose';
+import { Role } from '@app/auth';
 import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
@@ -73,13 +74,31 @@ export class ServicesService {
     );
   }
 
-  async update(id: string, updateServiceDto: UpdateServiceDto) {
+  async update(id: string, updateServiceDto: UpdateServiceDto, userId: string, role: string) {
+    const service = await this.servicesRepository.findOne({ _id: id });
+    if (!service) throw new NotFoundException('Service not found');
+
+    if (role !== Role.ADMIN) {
+      if (!service.creatorId || service.creatorId.toString() !== userId) {
+        throw new ForbiddenException('You are not authorized to update this service');
+      }
+    }
+
     const data: any = { ...updateServiceDto };
     if (data.categoryId) data.categoryId = new Types.ObjectId(data.categoryId);
     return this.servicesRepository.findOneAndUpdate({ _id: id }, data);
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string, role: string) {
+    const service = await this.servicesRepository.findOne({ _id: id });
+    if (!service) throw new NotFoundException('Service not found');
+
+    if (role !== Role.ADMIN) {
+      if (!service.creatorId || service.creatorId.toString() !== userId) {
+        throw new ForbiddenException('You are not authorized to delete this service');
+      }
+    }
+
     return this.servicesRepository.findOneAndDelete({ _id: id });
   }
 

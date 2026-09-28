@@ -101,13 +101,13 @@ export class ServicesController {
 
   @Roles(Role.ADMIN, Role.PHOTOGRAPHER, Role.SELLER)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateServiceDto: UpdateServiceDto) {
-    return this.servicesService.update(id, updateServiceDto);
+  update(@Request() req: AuthenticatedRequest, @Param('id') id: string, @Body() updateServiceDto: UpdateServiceDto) {
+    return this.servicesService.update(id, updateServiceDto, req.user.sub, req.user.role);
   }
 
   @Roles(Role.ADMIN, Role.PHOTOGRAPHER, Role.SELLER)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.servicesService.remove(id);
+  remove(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+    return this.servicesService.remove(id, req.user.sub, req.user.role);
   }
 }

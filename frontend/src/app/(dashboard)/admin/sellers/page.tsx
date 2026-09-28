@@ -1,25 +1,14 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/hooks/use-auth-store';
-
-interface Seller {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  bankDetails: string;
-  isActive: boolean;
-  sellerType: string;
-  status: string;
-  commissionRate: number;
-  createdAt: string;
-}
+import { fetchApi } from '@/lib/api';
 
 export default function SellersPage() {
-  const [sellers, setSellers] = useState<Seller[]>([]);
+  const [sellers, setSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuthStore();
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -32,17 +21,13 @@ export default function SellersPage() {
     commissionRate: 15,
   });
 
-  const SERVER_API_URL = process.env.NEXT_PUBLIC_SERVER_API_URL || '/api/v1';
-
   const fetchSellers = async () => {
     try {
-      const res = await fetch(`${SERVER_API_URL}/sellers`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      setSellers(data);
+      const data = await fetchApi('/sellers');
+      setSellers(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
+      setSellers([]);
     } finally {
       setLoading(false);
     }
@@ -55,12 +40,8 @@ export default function SellersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch(`${SERVER_API_URL}/sellers`, {
+      await fetchApi('/sellers', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
         body: JSON.stringify(formData)
       });
       setIsModalOpen(false);
@@ -101,7 +82,7 @@ export default function SellersPage() {
             {sellers.map(c => (
               <tr key={c._id}>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs rounded-full ${c.sellerType === 'IN_HOUSE' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                  <span className={px-2 py-1 text-xs rounded-full }>
                     {c.sellerType?.replace('_', ' ') || 'PARTNER'}
                   </span>
                 </td>
@@ -113,15 +94,12 @@ export default function SellersPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">{c.bankDetails}</td>
                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{c.commissionRate || 15}%</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-bold rounded-full ${
-                    c.status === 'VERIFIED' ? 'bg-green-100 text-green-800' : 
-                    c.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={px-2 py-1 text-xs font-bold rounded-full }>
                     {c.status || 'PENDING'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs rounded-full ${c.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                  <span className={px-2 py-1 text-xs rounded-full }>
                     {c.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>

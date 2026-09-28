@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from 'react';
 import { useBookingStore } from '@/hooks/use-booking-store';
@@ -15,6 +15,9 @@ export function Step8Confirmation() {
   React.useEffect(() => {
     // Clear cart immediately on reaching confirmation
     useCartStore.getState().clearCart();
+    return () => {
+      useBookingStore.getState().reset();
+    };
   }, []);
 
   const handleDone = () => {
@@ -26,6 +29,40 @@ export function Step8Confirmation() {
   };
 
   if (confirmedBooking) {
+    if (confirmedBooking.multi) {
+      const { summary, results } = confirmedBooking;
+      const firstSuccess = results?.find((r: any) => r.status === 'fulfilled' && r.value?.booking)?.value?.booking || results?.find((r: any) => r.booking?.booking)?.booking?.booking || results?.find((r: any) => r.booking)?.booking;
+      
+      const firstId = firstSuccess?._id;
+
+      return (
+        <div className="max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-sm border border-gray-100 text-center">
+          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+            ✓
+          </div>
+          <h2 className="text-3xl font-bold mb-2">Multiple Bookings Created!</h2>
+          <p className="text-gray-600 mb-4">{summary}</p>
+
+          <div className="flex flex-col sm:flex-row gap-3 mt-8">
+            {firstId && (
+              <Link
+                href={/customer/bookings/ + firstId + /invoice}
+                className="flex-1 flex items-center justify-center py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                Download Invoice
+              </Link>
+            )}
+            <button
+              onClick={handleDone}
+              className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+            >
+              Go to My Bookings
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     const booking = confirmedBooking;
     const pricing = booking?.pricing || {};
 
@@ -91,8 +128,8 @@ export function Step8Confirmation() {
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            href={`/customer/bookings/${booking?._id}/invoice`}
-            className="flex-1 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            href={/customer/bookings/ + booking?._id + /invoice}
+            className="flex-1 flex items-center justify-center py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             Download Invoice
           </Link>

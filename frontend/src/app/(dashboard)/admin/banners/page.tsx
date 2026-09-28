@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { fetchApi } from '@/lib/api';
@@ -196,8 +196,8 @@ export default function BannersManagementPage() {
               <div className="mt-auto pt-4 border-t flex justify-between items-center">
                 <div className="flex items-center flex-wrap gap-2">
                   <div>
-                    {banner.originalPrice > 0 && <span className="line-through text-gray-400 text-sm mr-2">₹{banner.originalPrice}</span>}
-                    <span className="font-bold text-lg text-gray-900">₹{banner.comboPrice || 0}</span>
+                    {banner.originalPrice > 0 && <span className="line-through text-gray-400 text-sm mr-2">â‚¹{banner.originalPrice}</span>}
+                    <span className="font-bold text-lg text-gray-900">â‚¹{banner.comboPrice || 0}</span>
                   </div>
                   {banner.time && <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100 flex items-center gap-1"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{banner.time}</span>}
                 </div>
@@ -217,7 +217,7 @@ export default function BannersManagementPage() {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl my-8">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-bold">{editingItem ? 'Edit Banner' : 'Create Banner'}</h2>
-              <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700">✕</button>
+              <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700">âœ•</button>
             </div>
             
             <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
@@ -251,7 +251,7 @@ export default function BannersManagementPage() {
                     <input 
                       type="datetime-local" 
                       value={formData.validUntil ? new Date(formData.validUntil).toISOString().slice(0,16) : ''} 
-                      onChange={e => setFormData({...formData, validUntil: new Date(e.target.value).toISOString()})} 
+                      onChange={e => setFormData({...formData, validUntil: e.target.value ? new Date(e.target.value).toISOString() : ''})} 
                       className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" 
                     />
                   </div>
@@ -284,11 +284,11 @@ export default function BannersManagementPage() {
                   }} className="w-full border border-gray-300 rounded-md p-1.5 text-sm focus:ring-1 focus:ring-blue-500 outline-none" placeholder="e.g. 6 Hours" />
                 </div>
                 <div className="md:col-span-1">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Original Price (₹)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Original Price (â‚¹)</label>
                   <input type="number" value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: parseInt(e.target.value)})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm bg-yellow-50 focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
                 <div className="md:col-span-1">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Combo Price (₹)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Combo Price (â‚¹)</label>
                   <input type="number" value={formData.comboPrice} onChange={e => setFormData({...formData, comboPrice: parseInt(e.target.value)})} className="w-full border border-gray-300 rounded-md p-1.5 text-sm font-bold text-blue-700 focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
               </div>
@@ -326,3 +326,4 @@ export default function BannersManagementPage() {
     </div>
   );
 }
+

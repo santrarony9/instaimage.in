@@ -204,7 +204,7 @@ export class BookingsController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) throw new BadRequestException('File is required');
-    return this.bookingsService.uploadToGallery(id, req.user.sub, file);
+    return this.bookingsService.uploadToGallery(id, req.user.sub, file, req.user.role);
   }
 
   @Delete(':id/gallery/:imageId')
@@ -214,6 +214,6 @@ export class BookingsController {
     @Param('id') id: string,
     @Param('imageId') imageId: string,
   ) {
-    return this.bookingsService.deleteFromGallery(id, req.user.sub, imageId);
+    return this.bookingsService.deleteFromGallery(id, req.user.sub, imageId, req.user.role);
   }
 }

@@ -1,6 +1,8 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { fetchApi } from '@/lib/api';
 import { useToast } from '@/components/ui/toast';
 
@@ -145,6 +147,7 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8">
+      <ToastContainer />
       <div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Platform Settings</h1>
         <p className="text-gray-500">Configure global platform settings, travel charges, and office locations.</p>
@@ -155,7 +158,7 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 border-b border-gray-200 flex justify-between items-center">
           <div>
             <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-              <span className="text-xl">✨</span> AI System Prompt
+              <span className="text-xl">âœ¨</span> AI System Prompt
             </h2>
             <p className="text-sm text-gray-600 mt-1">Train the AI how to write descriptions (tone, style, formatting).</p>
           </div>
@@ -187,7 +190,7 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
         <h2 className="text-lg font-bold mb-4">Travel Charge Configuration</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Per KM Rate (₹)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Per KM Rate (â‚¹)</label>
             <input 
               type="number" 
               value={perKmRate} 
@@ -205,7 +208,7 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Default Flat Charge (₹)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Default Flat Charge (â‚¹)</label>
             <input 
               type="number" 
               value={defaultFlatCharge} 
@@ -256,7 +259,7 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
                 className="absolute top-2 right-2 text-red-500 hover:text-red-700"
                 title="Remove"
               >
-                ✕
+                âœ•
               </button>
               
               <div className="flex-1 space-y-4">
@@ -325,3 +328,6 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
     </div>
   );
 }
+
+
+

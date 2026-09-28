@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DatabaseModule } from '@app/database';
@@ -32,9 +33,11 @@ import { EmailModule } from './modules/email/email.module';
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { BannersModule } from './modules/banners/banners.module';
 import { LeadsModule } from './modules/leads/leads.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     DatabaseModule,
@@ -70,6 +73,6 @@ import { LeadsModule } from './modules/leads/leads.module';
     LeadsModule,
   ],
   controllers: [ApiController],
-  providers: [ApiService],
+  providers: [ApiService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class ApiModule {}

@@ -1,24 +1,26 @@
-import React from 'react';
+﻿"use client";
+import React, { useState, useEffect } from 'react';
+import { fetchApi } from '@/lib/api';
 
+export default function LeadsPage() {
+  const [leads, setLeads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-// Since this is a server component, we need to fetch data
-export default async function LeadsPage() {
-  // We'll mock the data for now since the local frontend cannot reliably connect 
-  // to the live production backend's un-deployed /leads endpoint
-  const leads = [
-    {
-      _id: 'mock-1',
-      customerName: 'John Doe',
-      phoneNumber: '+919876543210',
-      totalEstimatedPrice: 23000,
-      status: 'NEW',
-      createdAt: new Date().toISOString(),
-      wishlist: [
-        { serviceName: 'Wedding Photography', basePrice: 15000 },
-        { serviceName: 'Drone Pilot', basePrice: 8000 }
-      ]
-    }
-  ];
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const data = await fetchApi('/leads');
+        setLeads(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeads();
+  }, []);
+
+  if (loading) return <div className="p-8">Loading leads...</div>;
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -29,15 +31,10 @@ export default async function LeadsPage() {
         </div>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg mb-6 text-sm flex gap-3">
-        <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path></svg>
-        <div>
-          <strong className="font-bold">Deployment Required:</strong> This page is currently showing mock data. You must deploy the backend API to production for the `/leads` endpoint to become active and collect real customer wishlists.
-        </div>
-      </div>
-
       <div className="grid gap-4">
-        {leads.map((lead) => (
+        {leads.length === 0 ? (
+          <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-gray-200 text-gray-500">No leads found.</div>
+        ) : leads.map((lead) => (
           <div key={lead._id} className="p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
@@ -46,23 +43,23 @@ export default async function LeadsPage() {
                 <div className="mt-4">
                   <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Requested Services</h4>
                   <ul className="space-y-1">
-                    {lead.wishlist.map((item, idx) => (
+                    {lead.wishlist?.map((item: any, idx: number) => (
                       <li key={idx} className="text-sm text-gray-700 flex justify-between w-64">
                         <span>{item.serviceName}</span>
-                        <span className="font-medium">₹{item.basePrice.toLocaleString('en-IN')}</span>
+                        <span className="font-medium">₹{item.basePrice?.toLocaleString('en-IN') || 0}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-3 pt-2 border-t border-gray-100 w-64 flex justify-between font-black text-gray-900">
                     <span>Estimate Total:</span>
-                    <span>₹{lead.totalEstimatedPrice.toLocaleString('en-IN')}</span>
+                    <span>₹{lead.totalEstimatedPrice?.toLocaleString('en-IN') || 0}</span>
                   </div>
                 </div>
               </div>
               
               <div className="flex flex-col gap-2 items-end">
                 <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  {lead.status}
+                  {lead.status || 'NEW'}
                 </span>
                 <span className="text-xs text-gray-400">
                   {new Date(lead.createdAt).toLocaleDateString()}

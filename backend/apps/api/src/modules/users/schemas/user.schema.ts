@@ -69,3 +69,5 @@ export class User extends AbstractDocument {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.index({ phone: 1 }, { unique: true, sparse: true });
+UserSchema.index({ referredBy: 1 });

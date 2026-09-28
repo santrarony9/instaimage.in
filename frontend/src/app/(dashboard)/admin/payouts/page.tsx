@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/hooks/use-auth-store';
+import { fetchApi } from '@/lib/api';
 
 interface Booking {
   _id: string;
@@ -25,16 +26,11 @@ export default function PayoutsPage() {
   const [loading, setLoading] = useState(true);
   const { token } = useAuthStore();
 
-  const SERVER_API_URL = process.env.NEXT_PUBLIC_SERVER_API_URL || '/api/v1';
-
   const fetchPayouts = async () => {
     try {
-      const res = await fetch(`${SERVER_API_URL}/bookings`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
+      const data = await fetchApi('/bookings/all');
       // Filter only bookings that have a seller assigned
-      const assignedBookings = data.filter((b: any) => b.sellerId);
+      const assignedBookings = Array.isArray(data) ? data.filter((b: any) => b.sellerId) : [];
       setBookings(assignedBookings);
     } catch (err) {
       console.error(err);
@@ -49,12 +45,8 @@ export default function PayoutsPage() {
 
   const markAsPaid = async (id: string) => {
     try {
-      await fetch(`${SERVER_API_URL}/bookings/${id}/seller-status`, {
+      await fetchApi(/bookings/ + id + /payout, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
         body: JSON.stringify({ payoutStatus: 'PAID' })
       });
       fetchPayouts();
@@ -99,9 +91,7 @@ export default function PayoutsPage() {
                   <div className="font-bold text-green-700 mt-1">Payout: ₹{b.pricing?.sellerPayout}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-bold rounded-full ${
-                    b.payoutStatus === 'PAID' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
-                  }`}>
+                  <span className={px-2 py-1 text-xs font-bold rounded-full }>
                     {b.payoutStatus || 'PENDING'}
                   </span>
                 </td>

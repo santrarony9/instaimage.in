@@ -53,7 +53,7 @@ export default function InvoicePage() {
           <div className="text-right">
             <h2 className="text-xl font-bold text-gray-800">TAX INVOICE</h2>
             <p className="text-gray-500 mt-1">Invoice #: {booking.bookingId}</p>
-            <p className="text-gray-500">Date: {new Date(booking.createdAt).toLocaleDateString()}</p>
+            <p className="text-gray-500">Date: {booking.createdAt ? new Date(booking.createdAt).toLocaleDateString() : 'N/A'}</p>
           </div>
         </div>
 
@@ -67,8 +67,8 @@ export default function InvoicePage() {
           <div className="text-right">
             <h3 className="font-bold text-gray-800 mb-2">Service Details:</h3>
             <p className="text-gray-700">{booking.serviceId?.name}</p>
-            <p className="text-gray-500">Date: {new Date(booking.scheduledDate).toLocaleDateString()}</p>
-            <p className="text-gray-500">Time: {booking.startTime} - {booking.endTime}</p>
+            <p className="text-gray-500">Date: {booking.scheduledDate ? new Date(booking.scheduledDate).toLocaleDateString() : 'N/A'}</p>
+            <p className="text-gray-500">Time: {booking.startTime || 'N/A'} - {booking.endTime || 'N/A'}</p>
           </div>
         </div>
 
@@ -105,6 +105,24 @@ export default function InvoicePage() {
                 <td className="py-4 text-right text-orange-700">₹{s.amount}</td>
               </tr>
             ))}
+            {booking.pricing?.deliveryCharge > 0 && (
+              <tr className="border-b border-gray-200">
+                <td className="py-4">Delivery Charge</td>
+                <td className="py-4 text-right">?{booking.pricing.deliveryCharge}</td>
+              </tr>
+            )}
+            {booking.pricing?.deliveryDiscount > 0 && (
+              <tr className="border-b border-gray-200">
+                <td className="py-4 text-green-600">Delivery Discount</td>
+                <td className="py-4 text-right text-green-600">-?{booking.pricing.deliveryDiscount}</td>
+              </tr>
+            )}
+            {booking.pricing?.expressDeliveryFee > 0 && (
+              <tr className="border-b border-gray-200">
+                <td className="py-4">Express Delivery</td>
+                <td className="py-4 text-right">?{booking.pricing.expressDeliveryFee}</td>
+              </tr>
+            )}
             {booking.pricing?.discount > 0 && (
               <tr className="border-b border-gray-200">
                 <td className="py-4 text-green-600">Discount Applied</td>

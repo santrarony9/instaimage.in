@@ -92,7 +92,8 @@ export default function SellerDashboard() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('/api/v1/uploads', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
+      const res = await fetch(`${apiUrl}/uploads`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

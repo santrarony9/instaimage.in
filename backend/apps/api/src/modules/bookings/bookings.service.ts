@@ -735,13 +735,16 @@ export class BookingsService {
     };
   }
 
-  async uploadToGallery(bookingId: string, sellerId: string, file: Express.Multer.File) {
+  async uploadToGallery(bookingId: string, userId: string, file: Express.Multer.File, role: string) {
     const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
     
-    // Check if assigned
-    if (booking.sellerId?.toString() !== sellerId) {
-      throw new ForbiddenException('You are not assigned to this booking');
+    // Check if assigned or admin
+    if (role !== Role.ADMIN) {
+      const seller = await this.SellersService.findByUserId(userId);
+      if (!seller || booking.sellerId?.toString() !== seller._id.toString()) {
+        throw new ForbiddenException('You are not assigned to this booking');
+      }
     }
 
     let fileBuffer = file.buffer;
@@ -798,12 +801,15 @@ export class BookingsService {
     }
   }
 
-  async deleteFromGallery(bookingId: string, sellerId: string, imageId: string) {
+  async deleteFromGallery(bookingId: string, userId: string, imageId: string, role: string) {
     const booking = await this.bookingsRepository.findOne(bookingId.startsWith('BKG-') ? { bookingId: bookingId } : { _id: bookingId });
     if (!booking) throw new NotFoundException('Booking not found');
     
-    if (booking.sellerId?.toString() !== sellerId) {
-      throw new ForbiddenException('You are not assigned to this booking');
+    if (role !== Role.ADMIN) {
+      const seller = await this.SellersService.findByUserId(userId);
+      if (!seller || booking.sellerId?.toString() !== seller._id.toString()) {
+        throw new ForbiddenException('You are not assigned to this booking');
+      }
     }
 
     const image = booking.gallery?.find(img => img._id === imageId);

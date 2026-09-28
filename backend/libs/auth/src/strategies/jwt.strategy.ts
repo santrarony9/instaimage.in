@@ -23,6 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
     // We attach this to the Express Request object automatically
-    return { sub: payload.sub, email: payload.email, role: payload.role };
+    return { sub: payload.sub, email: payload.email, role: payload.role, phone: payload.phone, isWhatsappVerified: payload.isWhatsappVerified };
   }
 }

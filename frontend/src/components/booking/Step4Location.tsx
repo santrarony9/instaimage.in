@@ -15,8 +15,10 @@ export function Step4Location() {
   
   // Try to parse existing address into fullAddress if possible
   const existingAddress = data.location?.address || '';
-  const [houseNo, setHouseNo] = useState('');
-  const [area, setArea] = useState(existingAddress);
+  const initialHouseNo = existingAddress.includes(', ') ? existingAddress.split(', ')[0] : '';
+  const initialArea = existingAddress.includes(', ') ? existingAddress.split(', ').slice(1).join(', ') : existingAddress;
+  const [houseNo, setHouseNo] = useState(initialHouseNo);
+  const [area, setArea] = useState(initialArea);
   const [addressType, setAddressType] = useState<'Home' | 'Work' | 'Other'>('Home');
 
   const [landmark, setLandmark] = useState(data.location?.landmark || '');
@@ -301,3 +303,4 @@ export function Step4Location() {
     </div>
   );
 }
+

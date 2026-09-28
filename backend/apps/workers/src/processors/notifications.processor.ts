@@ -50,9 +50,11 @@ export class NotificationsProcessor extends WorkerHost {
   }) {
     const phoneNumberId =
       process.env.WHATSAPP_PHONE_NUMBER_ID || '1302518772938870';
-    const accessToken =
-      process.env.WHATSAPP_ACCESS_TOKEN ||
-      'EAAPBkN377kUBSSPqwVDOjn4UaXp8N7V82xCdgEqjI1L8aoWQUDUXGRvPzGpsvgWzSDoKD0Sc27oKVyi0wJOxkdIpZAhgyRdX6Bo8cOB2kVWs3TYzACAo9jHVMMCJV0AVw1j6YgZAfhjCA5t2936zcb8ZBfhm2Tk96NYJ8WUUBNhJhRfIxFWCyOmZBhxC6QZDZD';
+    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+    if (!accessToken) {
+      this.logger.error('WHATSAPP_ACCESS_TOKEN is not set in environment variables. Cannot send WhatsApp message.');
+      return;
+    }
     const apiVersion = process.env.WHATSAPP_API_VERSION || 'v20.0';
 
     let cleaned = data.to.replace(/\D/g, '');

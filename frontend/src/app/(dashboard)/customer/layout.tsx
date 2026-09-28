@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/use-auth-store';
+import { fetchApi } from '@/lib/api';
+import { fetchApi } from '@/lib/api';
 import OnboardingModal from '@/components/auth/OnboardingModal';
 
 import { 
@@ -16,7 +18,8 @@ import {
   LifeBuoy,
   LogOut,
   Wallet,
-  ArrowLeft
+  ArrowLeft,
+  Bell
 } from 'lucide-react';
 
 const mainLinks = [
@@ -27,6 +30,7 @@ const mainLinks = [
 ];
 
 const secondaryLinks = [
+  { href: '/customer/notifications', label: 'Notifications', icon: Bell },
   { href: '/customer/payments', label: 'Payments', icon: CreditCard },
   { href: '/customer/reviews', label: 'Reviews', icon: Star },
   { href: '/customer/support', label: 'Support', icon: LifeBuoy },
@@ -37,6 +41,38 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  React.useEffect(() => {
+    let hasToken = false;
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        const parsed = JSON.parse(authStorage);
+        if (parsed.state?.token && (parsed.state?.user?.role === 'CUSTOMER' || parsed.state?.user?.role === 'customer')) {
+          hasToken = true;
+        }
+      }
+    } catch(e) {}
+    
+    if (!hasToken) {
+      router.push('/login');
+    }
+    setIsChecking(false);
+
+    if (hasToken) {
+      fetchApi('/notifications/me').then(data => {
+        if (Array.isArray(data)) {
+          setUnreadCount(data.filter(n => !n.isRead).length);
+        }
+      }).catch(console.error);
+    }
+  }, [router]);
+
+  if (isChecking) {
+    return <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>;
+  }
 
   const handleLogout = () => {
     logout();
@@ -56,7 +92,15 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
       </div>
 
       <div className="px-5 pb-6">
-        <Link href="/customer/wallet" className="block relative overflow-hidden group rounded-2xl">
+        <Link href="/customer/notifications" className="relative p-1.5 text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+            <Bell className="w-5 h-5" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                {unreadCount}
+              </span>
+            )}
+          </Link>
+          <Link href="/customer/wallet" className="block relative overflow-hidden group rounded-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 transition-transform duration-500 group-hover:scale-105"></div>
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-700"></div>
           <div className="relative p-4 flex items-center justify-between">
@@ -248,3 +292,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
     </div>
   );
 }
+
+
+
+

@@ -14,6 +14,29 @@ export default function PhotographerLayout({ children }: { children: React.React
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  React.useEffect(() => {
+    let hasToken = false;
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        const parsed = JSON.parse(authStorage);
+        if (parsed.state?.token && (parsed.state?.user?.role === 'PHOTOGRAPHER' || parsed.state?.user?.role === 'photographer')) {
+          hasToken = true;
+        }
+      }
+    } catch(e) {}
+    
+    if (!hasToken) {
+      router.push('/login');
+    }
+    setIsChecking(false);
+  }, [router]);
+
+  if (isChecking) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div></div>;
+  }
 
   const handleLogout = () => {
     logout();
@@ -113,3 +136,4 @@ export default function PhotographerLayout({ children }: { children: React.React
     </div>
   );
 }
+

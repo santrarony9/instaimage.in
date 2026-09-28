@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [router]);
 
   if (isChecking) {
-    return null;
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div></div>;
   }
 
   const handleLogout = () => {
@@ -148,3 +148,4 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
+

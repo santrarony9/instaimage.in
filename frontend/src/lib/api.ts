@@ -73,6 +73,25 @@ const api = {
     });
     return { data };
   },
+  get: async (endpoint: string) => {
+    const data = await fetchApi(endpoint, {
+      method: 'GET',
+    });
+    return { data };
+  },
+  put: async (endpoint: string, body: any) => {
+    const data = await fetchApi(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    });
+    return { data };
+  },
+  delete: async (endpoint: string) => {
+    const data = await fetchApi(endpoint, {
+      method: 'DELETE',
+    });
+    return { data };
+  },
 };
 
 export default api;

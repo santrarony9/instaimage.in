@@ -24,7 +24,7 @@ function BookingFlow() {
 
   // Populate booking data from URL params or cart
   useEffect(() => {
-    if (useBookingStore.getState().currentStep === 8) return;
+    if (useBookingStore.getState().currentStep >= 4 && useBookingStore.getState().data.serviceId) return;
 
     const serviceId = searchParams.get('serviceId');
     if (serviceId) {
@@ -71,7 +71,8 @@ function BookingFlow() {
         addonNames: firstItem.addonNames,
       });
 
-      if (firstItem.deliveryMethod === 'REMOTE') {
+      const hasPhysicalShoot = cartItems.some(item => item.deliveryMethod === 'ON_SPOT' || item.deliveryMethod === 'STUDIO');
+      if (!hasPhysicalShoot) {
         updateData({
           location: {
             address: 'Remote',
@@ -147,3 +148,5 @@ export default function BookingPage() {
     </Suspense>
   );
 }
+
+
