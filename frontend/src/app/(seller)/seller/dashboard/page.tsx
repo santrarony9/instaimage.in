@@ -423,7 +423,7 @@ export default function SellerDashboard() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">My Portfolio & Gallery</h2>
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded shadow text-sm">
+            <button className="bg-indigo-600 text-white px-4 py-2 rounded shadow text-sm" onClick={() => alert('Coming soon')}>
               + Upload Photos
             </button>
           </div>
@@ -438,7 +438,7 @@ export default function SellerDashboard() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">My Availability & Calendar</h2>
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded shadow text-sm">
+            <button className="bg-indigo-600 text-white px-4 py-2 rounded shadow text-sm" onClick={() => alert('Coming soon')}>
               + Block Dates
             </button>
           </div>
@@ -458,7 +458,7 @@ export default function SellerDashboard() {
               ))}
             </div>
             <div className="mt-4 flex justify-end">
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded shadow text-sm">Save Hours</button>
+              <button className="bg-indigo-600 text-white px-4 py-2 rounded shadow text-sm" onClick={() => alert('Coming soon')}>Save Hours</button>
             </div>
           </div>
 
@@ -560,3 +560,5 @@ export default function SellerDashboard() {
     </div>
   );
 }
+
+

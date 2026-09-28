@@ -1,3 +1,4 @@
+export const revalidate = 60;
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -48,7 +49,7 @@ export default function PrivacyPage() {
           3. WhatsApp Business Communication & Meta Cloud API
         </h2>
         <p>
-          By providing your phone number, you consent to receive transactional notifications and authentication codes from <strong>InstaImage (+91 94778 33176)</strong> via the <strong>Meta WhatsApp Cloud API</strong>. We do not use your phone number for unsolicited third-party marketing, and your communication preferences can be managed via account settings.
+          By providing your phone number, you consent to receive transactional notifications and authentication codes from <strong>InstaImage (<a href="tel:+918240508915">+91 82405 08915</a>)</strong> via the <strong>Meta WhatsApp Cloud API</strong>. We do not use your phone number for unsolicited third-party marketing, and your communication preferences can be managed via account settings.
         </p>
 
         <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">
@@ -84,10 +85,13 @@ export default function PrivacyPage() {
           <p><strong>Udyam Registration Number:</strong> UDYAM-WB-18-0211603</p>
           <p><strong>Registered Address:</strong> 85, Tilottama Plaza, Karunamoyee Ghat Road, Kolkata, South 24 Parganas, West Bengal - 700082, India</p>
           <p><strong>Official Email:</strong> <a href="mailto:info@instaimage.in" className="text-black font-semibold underline">info@instaimage.in</a></p>
-          <p><strong>Official Contact / WhatsApp:</strong> +91 94778 33176</p>
+          <p><strong>Official Contact / WhatsApp:</strong> <a href="tel:+918240508915">+91 82405 08915</a></p>
           <p><strong>Website:</strong> <a href="https://instaimage.in" className="text-black font-semibold underline">https://instaimage.in</a></p>
         </div>
       </div>
     </div>
   );
 }
+
+
+

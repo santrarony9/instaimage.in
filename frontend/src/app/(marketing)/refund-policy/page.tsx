@@ -1,3 +1,4 @@
+export const revalidate = 60;
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -34,3 +35,4 @@ return (
 </div>
 );
 }
+

@@ -29,7 +29,7 @@ export function Navbar() {
           {/* Logo */}
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center">
-              <Image 
+              <Image unoptimized={true} 
                 src="/logo.png" 
                 alt="InstaImage Logo" 
                 width={180} 

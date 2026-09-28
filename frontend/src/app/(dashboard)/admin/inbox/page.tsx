@@ -31,11 +31,12 @@ export default function WhatsAppInbox() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
+    if (!token) return;
     fetchConversations();
     // Poll every 10 seconds for new messages
     const interval = setInterval(fetchConversations, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [token]);
 
   const fetchConversations = async () => {
     try {

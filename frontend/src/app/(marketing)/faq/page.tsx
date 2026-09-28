@@ -1,3 +1,4 @@
+export const revalidate = 60;
 import { FAQPageJsonLd } from '@/components/seo/JsonLd';
 
 export const metadata = {
@@ -27,3 +28,4 @@ export default function FAQPage() {
     </div>
   );
 }
+

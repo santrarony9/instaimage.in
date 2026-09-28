@@ -1,3 +1,4 @@
+export const revalidate = 60;
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -37,7 +38,7 @@ return (
 <option>Fashion & Portraits</option>
 </select>
 </div>
-<Link href="/seller/register" className="block w-full text-center bg-black text-white font-bold py-3 rounded hover:bg-gray-800">
+<Link href="/login" className="block w-full text-center bg-black text-white font-bold py-3 rounded hover:bg-gray-800">
 Submit Application
 </Link>
 </form>
@@ -45,3 +46,4 @@ Submit Application
 </div>
 );
 }
+

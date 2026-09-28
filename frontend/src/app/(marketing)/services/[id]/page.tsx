@@ -1,3 +1,5 @@
+import { notFound } from 'next/navigation';
+export const revalidate = 60;
 import { Metadata } from 'next';
 import ServiceDetailsClient from './ServiceDetailsClient';
 import { ServiceJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
@@ -67,7 +69,7 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
   const service = await getService(id);
 
   if (!service) {
-    return <div className="min-h-screen flex items-center justify-center text-xl">Service not found.</div>;
+    return notFound();
   }
 
   const breadcrumbs = [
@@ -84,3 +86,4 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
     </>
   );
 }
+

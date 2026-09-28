@@ -47,8 +47,8 @@ export default function CouponsPage() {
     if (mode === 'edit' && coupon) {
       setCurrentCoupon({
         ...coupon,
-        validFrom: new Date(coupon.validFrom).toISOString().split('T')[0],
-        validUntil: new Date(coupon.validUntil).toISOString().split('T')[0],
+        validFrom: coupon.validFrom ? new Date(coupon.validFrom).toISOString().split('T')[0] : '',
+        validUntil: coupon.validUntil ? new Date(coupon.validUntil).toISOString().split('T')[0] : '',
       });
     } else {
       setCurrentCoupon({

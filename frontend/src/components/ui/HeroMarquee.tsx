@@ -33,7 +33,7 @@ export function HeroMarquee({ images }: { images: string[] }) {
         <div className="flex whitespace-nowrap animate-marquee-left w-max">
           {row1.map((src, i) => (
             <div key={i} className="relative w-48 h-36 md:w-64 md:h-48 rounded-xl overflow-hidden mx-2 flex-shrink-0 bg-gray-800 shadow-xl">
-              <Image 
+              <Image unoptimized={true} 
                 src={src} 
                 alt="Portfolio" 
                 fill 
@@ -48,7 +48,7 @@ export function HeroMarquee({ images }: { images: string[] }) {
         <div className="flex whitespace-nowrap animate-marquee-right w-max ml-[-20%]">
           {row2.map((src, i) => (
             <div key={i} className="relative w-48 h-36 md:w-64 md:h-48 rounded-xl overflow-hidden mx-2 flex-shrink-0 bg-gray-800 shadow-xl">
-              <Image 
+              <Image unoptimized={true} 
                 src={src} 
                 alt="Portfolio" 
                 fill 
@@ -63,7 +63,7 @@ export function HeroMarquee({ images }: { images: string[] }) {
         <div className="flex whitespace-nowrap animate-marquee-left w-max ml-[10%]">
           {row3.map((src, i) => (
             <div key={i} className="relative w-48 h-36 md:w-64 md:h-48 rounded-xl overflow-hidden mx-2 flex-shrink-0 bg-gray-800 shadow-xl">
-              <Image 
+              <Image unoptimized={true} 
                 src={src} 
                 alt="Portfolio" 
                 fill 

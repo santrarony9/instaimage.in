@@ -17,9 +17,9 @@ export function Step5DateTime() {
   const [minDate, setMinDate] = useState('');
 
   useEffect(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    setMinDate(tomorrow.toISOString().split('T')[0]);
+    const tzOffset = new Date().getTimezoneOffset() * 60000;
+    const localISOTime = new Date(Date.now() - tzOffset).toISOString().split('T')[0];
+    setMinDate(localISOTime);
   }, []);
 
   const [date, setDate] = useState(data.scheduledDate || '');
@@ -198,3 +198,5 @@ export function Step5DateTime() {
     </div>
   );
 }
+
+

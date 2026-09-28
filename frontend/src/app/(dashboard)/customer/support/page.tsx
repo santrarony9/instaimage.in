@@ -121,7 +121,7 @@ export default function SupportPage() {
                   </p>
                 </div>
                 <div className="text-blue-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                  View Thread ?
+                  View Thread &rarr;
                 </div>
               </div>
             </Link>
@@ -135,9 +135,7 @@ export default function SupportPage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h3 className="text-xl font-black text-gray-900">Open a Ticket</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-2">
-                ?
-              </button>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-2">&times;</button>
             </div>
             <form onSubmit={handleCreate} className="p-6 space-y-5">
               

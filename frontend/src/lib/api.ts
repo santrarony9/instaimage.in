@@ -36,7 +36,11 @@ export async function fetchApi(endpoint: string, options?: RequestInit) {
       // Only redirect on 401 if we HAD a token and we're not already on the login page
       if (response.status === 401 && typeof window !== 'undefined' && token && !window.location.pathname.startsWith('/login')) {
         localStorage.removeItem('auth-storage');
-        window.location.href = '/login';
+        if (window.location.pathname.includes('/seller')) {
+          window.location.href = '/seller/login';
+        } else {
+          window.location.href = '/login';
+        }
       }
       const errorData = await response.json().catch(() => ({}));
       let errorMessage = errorData.message;

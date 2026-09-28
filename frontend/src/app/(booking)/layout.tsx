@@ -19,7 +19,7 @@ export default function BookingLayout({
       <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 py-4 sticky top-0 z-[999]">
         <div className="max-w-4xl mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <Image 
+            <Image unoptimized={true} 
               src="/logo.png" 
               alt="InstaImage Logo" 
               width={180} 

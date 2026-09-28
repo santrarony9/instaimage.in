@@ -1,3 +1,4 @@
+export const revalidate = 60;
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -84,9 +85,12 @@ export default function TermsPage() {
           <p><strong>Udyam Registration Number:</strong> UDYAM-WB-18-0211603</p>
           <p><strong>Registered Address:</strong> 85, Tilottama Plaza, Karunamoyee Ghat Road, Kolkata, South 24 Parganas, West Bengal - 700082, India</p>
           <p><strong>Email:</strong> <a href="mailto:info@instaimage.in" className="text-black font-semibold underline">info@instaimage.in</a></p>
-          <p><strong>Phone / WhatsApp:</strong> +91 94778 33176</p>
+          <p><strong>Phone / WhatsApp:</strong> <a href="tel:+918240508915">+91 82405 08915</a></p>
         </div>
       </div>
     </div>
   );
 }
+
+
+

@@ -67,7 +67,7 @@ export default function TicketThreadPage({ params }: { params: Promise<{ id: str
       <div className="p-12 text-center">
         <h3 className="text-xl font-bold">Ticket not found</h3>
         <Link href="/customer/support" className="text-blue-600 font-medium hover:underline mt-4 inline-block">
-          ? Back to Support
+          &larr; Back to Support
         </Link>
       </div>
     );
@@ -114,7 +114,7 @@ export default function TicketThreadPage({ params }: { params: Promise<{ id: str
                   ) : (
                     user?.name?.charAt(0).toUpperCase() || 'U'
                   )
-                ) : '???'}
+                ) : 'ST'}
               </div>
               <div className={`flex flex-col ${isCustomer ? 'items-end' : 'items-start'}`}>
                 <div className="flex items-center gap-2 mb-1.5 px-1">

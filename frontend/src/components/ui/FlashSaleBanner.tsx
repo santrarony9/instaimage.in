@@ -66,21 +66,21 @@ export function FlashSaleBanner({
             {isClient && (
               <div className="flex gap-3">
                 <div className="flex flex-col items-center">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 w-12 h-12 md:width-14 md:height-14 rounded-xl flex items-center justify-center font-black text-xl md:text-2xl tabular-nums shadow-inner">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/20 w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center font-black text-xl md:text-2xl tabular-nums shadow-inner">
                     {timeLeft.hours.toString().padStart(2, '0')}
                   </div>
                   <span className="text-[10px] uppercase font-bold mt-1.5 text-rose-100 tracking-wider">Hours</span>
                 </div>
                 <div className="text-2xl font-black opacity-50 mt-2 md:mt-3">:</div>
                 <div className="flex flex-col items-center">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 w-12 h-12 md:width-14 md:height-14 rounded-xl flex items-center justify-center font-black text-xl md:text-2xl tabular-nums shadow-inner">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/20 w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center font-black text-xl md:text-2xl tabular-nums shadow-inner">
                     {timeLeft.minutes.toString().padStart(2, '0')}
                   </div>
                   <span className="text-[10px] uppercase font-bold mt-1.5 text-rose-100 tracking-wider">Mins</span>
                 </div>
                 <div className="text-2xl font-black opacity-50 mt-2 md:mt-3">:</div>
                 <div className="flex flex-col items-center">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 w-12 h-12 md:width-14 md:height-14 rounded-xl flex items-center justify-center font-black text-xl md:text-2xl tabular-nums shadow-inner">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/20 w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center font-black text-xl md:text-2xl tabular-nums shadow-inner">
                     {timeLeft.seconds.toString().padStart(2, '0')}
                   </div>
                   <span className="text-[10px] uppercase font-bold mt-1.5 text-rose-100 tracking-wider">Secs</span>

@@ -12,6 +12,8 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     loadNotifications();
+    const interval = setInterval(loadNotifications, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   async function loadNotifications() {
@@ -158,3 +160,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

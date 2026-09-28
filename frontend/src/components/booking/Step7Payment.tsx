@@ -35,35 +35,63 @@ export function Step7Payment() {
     const fetchPrice = async () => {
       try {
         setIsLoadingPrice(true);
-        const payload = {
-          serviceId: data.serviceId,
-          pricingMode: data.pricingMode || 'fixed',
-          addonNames: data.addonNames || [],
-          scheduledDate: data.scheduledDate,
-          startTime: data.startTime,
-          endTime: data.endTime,
-          timeFlexibility: data.timeFlexibility || 'STRICT',
-          extraHoursBooked: data.extraHoursBooked || 0,
-          location: data.location,
-          appliedCouponId: data.appliedCouponId,
-          isExpressDelivery: data.isExpressDelivery || false,
-          applyWalletBalance: data.applyWalletBalance || false,
-        };
-        const res = await fetchApi('/bookings/calculate-price', {
-          method: 'POST',
-          body: JSON.stringify(payload),
+        const itemsToCalculate = cartItems.length > 0 ? cartItems : [data];
+        let totalBasePrice = 0;
+        let totalAddonsPrice = 0;
+        let totalDiscount = 0;
+        let totalTax = 0;
+        let totalFinalAmount = 0;
+        let totalAdvanceAmount = 0;
+        let totalWalletDeduction = 0;
+
+        for (const item of itemsToCalculate) {
+          const payload = {
+            serviceId: item.serviceId,
+            pricingMode: item.pricingMode || "fixed",
+            addonNames: item.addonNames || [],
+            scheduledDate: item.scheduledDate,
+            startTime: item.startTime,
+            endTime: item.endTime,
+            timeFlexibility: item.timeFlexibility || "STRICT",
+            extraHoursBooked: item.extraHoursBooked || 0,
+            location: item.location,
+            appliedCouponId: item.appliedCouponId,
+            isExpressDelivery: item.isExpressDelivery || false,
+            applyWalletBalance: data.applyWalletBalance || false,
+          };
+          const res = await fetchApi("/bookings/calculate-price", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          totalBasePrice += res.basePrice || 0;
+          totalAddonsPrice += res.addonsPrice || 0;
+          totalDiscount += res.discount || 0;
+          totalTax += res.tax || 0;
+          totalFinalAmount += res.finalAmount || 0;
+          totalAdvanceAmount += res.advanceAmount || 0;
+          totalWalletDeduction += res.walletDeduction || 0;
+        }
+
+        setPricingInfo({
+          basePrice: totalBasePrice,
+          addonsPrice: totalAddonsPrice,
+          discount: totalDiscount,
+          tax: totalTax,
+          finalAmount: totalFinalAmount,
+          advanceAmount: totalAdvanceAmount,
+          walletDeduction: totalWalletDeduction,
+          pricingMode: itemsToCalculate[0]?.pricingMode
         });
-        setPricingInfo(res);
         setCalcError(null);
       } catch (error: any) {
         console.error("Failed to calculate price", error);
-        setCalcError(error.message || 'Unknown error');
+        setCalcError(error.message || "Unknown error");
       } finally {
         setIsLoadingPrice(false);
       }
     };
     fetchPrice();
-  }, [data]);
+  }, [data.applyWalletBalance, data.appliedCouponId, cartItems]);
 
   const handlePayNow = async () => {
     setIsProcessing(true);
@@ -540,3 +568,4 @@ export function Step7Payment() {
     </div>
   );
 }
+

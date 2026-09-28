@@ -128,7 +128,7 @@ export function CartSidebar() {
                   {item.serviceImage ? (() => {
                     const raw = item.serviceImage;
                     const src = raw.startsWith('/') ? `https://api.instaimage.in${raw}` : raw;
-                    return <Image src={src} alt={item.serviceName} fill sizes="80px" className="object-cover" />;
+                    return <Image unoptimized={true} src={src} alt={item.serviceName} fill sizes="80px" className="object-cover" />;
                   })() : (
                     <div className="w-full h-full flex items-center justify-center text-2xl">📸</div>
                   )}
