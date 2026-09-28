@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { CreditCard, Wallet, Percent, ShieldCheck } from 'lucide-react';
+import { CreditCard, Wallet, Percent, ShieldCheck, Camera, Video, Users, Scissors, Plane, Radio, ArrowRight, Sparkles } from 'lucide-react';
 import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
@@ -147,70 +147,55 @@ export default async function HomePage() {
         </div>
       </div>
       
-            {/* E-Commerce Offer Cards (Automatic Marquee) */}
-      <div className="w-full relative z-30 mb-10 overflow-hidden ">
-        <div className="offer-marquee-container flex w-max hover:[animation-play-state:paused]">
+      {/* Trust & Offer Badges */}
+      <div className="w-full relative z-30 mb-10 mt-8 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          {[...Array(2)].map((_, idx) => (
-            <div key={idx} className="flex gap-4 pr-4 pl-4 sm:pl-0">
-              
-              {/* Card 1: 20% Down Payment */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-purple-50 border border-purple-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-indigo-200 transition-colors cursor-default">
-                <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center shrink-0">
-                  <Percent className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm text-purple-950 leading-tight">20% Down Payment</h4>
-                  <p className="text-xs text-purple-700 mt-1 font-medium">Book full events easily</p>
-                </div>
-              </div>
-
-              {/* Card 2: No-cost EMI */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-purple-50 border border-purple-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-purple-200 transition-colors cursor-default">
-                <div className="w-12 h-12 bg-purple-100 text-purple-700 rounded-xl flex items-center justify-center shrink-0">
-                  <CreditCard className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm text-purple-950 leading-tight">No-Cost EMI Available</h4>
-                  <p className="text-xs text-purple-700 mt-1 font-medium">Pay in flexible installments</p>
-                </div>
-              </div>
-
-              {/* Card 3: 500 INR Wallet */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-gradient-to-r from-purple-600 to-indigo-600 border border-purple-500 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center p-3 gap-4 hover:scale-[1.02] transition-transform">
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-xl flex items-center justify-center shrink-0">
-                  <Wallet className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm text-white leading-tight">Get ₹500 Bonus</h4>
-                  <p className="text-xs text-purple-100 mt-1 font-medium">Sign up & claim in wallet</p>
-                </div>
-              </div>
-
-              {/* Card 4: Verified Professionals */}
-              <div className="shrink-0 w-[300px] sm:w-[320px] h-[80px] bg-purple-50 border border-purple-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center p-3 gap-4 hover:border-fuchsia-200 transition-colors cursor-default">
-                <div className="w-12 h-12 bg-fuchsia-100 text-fuchsia-700 rounded-xl flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm text-purple-950 leading-tight">100% Quality Assured</h4>
-                  <p className="text-xs text-purple-700 mt-1 font-medium">In-house professional shoots</p>
-                </div>
-              </div>
-
+          {/* Card 1: 500 INR Wallet */}
+          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
+              <Wallet className="w-6 h-6" strokeWidth={1.5} />
             </div>
-          ))}
-          
+            <div>
+              <h4 className="font-bold text-sm text-gray-900 leading-tight">Get ₹500 Bonus</h4>
+              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">Sign up & claim in wallet</p>
+            </div>
+          </div>
+
+          {/* Card 2: Verified Professionals */}
+          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
+            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-6 h-6" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm text-gray-900 leading-tight">100% Quality Assured</h4>
+              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">In-house professional shoots</p>
+            </div>
+          </div>
+
+          {/* Card 3: 20% Down Payment */}
+          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
+            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center shrink-0">
+              <Percent className="w-6 h-6" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm text-gray-900 leading-tight">20% Down Payment</h4>
+              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">Book full events easily</p>
+            </div>
+          </div>
+
+          {/* Card 4: No-cost EMI */}
+          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
+            <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shrink-0">
+              <CreditCard className="w-6 h-6" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm text-gray-900 leading-tight">No-Cost EMI Available</h4>
+              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">Pay in flexible installments</p>
+            </div>
+          </div>
+
         </div>
-        <style dangerouslySetInnerHTML={{__html: `
-          .offer-marquee-container {
-            animation: offers-marquee 25s linear infinite;
-          }
-          @keyframes offers-marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-        `}} />
       </div>
 
       <div id="shop" className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-4">
@@ -224,30 +209,39 @@ export default async function HomePage() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {categories.map((category: any, idx: number) => {
-                const categoryConfig: Record<string, { gradient: string; emoji: string }> = {
-                  'Photography': { gradient: 'from-purple-500 to-indigo-600', emoji: '📸' },
-                  'Videography': { gradient: 'from-rose-400 to-red-500', emoji: '🎬' },
-                  'Event Management': { gradient: 'from-emerald-400 to-teal-500', emoji: '🎪' },
-                  'Post Production': { gradient: 'from-amber-400 to-orange-500', emoji: '✂️' },
-                  'Drone': { gradient: 'from-sky-400 to-blue-600', emoji: '🚁' },
-                  'Live Stream': { gradient: 'from-pink-400 to-rose-600', emoji: '📡' },
+                const categoryConfig: Record<string, { color: string; icon: any; bg: string }> = {
+                  'Photography': { color: 'text-blue-600', bg: 'bg-blue-50 group-hover:bg-blue-600', icon: Camera },
+                  'Videography': { color: 'text-purple-600', bg: 'bg-purple-50 group-hover:bg-purple-600', icon: Video },
+                  'Event Management': { color: 'text-rose-600', bg: 'bg-rose-50 group-hover:bg-rose-600', icon: Users },
+                  'Post Production': { color: 'text-amber-600', bg: 'bg-amber-50 group-hover:bg-amber-600', icon: Scissors },
+                  'Drone': { color: 'text-sky-600', bg: 'bg-sky-50 group-hover:bg-sky-600', icon: Plane },
+                  'Live Stream': { color: 'text-emerald-600', bg: 'bg-emerald-50 group-hover:bg-emerald-600', icon: Radio },
                 };
-                const fallbackGradients = ['from-violet-500 to-purple-600', 'from-cyan-400 to-blue-500', 'from-lime-400 to-green-500', 'from-fuchsia-400 to-pink-600'];
+                const fallbackColors = [
+                  { color: 'text-violet-600', bg: 'bg-violet-50 group-hover:bg-violet-600' },
+                  { color: 'text-cyan-600', bg: 'bg-cyan-50 group-hover:bg-cyan-600' },
+                  { color: 'text-lime-600', bg: 'bg-lime-50 group-hover:bg-lime-600' },
+                  { color: 'text-fuchsia-600', bg: 'bg-fuchsia-50 group-hover:bg-fuchsia-600' }
+                ];
                 const config = categoryConfig[category.name] || {
-                  gradient: fallbackGradients[idx % fallbackGradients.length],
-                  emoji: '🌟',
+                  ...fallbackColors[idx % fallbackColors.length],
+                  icon: Sparkles,
                 };
+                const Icon = config.icon;
+
                 return (
-                  <Link key={category._id} href={`/services?category=${category.name}`} className={`relative bg-gradient-to-br ${config.gradient} rounded-2xl p-6 overflow-hidden group shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}>
-                    <div className="absolute right-0 bottom-0 opacity-20 transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform duration-500 text-8xl">
-                      {config.emoji}
-                    </div>
-                    <div className="relative z-10">
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 text-2xl">
-                        {config.emoji}
+                  <Link key={category._id} href={`/services?category=${category.name}`} className="group relative bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[180px]">
+                    <div className="flex justify-between items-start w-full relative z-10">
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${config.bg} ${config.color} group-hover:text-white`}>
+                        <Icon className="w-7 h-7" strokeWidth={1.5} />
                       </div>
-                      <h3 className="text-white text-lg sm:text-xl font-bold">{category.name}</h3>
-                      <p className="text-white/80 text-sm mt-1 font-medium">Explore &rarr;</p>
+                      <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-gray-900 group-hover:text-white transition-all duration-300">
+                        <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+                      </div>
+                    </div>
+                    <div className="mt-8 relative z-10">
+                      <h3 className="text-gray-900 text-lg sm:text-xl font-bold tracking-tight">{category.name}</h3>
+                      <p className="text-gray-500 text-sm mt-1 font-medium">Explore services</p>
                     </div>
                   </Link>
                 );
