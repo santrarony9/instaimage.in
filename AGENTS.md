@@ -77,6 +77,14 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
 - **Security Audit & Hardening:** Completed full codebase security audit. Disabled Swagger API docs in production, locked down CORS, patched `.env.production` Git leak, generated cryptographic JWT secret, and enforced HSTS.
 - **WhatsApp Inbox AdBlock Bypass:** Created a `/support-inbox/` backend alias to prevent AdBlockers from blocking the admin WhatsApp dashboard.
 - **Admin Setup:** Admin login changed to `info.instaimage@gmail.com` with a secure password. Test bookings were wiped.
+- **Pre-Launch Critical Audit Fixes (Sept 28, 2026):**
+  - Patched Google OAuth exploit where users bypassed email verification to receive free ₹500 wallet credits.
+  - Fixed multi-cart checkout bypass (Razorpay now opens sequentially for each item).
+  - Patched atomic double-refund race condition on booking cancellation.
+  - Prevented payment verification replay attacks by rejecting already-confirmed bookings.
+  - Enforced single-use per-user coupon restrictions to prevent promo code abuse.
+  - Removed hardcoded Razorpay live keys from frontend components.
+  - Fixed "Unauthorized" auth error redirect loop in checkout to correctly route back to `/login`.
 
 ### 2. Pending / Work-In-Progress
 - **Gallery Watermarking & Client Approval Flow:** The user has a specific design/idea for how clients will approve watermarked preview photos to unlock clean HD downloads. **DO NOT build this yet.** Wait for the user to provide their materials/instructions before modifying the gallery or upload system further.
