@@ -207,7 +207,7 @@ export default async function HomePage() {
               <h2 className="text-xl md:text-2xl font-bold text-purple-950">Explore Categories</h2>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {categories.map((category: any, idx: number) => {
                 const catName = category.name.toUpperCase();
                 const categoryConfig: Record<string, { color: string; icon: any; bg: string }> = {
