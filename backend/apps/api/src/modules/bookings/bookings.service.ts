@@ -644,18 +644,27 @@ export class BookingsService {
         if (coupon) {
           await this.couponsService.validateCoupon(coupon.code, preDiscountTotal);
           
-          if (coupon.discountType === 'PERCENTAGE') {
-            discount = (basePrice + addonsPrice) * (coupon.discountValue / 100);
-            if (coupon.maxDiscount && discount > coupon.maxDiscount)
-              discount = coupon.maxDiscount;
+          // Per-user single-use check: ensure this customer hasn't already used this coupon
+          const existingBookingWithCoupon = await this.bookingsRepository.model.findOne({
+            customerId: new Types.ObjectId(customerId),
+            appliedCouponId: new Types.ObjectId(createBookingDto.appliedCouponId),
+            status: { $ne: BookingStatus.CANCELLED },
+          });
+          if (existingBookingWithCoupon) {
+            this.logger.warn(`Customer ${customerId} already used coupon ${coupon.code}`);
+            // Don't apply discount — coupon already used by this customer
           } else {
-            discount = coupon.discountValue;
+            if (coupon.discountType === 'PERCENTAGE') {
+              discount = (basePrice + addonsPrice) * (coupon.discountValue / 100);
+              if (coupon.maxDiscount && discount > coupon.maxDiscount)
+                discount = coupon.maxDiscount;
+            } else {
+              discount = coupon.discountValue;
+            }
           }
         }
       } catch (err) {
-        // Coupon invalid - ignore discount silently or could throw. 
-        // For checkout robust calculation, ignoring invalid coupon is safer, 
-        // but throwing ensures UI catches it. Let's ignore it here to allow checkout to proceed without discount.
+        // Coupon invalid - ignore discount silently to allow checkout to proceed without discount.
         this.logger.warn(`Failed to apply coupon: ${err.message}`);
       }
     }

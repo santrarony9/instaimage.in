@@ -12,6 +12,7 @@ export default function ServicesClient({ initialServices }: { initialServices: a
 
   const searchParams = useSearchParams();
   const initialCategoryParam = searchParams.get('category');
+  const searchQuery = searchParams.get('search')?.toLowerCase() || '';
   
   const activeServices = services.filter(s => s.isActive !== false);
   const availableCategories = Array.from(new Set(activeServices.map(s => s.category).filter(Boolean))) as string[];
@@ -51,6 +52,16 @@ export default function ServicesClient({ initialServices }: { initialServices: a
 
   // Filter logic
   const filteredServices = activeServices.filter(s => {
+    // Free-text search: match against title, description, and category
+    if (searchQuery) {
+      const title = (s.title || s.name || '').toLowerCase();
+      const desc = (s.description || '').toLowerCase();
+      const cat = (s.category || '').toLowerCase();
+      const tags = (s.tags || []).join(' ').toLowerCase();
+      if (!title.includes(searchQuery) && !desc.includes(searchQuery) && !cat.includes(searchQuery) && !tags.includes(searchQuery)) {
+        return false;
+      }
+    }
     if (effectiveCategory && s.category?.toLowerCase() !== effectiveCategory.toLowerCase()) {
       return false;
     }

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ export function HeroSearchBar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push("/services?category=" + encodeURIComponent(query.trim()));
+      router.push("/services?search=" + encodeURIComponent(query.trim()));
     }
   };
 

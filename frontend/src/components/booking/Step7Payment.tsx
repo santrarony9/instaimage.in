@@ -68,17 +68,69 @@ export function Step7Payment() {
     setBookingError(null);
     try {
       if (cartItems.length > 1) {
-        // Multi-item: create all bookings at once, no per-item payment redirect
+        // Multi-item: create all bookings, then process payment for each sequentially
         const results = await submitMultiBooking(cartItems);
-        const successCount = results.filter((r: any) => r.status === 'fulfilled').length;
-        const failCount = results.filter((r: any) => r.status === 'rejected').length;
-        
-        // Confirm all succeeded ones, then move to confirmation
+        const successfulBookings = results.filter((r: any) => r.status === 'fulfilled' && r.booking?.paymentOrder?.id);
+        const walletOnlyBookings = results.filter((r: any) => r.status === 'fulfilled' && !r.booking?.paymentOrder?.id);
+        const failedBookings = results.filter((r: any) => r.status === 'rejected');
+
+        // Process Razorpay payment for each booking that needs it
+        for (const result of successfulBookings) {
+          const { booking, paymentOrder } = result.booking;
+          try {
+            await new Promise<void>((resolve, reject) => {
+              const loadRzp = () => {
+                if ((window as any).Razorpay) return Promise.resolve(true);
+                return new Promise((res) => {
+                  const s = document.createElement('script');
+                  s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                  s.onload = () => res(true);
+                  s.onerror = () => res(false);
+                  document.body.appendChild(s);
+                });
+              };
+              loadRzp().then((loaded) => {
+                if (!loaded) { reject(new Error('Razorpay SDK failed to load')); return; }
+                const rzp = new (window as any).Razorpay({
+                  key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Tb5eAjWbqWtFcS',
+                  amount: Math.round(paymentOrder.amount * 100),
+                  currency: paymentOrder.currency,
+                  name: 'InstaImage',
+                  description: `Booking ${booking.bookingId}`,
+                  order_id: paymentOrder.id,
+                  handler: async (response: any) => {
+                    try {
+                      await fetchApi(`/bookings/${booking._id}/verify-razorpay-payment`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                          razorpay_order_id: response.razorpay_order_id,
+                          razorpay_payment_id: response.razorpay_payment_id,
+                          razorpay_signature: response.razorpay_signature,
+                        }),
+                      });
+                      resolve();
+                    } catch (e) { reject(e); }
+                  },
+                  modal: { ondismiss: () => reject(new Error(`Payment cancelled for ${booking.bookingId}`)) },
+                  theme: { color: '#000000' },
+                });
+                rzp.on('payment.failed', (r: any) => reject(new Error(r.error.description || 'Payment failed')));
+                rzp.open();
+              });
+            });
+          } catch (payErr: any) {
+            setBookingError(`Payment failed for booking ${result.booking.booking.bookingId}: ${payErr.message}. Other bookings are pending payment.`);
+            setIsProcessing(false);
+            return;
+          }
+        }
+
         clearCart();
+        const totalSuccess = successfulBookings.length + walletOnlyBookings.length;
         setConfirmedBooking({
           multi: true,
           results,
-          summary: `${successCount} booking${successCount !== 1 ? 's' : ''} confirmed${failCount > 0 ? `, ${failCount} failed` : ''}`,
+          summary: `${totalSuccess} booking${totalSuccess !== 1 ? 's' : ''} confirmed${failedBookings.length > 0 ? `, ${failedBookings.length} failed` : ''}`,
         });
         nextStep();
         setIsProcessing(false);
@@ -185,7 +237,8 @@ export function Step7Payment() {
     } catch (err: any) {
       const message = err?.message || 'Failed to create booking. Please try again.';
       // If it's a role/auth error, the user's session is stale — force re-login
-      if (message.toLowerCase().includes('requires one of roles') || message.toLowerCase().includes('forbidden') || message.includes('401')) {
+      const lc = message.toLowerCase();
+      if (lc.includes('requires one of roles') || lc.includes('forbidden') || lc.includes('unauthorized') || lc.includes('401')) {
         localStorage.removeItem('auth-storage');
         window.location.href = `/login?returnUrl=/booking&reason=session_expired`;
         return;
