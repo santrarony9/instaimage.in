@@ -214,7 +214,7 @@ export default async function HomePage() {
                   'PHOTOGRAPHY': { image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=600&auto=format&fit=crop', icon: Camera },
                   'VIDEOGRAPHY': { image: 'https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=600&auto=format&fit=crop', icon: Video },
                   'EVENT MANAGEMENT': { image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=600&auto=format&fit=crop', icon: Users },
-                  'POST PRODUCTION': { image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?q=80&w=600&auto=format&fit=crop', icon: Scissors },
+                  'POST PRODUCTION': { image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=600&auto=format&fit=crop', icon: Scissors },
                   'DRONE': { image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=600&auto=format&fit=crop', icon: Plane },
                   'LIVE STREAM': { image: 'https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=600&auto=format&fit=crop', icon: Radio },
                 };
