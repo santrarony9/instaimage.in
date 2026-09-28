@@ -133,7 +133,7 @@ export default async function HomePage() {
       {/* Hero Section */}
       <div className="relative bg-black text-white overflow-hidden min-h-[500px] md:min-h-[600px] flex items-center justify-center">
         <HeroMarquee images={allImages} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/30 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/20 z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
           <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">
