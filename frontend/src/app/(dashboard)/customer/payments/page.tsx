@@ -48,7 +48,7 @@ export default function PaymentsPage() {
             Your payment history and invoices will appear here once you make a booking.
           </p>
           <Link 
-            href="/"
+            href="/services"
             className="mt-6 px-5 py-2.5 rounded-xl font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors inline-block"
           >
             Explore Services
@@ -92,7 +92,7 @@ export default function PaymentsPage() {
                     <td className="px-6 py-4 text-right">
                       {/* For now this links to the booking details, an actual PDF generator can be added later */}
                       <Link 
-                        href={`/customer/bookings/${booking._id}`}
+                        href={`/customer/bookings/${booking._id}/invoice`}
                         className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-bold text-xs"
                       >
                         <FileText className="w-4 h-4" />
@@ -109,3 +109,4 @@ export default function PaymentsPage() {
     </div>
   );
 }
+

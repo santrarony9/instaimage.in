@@ -107,7 +107,7 @@ export default function CustomerDashboardOverview() {
           </h1>
         </div>
         
-        <Link href="/" className="bg-gray-900 text-white px-6 py-3 rounded-full font-black hover:scale-105 transition-transform flex items-center justify-center gap-2 shadow-lg shadow-gray-900/20 whitespace-nowrap">
+        <Link href="/services" className="bg-gray-900 text-white px-6 py-3 rounded-full font-black hover:scale-105 transition-transform flex items-center justify-center gap-2 shadow-lg shadow-gray-900/20 whitespace-nowrap">
           <Camera className="w-5 h-5" />
           Book a Shoot
         </Link>
@@ -298,3 +298,4 @@ export default function CustomerDashboardOverview() {
     </div>
   );
 }
+
