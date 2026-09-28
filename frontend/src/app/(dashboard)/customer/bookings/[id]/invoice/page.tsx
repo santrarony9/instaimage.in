@@ -111,6 +111,12 @@ export default function InvoicePage() {
                 <td className="py-4 text-right text-green-600">-₹{booking.pricing?.discount}</td>
               </tr>
             )}
+            {booking.pricing?.walletDiscountApplied > 0 && (
+              <tr className="border-b border-gray-200">
+                <td className="py-4 text-green-600">💰 Wallet Balance Used</td>
+                <td className="py-4 text-right text-green-600">-₹{booking.pricing?.walletDiscountApplied}</td>
+              </tr>
+            )}
           </tbody>
         </table>
 

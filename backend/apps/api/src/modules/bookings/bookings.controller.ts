@@ -59,16 +59,17 @@ export class BookingsController {
     if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
       throw new BadRequestException('items array is required and must not be empty');
     }
-    // Create bookings in parallel, collect results including failures
-    const results = await Promise.allSettled(
-      body.items.map(item => this.bookingsService.createBooking(req.user.sub, item))
-    );
-    return results.map((result, index) => ({
-      index,
-      serviceId: body.items[index].serviceId,
-      status: result.status,
-      ...(result.status === 'fulfilled' ? { booking: result.value } : { error: (result as PromiseRejectedResult).reason?.message || 'Failed' }),
-    }));
+    // Process bookings SEQUENTIALLY to prevent wallet double-spend race condition
+    const results: Array<{ index: number; serviceId: string; status: string; booking?: any; error?: string }> = [];
+    for (let i = 0; i < body.items.length; i++) {
+      try {
+        const booking = await this.bookingsService.createBooking(req.user.sub, body.items[i]);
+        results.push({ index: i, serviceId: body.items[i].serviceId, status: 'fulfilled', booking });
+      } catch (err: any) {
+        results.push({ index: i, serviceId: body.items[i].serviceId, status: 'rejected', error: err?.message || 'Failed' });
+      }
+    }
+    return results;
   }
 
   @Get('my-bookings')

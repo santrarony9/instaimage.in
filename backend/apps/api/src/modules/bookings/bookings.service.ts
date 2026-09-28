@@ -200,6 +200,11 @@ export class BookingsService {
       throw new NotFoundException('Booking not found');
     }
 
+    // Guard: prevent replay attacks — if already confirmed, skip everything
+    if (booking.status === BookingStatus.CONFIRMED && booking.paymentStatus === 'PAID') {
+      return { success: true, booking, alreadyConfirmed: true };
+    }
+
     // IMPORTANT: Save booking status FIRST, then deduct wallet.
     // This prevents "money loss" bug where wallet is deducted but booking save fails.
     booking.status = BookingStatus.CONFIRMED;
@@ -309,25 +314,32 @@ export class BookingsService {
   }
 
   async cancelBookingCustomer(id: string, customerId: string) {
-    const booking = await this.bookingsRepository.model.findOne({ _id: new Types.ObjectId(id), customerId: new Types.ObjectId(customerId) });
-    if (!booking) {
-      throw new BadRequestException('Booking not found');
-    }
+    // Atomic: check status AND update in a single DB operation to prevent race conditions
+    const booking = await this.bookingsRepository.model.findOneAndUpdate(
+      {
+        _id: new Types.ObjectId(id),
+        customerId: new Types.ObjectId(customerId),
+        status: { $in: [BookingStatus.PENDING_PAYMENT, BookingStatus.CONFIRMED] },
+      },
+      {
+        status: BookingStatus.CANCELLED,
+        $push: {
+          timeline: {
+            status: BookingStatus.CANCELLED,
+            timestamp: new Date(),
+            note: `Cancelled by customer.`,
+          },
+        },
+      },
+      { new: true },
+    );
 
-    if (booking.status !== BookingStatus.PENDING_PAYMENT && booking.status !== BookingStatus.CONFIRMED) {
+    if (!booking) {
+      // Either booking doesn't exist or is already cancelled/completed
+      const existing = await this.bookingsRepository.model.findOne({ _id: new Types.ObjectId(id), customerId: new Types.ObjectId(customerId) });
+      if (!existing) throw new BadRequestException('Booking not found');
       throw new BadRequestException('Booking cannot be cancelled at this stage.');
     }
-
-    booking.status = BookingStatus.CANCELLED;
-    booking.timeline.push({
-      status: BookingStatus.CANCELLED,
-      timestamp: new Date(),
-      note: `Cancelled by customer. Wallet refunded: ₹${booking.pricing?.walletDiscountApplied || 0}. Advance paid via gateway: ₹${booking.pricing?.advancePaid || 0} (manual refund required).`,
-    });
-
-    // IMPORTANT: Save booking status FIRST, then refund wallet.
-    // This prevents the "free money" bug where wallet is refunded but booking save fails.
-    await booking.save();
 
     // Refund wallet balance after booking is safely marked as cancelled
     if (booking.pricing && booking.pricing.walletDiscountApplied > 0) {
@@ -339,7 +351,6 @@ export class BookingsService {
         );
       } catch (error) {
         this.logger.error(`Failed to refund wallet for booking ${booking.bookingId}: ${error.message}`);
-        // Booking is already cancelled — admin can manually issue wallet credit if needed
       }
     }
 

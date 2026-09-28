@@ -472,11 +472,7 @@ export class AuthService {
         isWhatsappVerified: false,
       });
 
-      await this.usersService.addWalletBalance(
-        user._id.toString(),
-        500,
-        'Welcome Bonus',
-      );
+      // No automatic wallet credit — user earns ₹500 by completing email verification via dashboard
       this.emailService.sendWelcomeEmail(user.email, user.name).catch(err => this.logger.error(`Failed to send welcome email: ${err.message}`));
     }
 

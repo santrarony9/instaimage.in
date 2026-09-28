@@ -150,7 +150,7 @@ export default function WalletHistoryPage() {
                     </div>
                   </div>
                   <div className={`text-lg font-black whitespace-nowrap ${isCredit ? 'text-emerald-600' : 'text-gray-900'}`}>
-                    {isCredit ? '+' : '-'} ?{tx.amount.toLocaleString('en-IN')}
+                    {isCredit ? '+' : '-'} ₹{tx.amount.toLocaleString('en-IN')}
                   </div>
                 </div>
               );

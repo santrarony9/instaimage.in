@@ -15,9 +15,11 @@ export default function ProfilePage() {
   // Hide auto-generated placeholder emails so users fill in their real email
   const realEmail = user?.email && !user.email.includes('@instaimage.in') ? user.email : '';
   const [email, setEmail] = useState(realEmail);
-  const [dateOfBirth, setDateOfBirth] = useState(
-    user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : ''
-  );
+  const [dateOfBirth, setDateOfBirth] = useState(() => {
+    if (!user?.dateOfBirth) return '';
+    const d = new Date(user.dateOfBirth);
+    return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+  });
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [couponSent, setCouponSent] = useState(false);
