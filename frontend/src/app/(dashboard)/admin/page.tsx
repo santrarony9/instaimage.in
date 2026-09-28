@@ -54,7 +54,8 @@ export default function AdminDashboardPage() {
   }
 
   const totalBookings = data.length;
-  const totalRevenue = data.reduce((sum, b) => sum + (b.pricing?.totalPrice || b.totalPrice || 0), 0);
+  const revenueStatuses = ['CONFIRMED', 'ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'EDITING', 'DELIVERED'];
+  const totalRevenue = data.filter(b => revenueStatuses.includes(b.status)).reduce((sum, b) => sum + (b.pricing?.totalPrice || b.totalPrice || 0), 0);
   
   const activeStatuses = ['CONFIRMED', 'PENDING_PAYMENT', 'ASSIGNED', 'IN_PROGRESS'];
   const activeBookingsCount = data.filter(b => activeStatuses.includes(b.status)).length;
