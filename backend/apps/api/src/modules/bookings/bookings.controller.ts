@@ -114,10 +114,11 @@ export class BookingsController {
   @Post(':id/verify-razorpay-payment')
   @Roles(Role.CUSTOMER)
   async verifyRazorpayPayment(
+    @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() payload: VerifyRazorpayPaymentDto,
   ) {
-    return this.bookingsService.verifyRazorpayPayment(id, payload);
+    return this.bookingsService.verifyRazorpayPayment(id, payload, req.user.sub);
   }
 
   @Patch(':id/status')

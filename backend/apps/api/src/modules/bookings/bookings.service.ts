@@ -178,6 +178,7 @@ export class BookingsService {
       razorpay_payment_id: string;
       razorpay_signature: string;
     },
+    customerId?: string,
   ) {
     const isValid = this.paymentsService.verifyRazorpaySignature(
       payload.razorpay_order_id,
@@ -198,6 +199,11 @@ export class BookingsService {
     
     if (!booking) {
       throw new NotFoundException('Booking not found');
+    }
+
+    // Verify booking belongs to the authenticated user
+    if (customerId && booking.customerId.toString() !== customerId) {
+      throw new BadRequestException('This booking does not belong to you');
     }
 
     // Guard: prevent replay attacks — if already confirmed, skip everything

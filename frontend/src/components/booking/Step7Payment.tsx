@@ -16,6 +16,8 @@ export function Step7Payment() {
   const [calcError, setCalcError] = useState<string | null>(null);
   const [walletBalance, setWalletBalance] = useState(0);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  // Cache the booking + paymentOrder so retrying doesn't create duplicates
+  const [pendingBooking, setPendingBooking] = useState<any>(null);
 
   useEffect(() => {
     const fetchWallet = async () => {
@@ -137,11 +139,18 @@ export function Step7Payment() {
         return;
       }
 
-      // Single-item flow
-      const response = await submitBooking();
+      // Single-item flow — reuse existing booking on retry to avoid duplicates
+      let response;
+      if (pendingBooking) {
+        response = pendingBooking;
+      } else {
+        response = await submitBooking();
+        setPendingBooking(response); // cache for retries
+      }
       const { booking, paymentOrder } = response;
       
       if (!paymentOrder || !paymentOrder.id) {
+        setPendingBooking(null);
         setConfirmedBooking(booking);
         clearCart();
         nextStep();
@@ -197,6 +206,7 @@ export function Step7Payment() {
                 }),
               });
               
+              setPendingBooking(null);
               setConfirmedBooking(booking);
               clearCart();
               nextStep();
