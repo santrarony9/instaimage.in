@@ -128,15 +128,16 @@ export class UsersService {
     const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
-    const newBalance = (user.walletBalance || 0) + amount;
-    if (newBalance < 0) {
+    if ((user.walletBalance || 0) + amount < 0) {
       throw new BadRequestException('Insufficient wallet balance');
     }
 
-    await this.usersRepository.findOneAndUpdate(
+    const updatedUser = await this.usersRepository.findOneAndUpdate(
       { _id: userId },
-      { walletBalance: newBalance },
+      { $inc: { walletBalance: amount } },
     );
+
+    const finalBalance = updatedUser?.walletBalance || ((user.walletBalance || 0) + amount);
 
     const type = amount >= 0 ? TransactionType.CREDIT : TransactionType.DEBIT;
 
@@ -148,7 +149,7 @@ export class UsersService {
       bookingId: bookingId ? new Types.ObjectId(bookingId) : undefined,
     });
 
-    return { balance: newBalance };
+    return { balance: finalBalance };
   }
 
   async getWalletTransactions(userId: string) {
@@ -167,10 +168,26 @@ export class UsersService {
       throw new BadRequestException('Phone number is required to issue a verification coupon.');
     }
 
+    const user = await this.usersRepository.findById(userId);
+    const displayName = user?.name || 'Customer';
+
     // Guard: one coupon per phone number
     const existingByPhone = await this.verificationCouponModel.findOne({ phone });
     if (existingByPhone) {
-      throw new BadRequestException('A verification coupon has already been issued for this phone number.');
+      if (existingByPhone.isRedeemed) {
+        throw new BadRequestException('A verification coupon has already been redeemed for this phone number.');
+      }
+      
+      // Resend the existing coupon if it hasn't been redeemed
+      existingByPhone.email = email;
+      existingByPhone.expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      await existingByPhone.save();
+
+      this.emailService.sendVerificationCouponEmail(email, displayName, existingByPhone.code).catch(err => console.error('Background task failed:', err));
+      return {
+        success: true,
+        message: 'Coupon code resent to your email! Check your inbox to claim ₹500.',
+      };
     }
 
     // Guard: one coupon per email address (prevents sharing email between accounts)
@@ -192,9 +209,6 @@ export class UsersService {
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     });
 
-    const user = await this.usersRepository.findById(userId);
-    const displayName = user?.name || 'Customer';
-
     // Send email asynchronously — don't block the response
     this.emailService.sendVerificationCouponEmail(email, displayName, code).catch(err => console.error('Background task failed:', err));
 
@@ -209,31 +223,35 @@ export class UsersService {
    * The coupon must belong to this user's phone number (anti-sharing guard).
    */
   async redeemVerificationCoupon(userId: string, code: string) {
-    const coupon = await this.verificationCouponModel.findOne({
-      code: code.trim().toUpperCase(),
-    });
+    const couponCode = code.trim().toUpperCase();
+    
+    // Find and update atomically to prevent race condition double-spends
+    const coupon = await this.verificationCouponModel.findOneAndUpdate(
+      { code: couponCode, isRedeemed: false },
+      { isRedeemed: true },
+      { new: false } // Returns the document BEFORE update
+    );
 
     if (!coupon) {
+      const existing = await this.verificationCouponModel.findOne({ code: couponCode });
+      if (existing && existing.isRedeemed) {
+        throw new BadRequestException('This coupon has already been redeemed.');
+      }
       throw new BadRequestException('Invalid coupon code. Please check and try again.');
     }
 
-    if (coupon.isRedeemed) {
-      throw new BadRequestException('This coupon has already been redeemed.');
-    }
-
     if (coupon.expiresAt < new Date()) {
+      // Revert the redemption if expired
+      await this.verificationCouponModel.findByIdAndUpdate(coupon._id, { isRedeemed: false });
       throw new BadRequestException('This coupon has expired. Verification coupons are valid for 30 days.');
     }
 
     // Security: coupon must belong to this user
     if (coupon.userId.toString() !== userId) {
+      // Revert the redemption if wrong user
+      await this.verificationCouponModel.findByIdAndUpdate(coupon._id, { isRedeemed: false });
       throw new BadRequestException('This coupon does not belong to your account.');
     }
-
-    // Mark redeemed first (prevent race condition double-spend)
-    await this.verificationCouponModel.findByIdAndUpdate(coupon._id, {
-      isRedeemed: true,
-    });
 
     // Credit ₹500 to wallet
     const result = await this.addWalletBalance(
