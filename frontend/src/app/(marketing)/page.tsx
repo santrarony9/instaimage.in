@@ -152,46 +152,46 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Card 1: 500 INR Wallet */}
-          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
+          <div className="w-full bg-gray-900 border border-gray-800 rounded-2xl shadow-lg flex items-center p-3 gap-4 hover:border-blue-500/50 hover:bg-gray-800 transition-all duration-300">
+            <div className="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center shrink-0">
               <Wallet className="w-6 h-6" strokeWidth={1.5} />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-gray-900 leading-tight">Get ₹500 Bonus</h4>
-              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">Sign up & claim in wallet</p>
+              <h4 className="font-bold text-sm text-white leading-tight">Get ₹500 Bonus</h4>
+              <p className="text-[11px] text-gray-400 mt-0.5 font-medium">Sign up & claim in wallet</p>
             </div>
           </div>
 
           {/* Card 2: Verified Professionals */}
-          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
-            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
+          <div className="w-full bg-gray-900 border border-gray-800 rounded-2xl shadow-lg flex items-center p-3 gap-4 hover:border-emerald-500/50 hover:bg-gray-800 transition-all duration-300">
+            <div className="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center shrink-0">
               <ShieldCheck className="w-6 h-6" strokeWidth={1.5} />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-gray-900 leading-tight">100% Quality Assured</h4>
-              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">In-house professional shoots</p>
+              <h4 className="font-bold text-sm text-white leading-tight">100% Quality Assured</h4>
+              <p className="text-[11px] text-gray-400 mt-0.5 font-medium">In-house professional shoots</p>
             </div>
           </div>
 
           {/* Card 3: 20% Down Payment */}
-          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
-            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center shrink-0">
+          <div className="w-full bg-gray-900 border border-gray-800 rounded-2xl shadow-lg flex items-center p-3 gap-4 hover:border-purple-500/50 hover:bg-gray-800 transition-all duration-300">
+            <div className="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center shrink-0">
               <Percent className="w-6 h-6" strokeWidth={1.5} />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-gray-900 leading-tight">20% Down Payment</h4>
-              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">Book full events easily</p>
+              <h4 className="font-bold text-sm text-white leading-tight">20% Down Payment</h4>
+              <p className="text-[11px] text-gray-400 mt-0.5 font-medium">Book full events easily</p>
             </div>
           </div>
 
           {/* Card 4: No-cost EMI */}
-          <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-[0_2px_10px_rgb(0,0,0,0.03)] flex items-center p-3 gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300">
-            <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center shrink-0">
+          <div className="w-full bg-gray-900 border border-gray-800 rounded-2xl shadow-lg flex items-center p-3 gap-4 hover:border-rose-500/50 hover:bg-gray-800 transition-all duration-300">
+            <div className="w-12 h-12 bg-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center shrink-0">
               <CreditCard className="w-6 h-6" strokeWidth={1.5} />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-gray-900 leading-tight">No-Cost EMI Available</h4>
-              <p className="text-[11px] text-gray-500 mt-0.5 font-medium">Pay in flexible installments</p>
+              <h4 className="font-bold text-sm text-white leading-tight">No-Cost EMI Available</h4>
+              <p className="text-[11px] text-gray-400 mt-0.5 font-medium">Pay in flexible installments</p>
             </div>
           </div>
 
@@ -209,39 +209,41 @@ export default async function HomePage() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {categories.map((category: any, idx: number) => {
+                const catName = category.name.toUpperCase();
                 const categoryConfig: Record<string, { color: string; icon: any; bg: string }> = {
-                  'Photography': { color: 'text-blue-600', bg: 'bg-blue-50 group-hover:bg-blue-600', icon: Camera },
-                  'Videography': { color: 'text-purple-600', bg: 'bg-purple-50 group-hover:bg-purple-600', icon: Video },
-                  'Event Management': { color: 'text-rose-600', bg: 'bg-rose-50 group-hover:bg-rose-600', icon: Users },
-                  'Post Production': { color: 'text-amber-600', bg: 'bg-amber-50 group-hover:bg-amber-600', icon: Scissors },
-                  'Drone': { color: 'text-sky-600', bg: 'bg-sky-50 group-hover:bg-sky-600', icon: Plane },
-                  'Live Stream': { color: 'text-emerald-600', bg: 'bg-emerald-50 group-hover:bg-emerald-600', icon: Radio },
+                  'PHOTOGRAPHY': { color: 'text-blue-400', bg: 'bg-blue-500/20 group-hover:bg-blue-500', icon: Camera },
+                  'VIDEOGRAPHY': { color: 'text-purple-400', bg: 'bg-purple-500/20 group-hover:bg-purple-500', icon: Video },
+                  'EVENT MANAGEMENT': { color: 'text-rose-400', bg: 'bg-rose-500/20 group-hover:bg-rose-500', icon: Users },
+                  'POST PRODUCTION': { color: 'text-amber-400', bg: 'bg-amber-500/20 group-hover:bg-amber-500', icon: Scissors },
+                  'DRONE': { color: 'text-sky-400', bg: 'bg-sky-500/20 group-hover:bg-sky-500', icon: Plane },
+                  'LIVE STREAM': { color: 'text-emerald-400', bg: 'bg-emerald-500/20 group-hover:bg-emerald-500', icon: Radio },
                 };
                 const fallbackColors = [
-                  { color: 'text-violet-600', bg: 'bg-violet-50 group-hover:bg-violet-600' },
-                  { color: 'text-cyan-600', bg: 'bg-cyan-50 group-hover:bg-cyan-600' },
-                  { color: 'text-lime-600', bg: 'bg-lime-50 group-hover:bg-lime-600' },
-                  { color: 'text-fuchsia-600', bg: 'bg-fuchsia-50 group-hover:bg-fuchsia-600' }
+                  { color: 'text-violet-400', bg: 'bg-violet-500/20 group-hover:bg-violet-500' },
+                  { color: 'text-cyan-400', bg: 'bg-cyan-500/20 group-hover:bg-cyan-500' },
+                  { color: 'text-lime-400', bg: 'bg-lime-500/20 group-hover:bg-lime-500' },
+                  { color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/20 group-hover:bg-fuchsia-500' }
                 ];
-                const config = categoryConfig[category.name] || {
+                const config = categoryConfig[catName] || {
                   ...fallbackColors[idx % fallbackColors.length],
                   icon: Sparkles,
                 };
                 const Icon = config.icon;
 
                 return (
-                  <Link key={category._id} href={`/services?category=${category.name}`} className="group relative bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[180px]">
+                  <Link key={category._id} href={`/services?category=${category.name}`} className="group relative bg-gray-900 border border-gray-800 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-xl hover:shadow-2xl hover:border-gray-700 transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[180px]">
+                    <div className={`absolute -right-10 -top-10 w-40 h-40 rounded-full blur-3xl opacity-20 transition-colors duration-500 ${config.bg.split(' ')[0]}`}></div>
                     <div className="flex justify-between items-start w-full relative z-10">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${config.bg} ${config.color} group-hover:text-white`}>
                         <Icon className="w-7 h-7" strokeWidth={1.5} />
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-gray-900 group-hover:text-white transition-all duration-300">
+                      <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-gray-900 transition-all duration-300">
                         <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
                       </div>
                     </div>
                     <div className="mt-8 relative z-10">
-                      <h3 className="text-gray-900 text-lg sm:text-xl font-bold tracking-tight">{category.name}</h3>
-                      <p className="text-gray-500 text-sm mt-1 font-medium">Explore services</p>
+                      <h3 className="text-white text-lg sm:text-xl font-bold tracking-tight">{category.name}</h3>
+                      <p className="text-gray-400 text-sm mt-1 font-medium group-hover:text-gray-300 transition-colors">Explore services</p>
                     </div>
                   </Link>
                 );
