@@ -210,40 +210,51 @@ export default async function HomePage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {categories.map((category: any, idx: number) => {
                 const catName = category.name.toUpperCase();
-                const categoryConfig: Record<string, { color: string; icon: any; bg: string }> = {
-                  'PHOTOGRAPHY': { color: 'text-blue-400', bg: 'bg-blue-500/20 group-hover:bg-blue-500', icon: Camera },
-                  'VIDEOGRAPHY': { color: 'text-purple-400', bg: 'bg-purple-500/20 group-hover:bg-purple-500', icon: Video },
-                  'EVENT MANAGEMENT': { color: 'text-rose-400', bg: 'bg-rose-500/20 group-hover:bg-rose-500', icon: Users },
-                  'POST PRODUCTION': { color: 'text-amber-400', bg: 'bg-amber-500/20 group-hover:bg-amber-500', icon: Scissors },
-                  'DRONE': { color: 'text-sky-400', bg: 'bg-sky-500/20 group-hover:bg-sky-500', icon: Plane },
-                  'LIVE STREAM': { color: 'text-emerald-400', bg: 'bg-emerald-500/20 group-hover:bg-emerald-500', icon: Radio },
+                const categoryConfig: Record<string, { image: string; icon: any }> = {
+                  'PHOTOGRAPHY': { image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=600&auto=format&fit=crop', icon: Camera },
+                  'VIDEOGRAPHY': { image: 'https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=600&auto=format&fit=crop', icon: Video },
+                  'EVENT MANAGEMENT': { image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=600&auto=format&fit=crop', icon: Users },
+                  'POST PRODUCTION': { image: 'https://images.unsplash.com/photo-1574717024453-354056fadcf7?q=80&w=600&auto=format&fit=crop', icon: Scissors },
+                  'DRONE': { image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=600&auto=format&fit=crop', icon: Plane },
+                  'LIVE STREAM': { image: 'https://images.unsplash.com/photo-1588196749597-9ff046428669?q=80&w=600&auto=format&fit=crop', icon: Radio },
                 };
-                const fallbackColors = [
-                  { color: 'text-violet-400', bg: 'bg-violet-500/20 group-hover:bg-violet-500' },
-                  { color: 'text-cyan-400', bg: 'bg-cyan-500/20 group-hover:bg-cyan-500' },
-                  { color: 'text-lime-400', bg: 'bg-lime-500/20 group-hover:bg-lime-500' },
-                  { color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/20 group-hover:bg-fuchsia-500' }
+                
+                const defaultImages = [
+                  'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?q=80&w=600&auto=format&fit=crop',
+                  'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=600&auto=format&fit=crop'
                 ];
-                const config = categoryConfig[catName] || {
-                  ...fallbackColors[idx % fallbackColors.length],
-                  icon: Sparkles,
+                
+                const config = categoryConfig[catName] || { 
+                  image: defaultImages[idx % defaultImages.length], 
+                  icon: Sparkles 
                 };
                 const Icon = config.icon;
 
                 return (
-                  <Link key={category._id} href={`/services?category=${category.name}`} className="group relative bg-gray-900 border border-gray-800 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-xl hover:shadow-2xl hover:border-gray-700 transition-all duration-300 flex flex-col justify-between min-h-[160px] md:min-h-[180px]">
-                    <div className={`absolute -right-10 -top-10 w-40 h-40 rounded-full blur-3xl opacity-20 transition-colors duration-500 ${config.bg.split(' ')[0]}`}></div>
-                    <div className="flex justify-between items-start w-full relative z-10">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${config.bg} ${config.color} group-hover:text-white`}>
-                        <Icon className="w-7 h-7" strokeWidth={1.5} />
-                      </div>
-                      <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-gray-900 transition-all duration-300">
-                        <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+                  <Link key={category._id} href={`/services?category=${category.name}`} className="group relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col justify-between min-h-[220px] md:min-h-[260px] border border-gray-200 hover:-translate-y-1">
+                    
+                    {/* Background Image */}
+                    <div className="absolute inset-0 z-0">
+                      <Image unoptimized src={config.image} alt={category.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" sizes="(max-width: 768px) 50vw, 20vw" />
+                    </div>
+
+                    {/* Gradient Overlays */}
+                    <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/80 group-hover:to-black/90 transition-colors duration-300"></div>
+
+                    {/* Content Top */}
+                    <div className="flex justify-between items-start w-full relative z-20 p-5 sm:p-6">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-white/20 backdrop-blur-md text-white border border-white/20 group-hover:bg-white group-hover:text-gray-900 transition-all duration-300">
+                        <Icon className="w-6 h-6" strokeWidth={1.5} />
                       </div>
                     </div>
-                    <div className="mt-8 relative z-10">
-                      <h3 className="text-white text-lg sm:text-xl font-bold tracking-tight">{category.name}</h3>
-                      <p className="text-gray-400 text-sm mt-1 font-medium group-hover:text-gray-300 transition-colors">Explore services</p>
+
+                    {/* Content Bottom */}
+                    <div className="relative z-20 p-5 sm:p-6 mt-auto">
+                      <h3 className="text-white text-lg sm:text-xl font-bold tracking-tight drop-shadow-md">{category.name}</h3>
+                      <div className="flex items-center gap-1 mt-1 text-white/80 group-hover:text-white transition-colors duration-300">
+                        <p className="text-sm font-semibold">Explore</p>
+                        <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" />
+                      </div>
                     </div>
                   </Link>
                 );
