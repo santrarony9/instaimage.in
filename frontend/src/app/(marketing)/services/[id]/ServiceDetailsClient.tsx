@@ -146,75 +146,52 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
           
           {/* Left Column: Media & Details */}
           <div className="w-full lg:w-7/12">
-            {/* Masonry Media Gallery */}
-            <div className="mb-8 relative">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg">
-                
-                {/* Left Large Image/Video */}
-                <div className="relative w-full h-full cursor-pointer group" onClick={() => setActiveImageIndex(0)}>
-                  {isVideo(uniqueMediaList[0]) ? (
-                    <video src={uniqueMediaList[0].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[0]}` : uniqueMediaList[0]} autoPlay muted loop playsInline className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
-                  ) : (
-                    <Image unoptimized src={uniqueMediaList[0].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[0]}` : uniqueMediaList[0]} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition duration-700" priority />
-                  )}
-                  {isVideo(uniqueMediaList[0]) && (
-                    <div className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-sm">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition duration-300" />
-                </div>
+            {/* Traditional Media Gallery */}
+            <div className="mb-8 flex flex-col gap-4">
+              {/* Main Large Image/Video */}
+              <div 
+                className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-sm cursor-pointer group border border-gray-100 bg-gray-50 flex items-center justify-center"
+                onClick={() => setActiveImageIndex(0)}
+              >
+                {isVideo(uniqueMediaList[0]) ? (
+                  <video src={uniqueMediaList[0].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[0]}` : uniqueMediaList[0]} autoPlay muted loop playsInline className="w-full h-full object-contain" />
+                ) : (
+                  <Image unoptimized src={uniqueMediaList[0].startsWith('/') ? `https://api.instaimage.in${uniqueMediaList[0]}` : uniqueMediaList[0]} alt={service.name} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" priority />
+                )}
+                {isVideo(uniqueMediaList[0]) && (
+                  <div className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full backdrop-blur-sm">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  </div>
+                )}
+              </div>
 
-                {/* Right Grid (Hidden on very small screens, visible on md+) */}
-                <div className="hidden md:grid grid-cols-2 grid-rows-2 gap-2 h-full">
-                  {uniqueMediaList.slice(1, 5).map((media, idx) => {
+              {/* Thumbnails Row */}
+              {uniqueMediaList.length > 1 && (
+                <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+                  {uniqueMediaList.map((media, idx) => {
                     const isVid = isVideo(media);
-                    const isLast = idx === 3 && uniqueMediaList.length > 5;
-                    const url = media.startsWith('/') ? `https://api.instaimage.in${media}` : media;
-
+                    const url = media.startsWith('/') && !media.startsWith('//') ? `https://api.instaimage.in${media}` : media;
                     return (
                       <div 
-                        key={idx + 1} 
-                        className="relative w-full h-full cursor-pointer group overflow-hidden"
-                        onClick={() => setActiveImageIndex(idx + 1)}
+                        key={idx}
+                        className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden cursor-pointer border-2 flex-shrink-0 bg-gray-100 ${activeImageIndex === idx ? 'border-blue-600 opacity-100' : 'border-transparent hover:border-gray-300 opacity-80'}`}
+                        onClick={() => setActiveImageIndex(idx)}
                       >
                         {isVid ? (
-                          <video src={url} autoPlay muted loop playsInline className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+                          <video src={url} className="w-full h-full object-cover" />
                         ) : (
-                          <Image unoptimized src={url} alt={`${service.name} ${idx + 1}`} fill sizes="25vw" className="object-cover group-hover:scale-110 transition duration-700" />
+                          <Image unoptimized src={url} alt={`${service.name} thumbnail ${idx + 1}`} fill sizes="96px" className="object-cover" />
                         )}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition duration-300" />
-                        
-                        {/* Overlay for "View All" on the last image if more than 5 */}
-                        {isLast && (
-                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-lg backdrop-blur-sm hover:bg-black/40 transition">
-                            +{uniqueMediaList.length - 5} More
+                        {isVid && (
+                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                             <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                           </div>
-                        )}
-                        {isVid && !isLast && (
-                           <div className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full backdrop-blur-sm">
-                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                           </div>
                         )}
                       </div>
                     );
                   })}
-                  {/* Fill empty slots if less than 5 images to keep the grid intact */}
-                  {uniqueMediaList.length < 5 && Array.from({ length: 5 - uniqueMediaList.length }).map((_, i) => (
-                    <div key={`empty-${i}`} className="bg-gray-100 w-full h-full flex items-center justify-center">
-                       <span className="text-gray-300 text-3xl">📸</span>
-                    </div>
-                  ))}
                 </div>
-              </div>
-              
-              <button 
-                onClick={() => setActiveImageIndex(0)}
-                className="md:hidden absolute bottom-4 right-4 bg-white/90 backdrop-blur text-black font-bold px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                View all {uniqueMediaList.length} media
-              </button>
+              )}
             </div>
 
             {/* Fullscreen Lightbox Modal */}
