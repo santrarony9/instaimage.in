@@ -203,6 +203,11 @@ export default function ServicesManagementPage() {
     }
     
     payload.isActive = Boolean(payload.isActive);
+    
+    // Admin-created services are always pre-approved and visible on the frontend
+    if (!editingItem) {
+      payload.isApproved = true;
+    }
 
     try {
       if (editingItem) {
