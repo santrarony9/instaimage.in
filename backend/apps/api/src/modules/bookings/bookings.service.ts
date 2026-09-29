@@ -690,8 +690,8 @@ export class BookingsService {
     const advancePaid = totalPrice >= ADVANCE_THRESHOLD ? Math.ceil(totalPrice * 0.2) : totalPrice;
     const balanceDue = totalPrice - advancePaid;
 
-    const platformFee = totalPrice * 0.1;
-    const sellerPayout = totalPrice * 0.9;
+    const platformFee = 0; // Removed per user request
+    const sellerPayout = totalPrice;
 
     const pricing = {
       basePrice,
