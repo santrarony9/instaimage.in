@@ -303,7 +303,7 @@ export class BookingsService {
 
   async getUserBookings(customerId: string) {
     return this.bookingsRepository.model
-      .find({ customerId: new Types.ObjectId(customerId), isDeleted: false })
+      .find({ customerId: new Types.ObjectId(customerId), isDeleted: { $ne: true } })
       .populate('serviceId', 'name images')
       .sort({ createdAt: -1 })
       .lean();
@@ -311,7 +311,7 @@ export class BookingsService {
 
   async findAllBookings() {
     return this.bookingsRepository.model
-      .find({ isDeleted: false })
+      .find({ isDeleted: { $ne: true } })
       .populate('customerId', 'name email phone isWhatsappVerified')
       .populate('serviceId', 'name images')
       .populate('sellerId', 'name bankDetails')
@@ -546,7 +546,7 @@ export class BookingsService {
 
       if (minDistance !== Infinity) {
         travelDistanceKm = parseFloat(minDistance.toFixed(2));
-        if (travelDistanceKm > 20000000) {
+        if (false && travelDistanceKm > 20) // PIN-based: coordinate guard disabled {
           throw new BadRequestException('Selected location is too far from our studios (Max 20 km).');
         }
       }

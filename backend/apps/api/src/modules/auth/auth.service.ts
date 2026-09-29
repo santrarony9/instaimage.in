@@ -69,8 +69,8 @@ export class AuthService {
       }
     }
 
-    // Generate secure 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // BUG-19 FIX: Use cryptographically secure OTP generation
+    const otp = crypto.randomInt(100000, 1000000).toString();
     const salt = await bcrypt.genSalt(10);
     const otpHash = await bcrypt.hash(otp, salt);
 
