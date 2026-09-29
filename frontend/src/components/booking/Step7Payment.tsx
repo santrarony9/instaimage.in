@@ -298,7 +298,7 @@ export function Step7Payment() {
           {calcError ? `Server returned: ${calcError}` : "We couldn't fetch pricing. Please check your internet connection and try again."}
         </p>
         <div className="flex justify-center gap-3">
-          <button onClick={prevStep} className="text-gray-600 px-6 py-2 rounded-md hover:bg-gray-100 transition">Back</button>
+          <button onClick={() => { const { user } = useAuthStore.getState(); const isRemote = cartItems.length > 0 ? !cartItems.some(i => i.deliveryMethod === 'ON_SPOT' || (i.deliveryMethod as any) === 'STUDIO') : data.deliveryMethod === 'REMOTE'; if (isRemote) { window.location.href = '/cart'; } else if (user) { setStep(5); } else { prevStep(); } }} className="text-gray-600 px-6 py-2 rounded-md hover:bg-gray-100 transition">Back</button>
           <button onClick={() => window.location.reload()} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">Retry</button>
         </div>
       </div>
@@ -540,7 +540,10 @@ export function Step7Payment() {
         <button 
           onClick={() => {
             const { user } = useAuthStore.getState();
-            if (user) {
+            const isRemote = cartItems.length > 0 ? !cartItems.some(i => i.deliveryMethod === 'ON_SPOT' || (i.deliveryMethod as any) === 'STUDIO') : data.deliveryMethod === 'REMOTE';
+            if (isRemote) {
+              window.location.href = '/cart';
+            } else if (user) {
               setStep(5);
             } else {
               prevStep();
