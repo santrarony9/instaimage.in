@@ -108,7 +108,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
     serviceName: service.name,
     serviceImage: service.images?.[0],
     pricingMode,
-    deliveryMethod: service.deliveryMethod === 'REMOTE' ? 'REMOTE' as const : 'ON_SPOT' as const,
+    deliveryMethod: (service.deliveryMethod === 'REMOTE' || service.category === 'POST PRODUCTION') ? 'REMOTE' as const : 'ON_SPOT' as const,
     addonNames: selectedAddons,
     extraHoursBooked: extraHours,
     basePrice: totalPrice,

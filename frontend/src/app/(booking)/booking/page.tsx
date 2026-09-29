@@ -55,8 +55,11 @@ function BookingFlow() {
             pincode: '000000',
             landmark: 'Remote Post-Production',
           },
+          scheduledDate: new Date().toISOString(),
+          startTime: '10:00 AM',
+          endTime: '06:00 PM',
         });
-        setStep(5);
+        setStep(useAuthStore.getState().user ? 7 : 6);
       } else {
         setStep(4);
       }
@@ -80,8 +83,11 @@ function BookingFlow() {
             pincode: '000000',
             landmark: 'Remote Post-Production',
           },
+          scheduledDate: new Date().toISOString(),
+          startTime: '10:00 AM',
+          endTime: '06:00 PM',
         });
-        setStep(5);
+        setStep(useAuthStore.getState().user ? 7 : 6);
       } else {
         setStep(4);
       }
