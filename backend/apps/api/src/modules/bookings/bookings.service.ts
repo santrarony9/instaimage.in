@@ -50,10 +50,10 @@ export class BookingsService {
     private readonly settingsService: SettingsService,
     private readonly usersService: UsersService,
   ) {
-    const b2KeyId = process.env.B2_KEY_ID;
-    const b2AppKey = process.env.B2_APPLICATION_KEY;
+    const b2KeyId = process.env.B2_KEY_ID || '';
+    const b2AppKey = process.env.B2_APPLICATION_KEY || '';
     if (!b2KeyId || !b2AppKey) {
-      throw new Error('B2_KEY_ID and B2_APPLICATION_KEY environment variables are required');
+      console.warn('[BookingsService] B2 keys missing — gallery features will fail gracefully');
     }
     this.s3 = new S3Client({
       endpoint: process.env.B2_ENDPOINT || 'https://s3.eu-central-003.backblazeb2.com',
@@ -109,9 +109,7 @@ export class BookingsService {
         customerNotes: createBookingDto.customerNotes,
       });
 
-      if (createBookingDto.appliedCouponId && pricing.discount > 0) {
-        await this.couponsService.incrementUsage(createBookingDto.appliedCouponId).catch(e => this.logger.error(`Failed to increment coupon usage: ${e.message}`));
-      }
+      // BUG-02 FIX: Coupon usage incremented only AFTER payment verified (in verifyRazorpayPayment).
 
       // 3. Handle Payment Order Mock or Direct Confirmation
       let paymentOrder = null;
@@ -123,17 +121,18 @@ export class BookingsService {
         );
       } else {
         // If 100% paid via wallet, confirm immediately and deduct balance
+        // BUG-03 FIX: Save booking FIRST, then deduct wallet
+        booking.status = BookingStatus.CONFIRMED;
+        booking.paymentStatus = 'PAID';
+        await booking.save();
         if (walletDiscountApplied && walletDiscountApplied > 0) {
           await this.usersService.addWalletBalance(
             customerId,
             -walletDiscountApplied,
             `Applied to booking ${bookingId}`,
             booking._id.toString(),
-          );
+          ).catch(e => this.logger.error(`Wallet deduction failed: ${e.message}`));
         }
-        booking.status = BookingStatus.CONFIRMED;
-        booking.paymentStatus = 'PAID';
-        await booking.save();
       }
 
       if (pricing.advancePaid === 0) {
@@ -217,6 +216,13 @@ export class BookingsService {
     booking.paymentStatus = 'PAID';
     booking.paymentId = payload.razorpay_payment_id;
     await booking.save();
+
+    // BUG-02 FIX: Increment coupon usage only after payment confirmed
+    if (booking.appliedCouponId && booking.pricing?.discount > 0) {
+      await this.couponsService.incrementUsage(booking.appliedCouponId.toString()).catch(e =>
+        this.logger.error(`Failed to increment coupon post-payment: ${d}{e.message}`)
+      );
+    }
 
     // Deduct wallet discount after booking is safely confirmed
     if (
@@ -366,22 +372,24 @@ export class BookingsService {
   async updateBookingStatus(id: string, status: BookingStatus) {
     const booking = await this.bookingsRepository.update(id, { status });
 
-    if (status === BookingStatus.CONFIRMED && booking && booking.customerId) {
+    // BUG-14 FIX: only grant referral for paid confirmed bookings, mark-then-reward order
+    if (status === BookingStatus.CONFIRMED && booking && booking.customerId
+        && booking.paymentStatus === 'PAID') {
       const user = await this.usersService.findById(
         booking.customerId.toString(),
       );
       if (user && !user.hasCompletedFirstBooking && user.referredBy) {
-        // Reward the referrer
-        await this.usersService.addWalletBalance(
-          user.referredBy.toString(),
-          500,
-          `Referral reward for ${user.name}'s first booking`,
-          booking._id.toString(),
-        );
-        // Mark as completed
-        await this.usersService.update(user._id.toString(), {
+        const marked = await this.usersService.update(user._id.toString(), {
           hasCompletedFirstBooking: true,
         });
+        if (marked) {
+          await this.usersService.addWalletBalance(
+            user.referredBy.toString(),
+            500,
+            `Referral reward for ${user.name}'s first booking`,
+            booking._id.toString(),
+          );
+        }
       }
     }
 
@@ -407,7 +415,7 @@ export class BookingsService {
     const newTotalPrice = booking.pricing.totalPrice + surcharge.amount;
     const newBalanceDue = booking.pricing.balanceDue + surcharge.amount;
 
-    // BUG-08 FIX: use booking._id not raw id string + use field-level updates not spread
+    // BUG-08 FIX: use booking._id + field-level updates (no subdoc spread)
     return this.bookingsRepository.update(booking._id.toString(), {
       "pricing.surcharges": newSurcharges,
       "pricing.surchargesPrice": newSurchargesPrice,
@@ -423,7 +431,7 @@ export class BookingsService {
     return this.bookingsRepository.model
       .find({
         sellerId: seller._id,
-        isDeleted: false,
+        isDeleted: { $ne: true },
       })
       .populate('customerId', 'name email phone')
       .populate('serviceId', 'name images')
@@ -458,7 +466,7 @@ export class BookingsService {
       }
     }
 
-    // BUG-07 FIX: use booking._id (ObjectId) not bookingId (BKG string)
+    // BUG-07 FIX: use booking._id (ObjectId) not BKG string for update
     return this.bookingsRepository.update(booking._id.toString(), {
       sellerId: new Types.ObjectId(sellerId),
       status: BookingStatus.ASSIGNED,
@@ -487,17 +495,16 @@ export class BookingsService {
       throw new ForbiddenException('You are not assigned to this booking');
     }
 
-    // BUG-15 FIX: whitelist only statuses sellers are allowed to set
-    const ALLOWED_SELLER_STATUSES = [
+    // BUG-15 FIX: whitelist statuses sellers can set
+    const ALLOWED_SELLER_STATUSES: BookingStatus[] = [
       BookingStatus.IN_PROGRESS,
       BookingStatus.COMPLETED,
       BookingStatus.EDITING,
       BookingStatus.DELIVERED,
     ];
     if (!ALLOWED_SELLER_STATUSES.includes(status)) {
-      throw new BadRequestException(`Sellers cannot set booking status to ${status}`);
+      throw new BadRequestException(`Sellers cannot set status to ${d}{status}`);
     }
-    // BUG-07 variant: use booking._id not BKG string
     return this.bookingsRepository.update(booking._id.toString(), { status });
   }
 
@@ -556,7 +563,7 @@ export class BookingsService {
 
       if (minDistance !== Infinity) {
         travelDistanceKm = parseFloat(minDistance.toFixed(2));
-        if (false && travelDistanceKm > 20) // PIN-based: coordinate guard disabled {
+        if (travelDistanceKm > 20) {
           throw new BadRequestException('Selected location is too far from our studios (Max 20 km).');
         }
       }
@@ -871,7 +878,7 @@ export class BookingsService {
 
     const bookings = await this.bookingsRepository.model
       .find({
-        isDeleted: false,
+        isDeleted: { $ne: true },
         'internalNotes.followUpDate': { $gte: today },
       })
       .populate('customerId', 'name email phone')
