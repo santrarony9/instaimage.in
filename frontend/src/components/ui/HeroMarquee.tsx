@@ -26,7 +26,7 @@ export function HeroMarquee({ images }: { images: string[] }) {
   const row3 = createRowImages(images.length > 6 ? 6 : 2);
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden bg-black opacity-30 rotate-[-4deg] scale-110">
+    <div className="absolute inset-0 z-0 overflow-hidden bg-black rotate-[-4deg] scale-110">
       <div className="flex flex-col gap-4 pt-10">
         
         {/* Row 1: Left */}

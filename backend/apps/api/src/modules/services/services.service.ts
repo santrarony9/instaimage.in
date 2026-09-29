@@ -30,7 +30,7 @@ export class ServicesService {
 
   async findAll() {
     return this.servicesRepository.model
-      .find({ isApproved: true, isActive: true })
+      .find({ isApproved: { $ne: false }, isActive: true })
       .sort({ createdAt: -1 })
       .limit(200)
       .lean();
