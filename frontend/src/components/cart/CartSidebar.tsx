@@ -1,3 +1,5 @@
+import { useRouter } from 'next/navigation';
+import { useBookingStore } from '@/hooks/use-booking-store';
 "use client";
 
 import { useCartStore } from '@/hooks/use-cart-store';
@@ -8,6 +10,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export function CartSidebar() {
+  const router = useRouter();
   const { items, isSidebarOpen, setSidebarOpen, removeItem, clearCart } = useCartStore();
   const { user } = useAuthStore();
   const [mounted, setMounted] = useState(false);
@@ -209,13 +212,16 @@ export function CartSidebar() {
 
               {/* Primary CTA: if logged in → direct Checkout, else → send wishlist lead */}
               {user ? (
-                <Link
-                  href="/booking"
-                  onClick={() => setSidebarOpen(false)}
+                <button
+                  onClick={() => {
+                    setSidebarOpen(false);
+                    useBookingStore.getState().reset();
+                    router.push('/booking');
+                  }}
                   className="flex-1 bg-black text-white text-center py-3 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-gray-800 transition shadow-lg flex justify-center items-center gap-2"
                 >
                   Checkout Now
-                </Link>
+                </button>
               ) : (
                 <button
                   onClick={handleSubmitLead}

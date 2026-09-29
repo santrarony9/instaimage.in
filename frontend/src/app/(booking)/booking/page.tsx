@@ -24,7 +24,10 @@ function BookingFlow() {
 
   // Populate booking data from URL params or cart
   useEffect(() => {
-    if (useBookingStore.getState().currentStep >= 4 && useBookingStore.getState().data.serviceId) return;
+    // Check if we are already in the middle of a flow for the EXACT SAME setup
+    const storeData = useBookingStore.getState().data;
+    const isDifferentService = searchParams.get('serviceId') && searchParams.get('serviceId') !== storeData.serviceId;
+    if (useBookingStore.getState().currentStep >= 4 && storeData.serviceId && !isDifferentService) return;
 
     const serviceId = searchParams.get('serviceId');
     if (serviceId) {
@@ -47,7 +50,9 @@ function BookingFlow() {
         addonNames: addons ? addons.split(',') : [],
       });
 
-      if (type === 'REMOTE') {
+      const hasPhysicalShoot = cartItems.some(item => item.deliveryMethod === 'ON_SPOT' || (item.deliveryMethod as string) === 'STUDIO');
+      
+      if (!hasPhysicalShoot) {
         updateData({
           location: {
             address: 'Remote',

@@ -134,6 +134,7 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
       ...(extraHours > 0 ? { extraHours: String(extraHours) } : {}),
       ...(selectedAddons.length > 0 ? { addons: selectedAddons.join(',') } : {}),
     });
+    useBookingStore.getState().reset();
     router.push(`/booking?${params.toString()}`);
   };
 
