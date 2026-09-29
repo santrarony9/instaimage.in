@@ -38,11 +38,16 @@ export function Step7Payment() {
         const itemsToCalculate = cartItems.length > 0 ? cartItems : [data];
         let totalBasePrice = 0;
         let totalAddonsPrice = 0;
+        let totalExtraHoursPrice = 0;
+        let totalDeliveryCharge = 0;
+        let maxTravelDistanceKm = 0;
         let totalDiscount = 0;
-        let totalTax = 0;
         let totalFinalAmount = 0;
         let totalAdvanceAmount = 0;
         let totalWalletDeduction = 0;
+        let totalExpressDeliveryFee = 0;
+        let totalAvailableExpressFee = 0;
+        let allMatchedAddons: any[] = [];
 
         for (const item of itemsToCalculate) {
           const payload = {
@@ -66,25 +71,38 @@ export function Step7Payment() {
           if (res && res.pricing) {
             totalBasePrice += res.pricing.basePrice || 0;
             totalAddonsPrice += res.pricing.addonsPrice || 0;
+            totalExtraHoursPrice += res.pricing.extraHoursPrice || 0;
+            totalDeliveryCharge += res.pricing.deliveryCharge || 0;
+            maxTravelDistanceKm = Math.max(maxTravelDistanceKm, res.pricing.travelDistanceKm || 0);
             totalDiscount += res.pricing.discount || 0;
             totalFinalAmount += res.pricing.totalPrice || 0;
             totalAdvanceAmount += res.pricing.advancePaid || 0;
             totalWalletDeduction += res.pricing.walletDiscountApplied || 0;
-            totalTax += res.pricing.expressDeliveryFee || 0; // Using tax variable to store express fee temporarily
+            totalExpressDeliveryFee += res.pricing.expressDeliveryFee || 0;
+          }
+          if (res && res.matchedAddons) {
+            allMatchedAddons = [...allMatchedAddons, ...res.matchedAddons];
+          }
+          if (res && res.availableExpressFee) {
+            totalAvailableExpressFee += res.availableExpressFee;
           }
         }
 
         setPricingInfo({
-          availableExpressFee: 0,
+          availableExpressFee: totalAvailableExpressFee,
+          matchedAddons: allMatchedAddons,
           pricing: {
             basePrice: totalBasePrice,
             addonsPrice: totalAddonsPrice,
+            extraHoursPrice: totalExtraHoursPrice,
+            deliveryCharge: totalDeliveryCharge,
+            travelDistanceKm: maxTravelDistanceKm,
             discount: totalDiscount,
             walletDiscountApplied: totalWalletDeduction,
             totalPrice: totalFinalAmount,
             advancePaid: totalAdvanceAmount,
             balanceDue: totalFinalAmount - totalAdvanceAmount,
-            expressDeliveryFee: totalTax
+            expressDeliveryFee: totalExpressDeliveryFee
           }
         });
         setCalcError(null);
