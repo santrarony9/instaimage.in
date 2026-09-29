@@ -63,24 +63,29 @@ export function Step7Payment() {
             method: "POST",
             body: JSON.stringify(payload),
           });
-          totalBasePrice += res.basePrice || 0;
-          totalAddonsPrice += res.addonsPrice || 0;
-          totalDiscount += res.discount || 0;
-          totalTax += res.tax || 0;
-          totalFinalAmount += res.finalAmount || 0;
-          totalAdvanceAmount += res.advanceAmount || 0;
-          totalWalletDeduction += res.walletDeduction || 0;
+          if (res && res.pricing) {
+            totalBasePrice += res.pricing.basePrice || 0;
+            totalAddonsPrice += res.pricing.addonsPrice || 0;
+            totalDiscount += res.pricing.discount || 0;
+            totalFinalAmount += res.pricing.totalPrice || 0;
+            totalAdvanceAmount += res.pricing.advancePaid || 0;
+            totalWalletDeduction += res.pricing.walletDiscountApplied || 0;
+            totalTax += res.pricing.expressDeliveryFee || 0; // Using tax variable to store express fee temporarily
+          }
         }
 
         setPricingInfo({
-          basePrice: totalBasePrice,
-          addonsPrice: totalAddonsPrice,
-          discount: totalDiscount,
-          tax: totalTax,
-          finalAmount: totalFinalAmount,
-          advanceAmount: totalAdvanceAmount,
-          walletDeduction: totalWalletDeduction,
-          pricingMode: itemsToCalculate[0]?.pricingMode
+          availableExpressFee: 0,
+          pricing: {
+            basePrice: totalBasePrice,
+            addonsPrice: totalAddonsPrice,
+            discount: totalDiscount,
+            walletDiscountApplied: totalWalletDeduction,
+            totalPrice: totalFinalAmount,
+            advancePaid: totalAdvanceAmount,
+            balanceDue: totalFinalAmount - totalAdvanceAmount,
+            expressDeliveryFee: totalTax
+          }
         });
         setCalcError(null);
       } catch (error: any) {
