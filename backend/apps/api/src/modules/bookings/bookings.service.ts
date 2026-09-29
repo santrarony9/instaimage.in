@@ -553,6 +553,9 @@ export class BookingsService {
 
       if (minDistance !== Infinity) {
         travelDistanceKm = parseFloat(minDistance.toFixed(2));
+        if (travelDistanceKm > 100) {
+          throw new BadRequestException('Selected location is too far from our studios (Max 100 km).');
+        }
         const billableDistance = Math.max(
           0,
           travelDistanceKm - travelConfig.freeRadiusKm,
