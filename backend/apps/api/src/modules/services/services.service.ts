@@ -30,7 +30,7 @@ export class ServicesService {
 
   async findAll() {
     return this.servicesRepository.model
-      .find({ isApproved: { $ne: false }, isActive: true })
+      .find({ isApproved: { $ne: false }, isActive: true, isDeleted: { $ne: true } })
       .sort({ createdAt: -1 })
       .limit(200)
       .lean();
@@ -38,7 +38,7 @@ export class ServicesService {
 
   // Admin: return ALL services (approved + pending)
   async findAllAdmin() {
-    return this.servicesRepository.model.find({}).lean();
+    return this.servicesRepository.model.find({ isDeleted: { $ne: true } }).lean();
   }
 
   // Admin: return only pending (unapproved) services
