@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
+
 import { fetchApi } from '@/lib/api';
 import { useToast } from '@/components/ui/toast';
 
@@ -147,7 +147,7 @@ CRITICAL: Output the response as a bulleted list of the main features/benefits, 
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8">
-      <ToastContainer />
+
       <div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Platform Settings</h1>
         <p className="text-gray-500">Configure global platform settings, travel charges, and office locations.</p>

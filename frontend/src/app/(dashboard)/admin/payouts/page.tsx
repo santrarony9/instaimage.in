@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/hooks/use-auth-store';
@@ -45,7 +45,7 @@ export default function PayoutsPage() {
 
   const markAsPaid = async (id: string) => {
     try {
-      await fetchApi(/bookings/ + id + /payout, {
+      await fetchApi(`/bookings/${id}/payout`, {
         method: 'PATCH',
         body: JSON.stringify({ payoutStatus: 'PAID' })
       });
@@ -91,7 +91,7 @@ export default function PayoutsPage() {
                   <div className="font-bold text-green-700 mt-1">Payout: ₹{b.pricing?.sellerPayout}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={px-2 py-1 text-xs font-bold rounded-full }>
+                  <span className="px-2 py-1 text-xs font-bold rounded-full">
                     {b.payoutStatus || 'PENDING'}
                   </span>
                 </td>

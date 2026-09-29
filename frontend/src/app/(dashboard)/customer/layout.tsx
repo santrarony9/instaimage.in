@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/hooks/use-auth-store';
 import { fetchApi } from '@/lib/api';
-import { fetchApi } from '@/lib/api';
 import OnboardingModal from '@/components/auth/OnboardingModal';
 
 import { 

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/hooks/use-auth-store';
@@ -82,7 +82,7 @@ export default function SellersPage() {
             {sellers.map(c => (
               <tr key={c._id}>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={px-2 py-1 text-xs rounded-full }>
+                  <span className="px-2 py-1 text-xs rounded-full">
                     {c.sellerType?.replace('_', ' ') || 'PARTNER'}
                   </span>
                 </td>
@@ -94,12 +94,12 @@ export default function SellersPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">{c.bankDetails}</td>
                 <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{c.commissionRate || 15}%</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={px-2 py-1 text-xs font-bold rounded-full }>
+                  <span className="px-2 py-1 text-xs font-bold rounded-full">
                     {c.status || 'PENDING'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={px-2 py-1 text-xs rounded-full }>
+                  <span className="px-2 py-1 text-xs rounded-full">
                     {c.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>

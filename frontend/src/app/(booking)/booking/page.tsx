@@ -71,7 +71,7 @@ function BookingFlow() {
         addonNames: firstItem.addonNames,
       });
 
-      const hasPhysicalShoot = cartItems.some(item => item.deliveryMethod === 'ON_SPOT' || item.deliveryMethod === 'STUDIO');
+      const hasPhysicalShoot = cartItems.some(item => item.deliveryMethod === 'ON_SPOT' || (item.deliveryMethod as string) === 'STUDIO');
       if (!hasPhysicalShoot) {
         updateData({
           location: {

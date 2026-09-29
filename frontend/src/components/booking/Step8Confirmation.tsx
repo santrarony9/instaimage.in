@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import { useBookingStore } from '@/hooks/use-booking-store';
@@ -46,7 +46,7 @@ export function Step8Confirmation() {
           <div className="flex flex-col sm:flex-row gap-3 mt-8">
             {firstId && (
               <Link
-                href={/customer/bookings/ + firstId + /invoice}
+                href={`/customer/bookings/${firstId}/invoice`}
                 className="flex-1 flex items-center justify-center py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
               >
                 Download Invoice
@@ -128,7 +128,7 @@ export function Step8Confirmation() {
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            href={/customer/bookings/ + booking?._id + /invoice}
+            href={`/customer/bookings/${booking?._id}/invoice`}
             className="flex-1 flex items-center justify-center py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             Download Invoice
