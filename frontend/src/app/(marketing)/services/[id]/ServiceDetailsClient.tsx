@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/hooks/use-cart-store';
+import { useBookingStore } from '@/hooks/use-booking-store';
 
 export default function ServiceDetailsClient({ initialService }: { initialService: any }) {
   const router = useRouter();
