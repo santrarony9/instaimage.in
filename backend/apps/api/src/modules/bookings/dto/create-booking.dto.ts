@@ -8,6 +8,7 @@ import {
   IsMongoId,
   IsNumber,
   IsBoolean,
+  Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
@@ -80,6 +81,7 @@ export class CreateBookingDto {
 
   @IsOptional()
   @IsNumber()
+  @Min(0)
   extraHoursBooked?: number;
 
   @IsOptional()

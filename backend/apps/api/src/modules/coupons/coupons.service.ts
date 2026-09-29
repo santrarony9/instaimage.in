@@ -60,9 +60,23 @@ export class CouponsService {
   }
 
   async incrementUsage(id: string) {
-    return this.couponsRepository.findOneAndUpdate(
-      { _id: id },
+    const coupon = await this.couponsRepository.findOne({ _id: id });
+    if (!coupon) return null;
+    
+    const query: any = { _id: id };
+    if (coupon.maxUsageLimit) {
+      query.currentUsageCount = { $lt: coupon.maxUsageLimit };
+    }
+    
+    const updated = await this.couponsRepository.findOneAndUpdate(
+      query,
       { $inc: { currentUsageCount: 1 } }
     );
+    
+    if (!updated && coupon.maxUsageLimit) {
+      throw new Error('Coupon usage limit reached during checkout.');
+    }
+    
+    return updated;
   }
 }

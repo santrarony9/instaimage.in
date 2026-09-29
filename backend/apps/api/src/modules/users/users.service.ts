@@ -132,10 +132,21 @@ export class UsersService {
       throw new BadRequestException('Insufficient wallet balance');
     }
 
-    const updatedUser = await this.usersRepository.findOneAndUpdate(
-      { _id: userId },
-      { $inc: { walletBalance: amount } },
-    );
+    let updatedUser;
+    if (amount < 0) {
+      updatedUser = await this.usersRepository.findOneAndUpdate(
+        { _id: userId, walletBalance: { $gte: Math.abs(amount) } },
+        { $inc: { walletBalance: amount } },
+      );
+      if (!updatedUser) {
+        throw new BadRequestException('Insufficient wallet balance or user not found');
+      }
+    } else {
+      updatedUser = await this.usersRepository.findOneAndUpdate(
+        { _id: userId },
+        { $inc: { walletBalance: amount } },
+      );
+    }
 
     const finalBalance = updatedUser?.walletBalance || ((user.walletBalance || 0) + amount);
 

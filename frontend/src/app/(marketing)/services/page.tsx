@@ -17,15 +17,22 @@ export default async function ServicesPage({
   const SERVER_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
   const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.instaimage.in/api/v1';
   let services = [];
+  let categories = [];
 
   try {
-    const res = await fetch(`${SERVER_API_URL}/services`, { 
-      next: { revalidate: 60 }
-    });
+    const [resServices, resCategories] = await Promise.all([
+      fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } }),
+      fetch(`${SERVER_API_URL}/categories`, { next: { revalidate: 60 } }).catch(() => null)
+    ]);
     
-    if (res.ok) {
-      const data = await res.json();
+    if (resServices.ok) {
+      const data = await resServices.json();
       services = Array.isArray(data) ? data : (data.data || []);
+    }
+    
+    if (resCategories && resCategories.ok) {
+      const data = await resCategories.json();
+      categories = Array.isArray(data) ? data : (data.data || []);
     }
   } catch (e) {
     console.error('Failed to fetch services:', e);
@@ -81,7 +88,7 @@ export default async function ServicesPage({
           </div>
         </div>
       }>
-        <ServicesClient initialServices={services} />
+        <ServicesClient initialServices={services} initialCategories={categories} />
       </Suspense>
     </>
   );

@@ -26,9 +26,10 @@ export default async function HomePage() {
   let banners: any[] = [];
   
   try {
-    const [resServices, resBanners] = await Promise.all([
+    const [resServices, resBanners, resCategories] = await Promise.all([
       fetch(`${SERVER_API_URL}/services`, { next: { revalidate: 60 } }),
-      fetch(`${SERVER_API_URL}/banners?activeOnly=true`, { next: { revalidate: 60 } }).catch(() => null)
+      fetch(`${SERVER_API_URL}/banners?activeOnly=true`, { next: { revalidate: 60 } }).catch(() => null),
+      fetch(`${SERVER_API_URL}/categories`, { next: { revalidate: 60 } }).catch(() => null)
     ]);
     
     if (resServices.ok) {
@@ -39,6 +40,10 @@ export default async function HomePage() {
       const data = await resBanners.json();
       banners = Array.isArray(data) ? data : (data.data || []);
     }
+    if (resCategories && resCategories.ok) {
+      const data = await resCategories.json();
+      categories = Array.isArray(data) ? data : (data.data || []);
+    }
   } catch (e) {
     console.error('Failed to fetch data:', e);
   }
@@ -46,7 +51,6 @@ export default async function HomePage() {
   // Filter out inactive
   services = services.filter(s => s.isActive !== false);
   
-  // Extract categories dynamically from services (like ServicesClient does)
   const categoryOrder = [
     'Photography',
     'Videography',
@@ -54,19 +58,15 @@ export default async function HomePage() {
     'Post Production'
   ];
   
-  const extractedCategories = Array.from(new Set(services.map(s => s.category).filter(Boolean))) as string[];
-  categories = extractedCategories.sort((a, b) => {
-    const indexA = categoryOrder.indexOf(a);
-    const indexB = categoryOrder.indexOf(b);
-    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+  // Sort categories
+  categories.sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a.name);
+    const indexB = categoryOrder.indexOf(b.name);
+    if (indexA === -1 && indexB === -1) return a.name.localeCompare(b.name);
     if (indexA === -1) return 1;
     if (indexB === -1) return -1;
     return indexA - indexB;
-  }).map(cat => ({
-    _id: cat,
-    name: cat,
-    slug: cat.toLowerCase().replace(/\s+/g, '-')
-  }));
+  });
 
   // Extract Event Managers
   const eventManagers = services.filter(s => s.category === 'Event Management').slice(0, 6);

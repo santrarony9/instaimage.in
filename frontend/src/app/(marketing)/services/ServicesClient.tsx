@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
-export default function ServicesClient({ initialServices }: { initialServices: any[] }) {
+export default function ServicesClient({ initialServices, initialCategories }: { initialServices: any[], initialCategories?: any[] }) {
   const [services] = useState<any[]>(initialServices);
   const loading = false;
 
@@ -15,10 +15,25 @@ export default function ServicesClient({ initialServices }: { initialServices: a
   const searchQuery = searchParams.get('search')?.toLowerCase() || '';
   
   const activeServices = services.filter(s => s.isActive !== false);
-  const availableCategories = Array.from(new Set(activeServices.map(s => s.category).filter(Boolean))) as string[];
   
+  // Use passed categories if available, fallback to dynamic extraction
+  const categories = initialCategories && initialCategories.length > 0 
+    ? initialCategories 
+    : (() => {
+        const extracted = Array.from(new Set(activeServices.map(s => s.category).filter(Boolean))) as string[];
+        const categoryOrder = ['Photography', 'Videography', 'Event Management', 'Post Production'];
+        return extracted.sort((a, b) => {
+          const indexA = categoryOrder.indexOf(a);
+          const indexB = categoryOrder.indexOf(b);
+          if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        }).map(c => ({ name: c, _id: c }));
+      })();
+
   const initialCategory = initialCategoryParam 
-    ? availableCategories.find(c => c.toLowerCase() === initialCategoryParam.toLowerCase()) || initialCategoryParam
+    ? categories.find(c => c.name.toLowerCase() === initialCategoryParam.toLowerCase())?.name || initialCategoryParam
     : null;
 
   // Filters state
@@ -29,22 +44,6 @@ export default function ServicesClient({ initialServices }: { initialServices: a
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || '/v1';
   
-  // Extract unique values for filters
-  const categoryOrder = [
-    'Photography',
-    'Videography',
-    'Event Management',
-    'Post Production'
-  ];
-  
-  const categories = availableCategories.sort((a, b) => {
-    const indexA = categoryOrder.indexOf(a);
-    const indexB = categoryOrder.indexOf(b);
-    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
-    if (indexA === -1) return 1; // Unknown at bottom
-    if (indexB === -1) return -1;
-    return indexA - indexB;
-  });
   const locations = ["Kolkata", "Remote"]; // Hardcoded main regions as requested by user
   const occasions = Array.from(new Set(activeServices.flatMap(s => s.occasions || []).filter(Boolean))) as string[];
 
@@ -91,19 +90,17 @@ export default function ServicesClient({ initialServices }: { initialServices: a
           </button>
           {categories.map(cat => (
             <button 
-              key={cat} 
+              key={cat._id || cat.name} 
               onClick={() => {
-                // If it's already selected, don't deselect (quick commerce behavior)
-                setSelectedCategories([cat]);
+                setSelectedCategories([cat.name]);
               }}
-              className={`text-left px-4 py-4 border-l-4 transition-colors flex items-center justify-between ${effectiveCategory === cat ? 'border-blue-600 bg-blue-50 text-blue-800 font-bold' : 'border-transparent text-gray-600 hover:bg-gray-50'}`}
+              className={`text-left px-4 py-4 border-l-4 transition-colors flex items-center justify-between ${effectiveCategory === cat.name ? 'border-blue-600 bg-blue-50 text-blue-800 font-bold' : 'border-transparent text-gray-600 hover:bg-gray-50'}`}
             >
               <div className="flex items-center">
-                {/* Dummy placeholder icon circle */}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${effectiveCategory === cat ? 'bg-blue-200' : 'bg-gray-100'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${effectiveCategory === cat.name ? 'bg-blue-200' : 'bg-gray-100'}`}>
                   <span className="text-xs">📸</span>
                 </div>
-                <span className="text-sm">{cat}</span>
+                <span className="text-sm">{cat.name}</span>
               </div>
             </button>
           ))}

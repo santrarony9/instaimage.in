@@ -689,6 +689,8 @@ export class BookingsService {
       expressDeliveryFee -
       totalDiscount;
 
+    totalPrice = Math.max(0, totalPrice);
+
     const WALLET_MIN_BOOKING = 5000;
     let walletDiscountApplied = 0;
     if (createBookingDto.applyWalletBalance && customerId && totalPrice >= WALLET_MIN_BOOKING) {

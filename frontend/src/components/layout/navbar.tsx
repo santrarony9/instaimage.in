@@ -49,9 +49,17 @@ export function Navbar() {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-6">
-            <button className="hidden md:flex text-gray-500 hover:text-black transition">
-              <Search className="h-5 w-5" />
-            </button>
+            <form action="/services" method="GET" className="hidden md:flex relative group">
+              <input 
+                type="text" 
+                name="search" 
+                placeholder="Search..." 
+                className="w-8 focus:w-48 pl-8 pr-2 py-1.5 bg-transparent group-hover:w-48 focus:bg-gray-100 rounded-full text-sm border-transparent focus:outline-none transition-all duration-300" 
+              />
+              <button type="submit" className="absolute left-1.5 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-black transition">
+                <Search className="h-5 w-5" />
+              </button>
+            </form>
 
             {/* Cart Button */}
             <button 
