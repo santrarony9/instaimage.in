@@ -1,6 +1,7 @@
+"use client";
+
 import { useRouter } from 'next/navigation';
 import { useBookingStore } from '@/hooks/use-booking-store';
-"use client";
 
 import { useCartStore } from '@/hooks/use-cart-store';
 import { useAuthStore } from '@/hooks/use-auth-store';
