@@ -40,6 +40,22 @@ export function Step4Location() {
     });
   }, []);
 
+  const doReverseGeocode = async (lat: number, lon: number) => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`);
+      const geoData = await res.json();
+      if (geoData) {
+        setArea(geoData.display_name);
+        if (geoData.address?.postcode) setPincode(geoData.address.postcode);
+        if (geoData.address?.city || geoData.address?.state_district) {
+          setCity(geoData.address.city || geoData.address.state_district || '');
+        }
+      }
+    } catch (err) {
+      console.error("Reverse geocoding failed", err);
+    }
+  };
+
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -192,7 +208,10 @@ export function Step4Location() {
           
           <MapSelector 
             defaultPosition={coordinates ? [coordinates[1], coordinates[0]] : undefined}
-            onLocationSelect={(lat, lng) => setCoordinates([lng, lat])}
+            onLocationSelect={async (lat, lng) => {
+              setCoordinates([lng, lat]);
+              await doReverseGeocode(lat, lng);
+            }}
           />
           <p className="text-xs text-indigo-600 mt-2 font-medium">💡 Drag the pin to adjust your exact location</p>
         </div>

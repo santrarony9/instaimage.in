@@ -112,6 +112,21 @@ export class UsersService {
     return addresses;
   }
 
+  async deleteAddress(userId: string, index: number) {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    
+    const addresses = user.savedAddresses || [];
+    if (index >= 0 && index < addresses.length) {
+      addresses.splice(index, 1);
+      await this.usersRepository.findOneAndUpdate(
+        { _id: userId },
+        { savedAddresses: addresses },
+      );
+    }
+    return addresses;
+  }
+
   async updateRole(id: string, role: string) {
     if (!['ADMIN', 'CUSTOMER', 'SELLER'].includes(role)) {
       throw new BadRequestException('Invalid role');

@@ -7,6 +7,7 @@ import {
   Query,
   Req,
   Post,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles, Role, Public } from '@app/auth';
@@ -23,6 +24,11 @@ export class UsersController {
   @Post('me/addresses')
   addAddress(@Req() req: any, @Body() addressData: any) {
     return this.usersService.addAddress(req.user.sub, addressData);
+  }
+
+  @Delete('me/addresses/:index')
+  deleteAddress(@Req() req: any, @Param('index') index: string) {
+    return this.usersService.deleteAddress(req.user.sub, parseInt(index));
   }
 
   @Patch('me')
