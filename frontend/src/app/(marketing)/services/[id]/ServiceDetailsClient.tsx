@@ -125,7 +125,16 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
     if (!alreadyInCart) {
       addItem(buildCartItem());
     }
-    router.push('/booking');
+    // Pass type so booking flow can skip Step 4 (address) for REMOTE/POST PRODUCTION services
+    const isRemote = service.deliveryMethod === 'REMOTE' || service.category === 'POST PRODUCTION';
+    const params = new URLSearchParams({
+      serviceId: service._id,
+      type: isRemote ? 'REMOTE' : 'ON_SPOT',
+      mode: pricingMode,
+      ...(extraHours > 0 ? { extraHours: String(extraHours) } : {}),
+      ...(selectedAddons.length > 0 ? { addons: selectedAddons.join(',') } : {}),
+    });
+    router.push(`/booking?${params.toString()}`);
   };
 
   return (
