@@ -40,7 +40,7 @@ export function Step7Payment() {
         let totalAddonsPrice = 0;
         let totalExtraHoursPrice = 0;
         let totalDeliveryCharge = 0;
-        let maxTravelDistanceKm = 0;
+        
         let totalDiscount = 0;
         let totalFinalAmount = 0;
         let totalAdvanceAmount = 0;
@@ -73,7 +73,7 @@ export function Step7Payment() {
             totalAddonsPrice += res.pricing.addonsPrice || 0;
             totalExtraHoursPrice += res.pricing.extraHoursPrice || 0;
             totalDeliveryCharge += res.pricing.deliveryCharge || 0;
-            maxTravelDistanceKm = Math.max(maxTravelDistanceKm, res.pricing.travelDistanceKm || 0);
+            
             totalDiscount += res.pricing.discount || 0;
             totalFinalAmount += res.pricing.totalPrice || 0;
             totalAdvanceAmount += res.pricing.advancePaid || 0;
@@ -96,7 +96,7 @@ export function Step7Payment() {
             addonsPrice: totalAddonsPrice,
             extraHoursPrice: totalExtraHoursPrice,
             deliveryCharge: totalDeliveryCharge,
-            travelDistanceKm: maxTravelDistanceKm,
+            
             discount: totalDiscount,
             walletDiscountApplied: totalWalletDeduction,
             totalPrice: totalFinalAmount,

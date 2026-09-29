@@ -87,7 +87,7 @@ export default function PayoutsPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <div><span className="text-gray-500">Total:</span> ₹{b.pricing?.totalPrice}</div>
-                  <div><span className="text-gray-500">Platform Fee:</span> ₹{b.pricing?.platformFee}</div>
+                  
                   <div className="font-bold text-green-700 mt-1">Payout: ₹{b.pricing?.sellerPayout}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

@@ -630,11 +630,7 @@ export class BookingsService {
     // First calculate total before discount to validate minOrderValue
     let preDiscountTotal = basePrice + addonsPrice + extraHoursPrice + surchargesPrice + deliveryCharge + (createBookingDto.isExpressDelivery ? (service.expressDeliveryFee || 0) : 0);
 
-    const travelConfig = await this.settingsService.getSetting('travelChargeConfig');
     let deliveryDiscount = 0;
-    if (travelConfig?.isFreeOfferActive) {
-      deliveryDiscount = deliveryCharge;
-    }
 
     if (createBookingDto.appliedCouponId) {
       try {
