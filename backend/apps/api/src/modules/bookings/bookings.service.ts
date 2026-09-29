@@ -507,19 +507,12 @@ export class BookingsService {
   }
 
   async calculateTravelCharge(clientCoordinates: number[] | undefined | null) {
-    let deliveryCharge = 500;
+    let deliveryCharge = 0; // Travel charge removed per user request
     let travelDistanceKm = 0;
     let nearestOfficeName = undefined;
 
     const officeLocations =
       (await this.settingsService.getSetting('officeLocations')) || [];
-    const travelConfig = (await this.settingsService.getSetting(
-      'travelChargeConfig',
-    )) || {
-      perKmRate: 15,
-      freeRadiusKm: 5,
-      defaultFlatCharge: 500,
-    };
 
     if (
       clientCoordinates &&
@@ -556,18 +549,7 @@ export class BookingsService {
         if (travelDistanceKm > 20) {
           throw new BadRequestException('Selected location is too far from our studios (Max 20 km).');
         }
-        const billableDistance = Math.max(
-          0,
-          travelDistanceKm - travelConfig.freeRadiusKm,
-        );
-        deliveryCharge = Math.ceil(
-          billableDistance * 2 * travelConfig.perKmRate,
-        ); // * 2 for round trip
-      } else {
-        deliveryCharge = travelConfig.defaultFlatCharge || 500;
       }
-    } else {
-      deliveryCharge = travelConfig.defaultFlatCharge || 500;
     }
 
     return { deliveryCharge, travelDistanceKm, nearestOfficeName };
