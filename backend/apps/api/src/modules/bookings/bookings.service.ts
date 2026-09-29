@@ -220,7 +220,7 @@ export class BookingsService {
     // BUG-02 FIX: Increment coupon usage only after payment confirmed
     if (booking.appliedCouponId && booking.pricing?.discount > 0) {
       await this.couponsService.incrementUsage(booking.appliedCouponId.toString()).catch(e =>
-        this.logger.error(`Failed to increment coupon post-payment: ${d}{e.message}`)
+        this.logger.error(`Failed to increment coupon post-payment: ${e.message}`)
       );
     }
 
@@ -503,7 +503,7 @@ export class BookingsService {
       BookingStatus.DELIVERED,
     ];
     if (!ALLOWED_SELLER_STATUSES.includes(status)) {
-      throw new BadRequestException(`Sellers cannot set status to ${d}{status}`);
+      throw new BadRequestException(`Sellers cannot set status to ${status}`);
     }
     return this.bookingsRepository.update(booking._id.toString(), { status });
   }
