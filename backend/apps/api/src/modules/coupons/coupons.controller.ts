@@ -41,7 +41,7 @@ export class CouponsController {
     }
   }
 
-  @Public()
+  @Roles(Role.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.couponsService.findOne(id);

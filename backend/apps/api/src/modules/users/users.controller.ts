@@ -10,9 +10,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Roles, Role, Public } from '@app/auth';
+import { Roles, Role, Public, JwtAuthGuard, RolesGuard } from '@app/auth';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
