@@ -108,7 +108,7 @@ export function Step7Payment() {
         setCalcError(null);
       } catch (error: any) {
         console.error("Failed to calculate price", error);
-        setCalcError(error.message || "Unknown error");
+        let msg = error.message || "Unknown error"; if (msg === "Failed to fetch") msg = "Selected location is too far from our studios (Max 20 km) or network error."; setCalcError(msg);
       } finally {
         setIsLoadingPrice(false);
       }
