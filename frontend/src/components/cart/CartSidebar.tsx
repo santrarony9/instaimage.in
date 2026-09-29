@@ -174,14 +174,13 @@ export function CartSidebar() {
               {user ? (
                 // Logged-in: no form needed, we already have their details
                 <p className="text-emerald-700 text-xs font-medium">
-                  We&apos;ll call you back at{' '}
-                  <strong className="font-bold">{user.phone || user.email}</strong> with a one-time discount coupon.
+                  Call or WhatsApp us at <strong className="font-bold">+91 8240508915</strong> for a one-time discount coupon, or we will call you on your registered number.
                 </p>
               ) : (
                 // Guest: show compact inline fields
                 <>
                   <p className="text-emerald-700 text-xs font-medium mb-3">
-                    Our team will call you back with a one-time discount coupon.
+                    Call or WhatsApp us at <strong className="font-bold">+91 8240508915</strong>, or enter your details below and our team will call you back with a one-time discount coupon.
                   </p>
                   <div className="space-y-2">
                     <input

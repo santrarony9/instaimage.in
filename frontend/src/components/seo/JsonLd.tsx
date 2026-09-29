@@ -9,7 +9,7 @@ url: 'https://instaimage.in',
 logo: 'https://instaimage.in/icon-512.png',
 contactPoint: {
 '@type': 'ContactPoint',
-telephone: '+91-0000000000',
+telephone: '+91-8240508915',
 contactType: 'customer service',
 areaServed: 'IN',
 availableLanguage: ['en', 'hi', 'bn'],
