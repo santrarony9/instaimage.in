@@ -15,6 +15,7 @@ import Link from 'next/link';
 
 function BookingFlow() {
   const currentStep = useBookingStore((state) => state.currentStep);
+  const serviceId = useBookingStore((state) => state.data.serviceId);
   const updateData = useBookingStore((state) => state.updateData);
   const setStep = useBookingStore((state) => state.setStep);
   const cartItems = useCartStore((state) => state.items);
@@ -107,7 +108,10 @@ function BookingFlow() {
   }, [currentStep, user, setStep]);
 
   // Guard: if no service is loaded and not on confirmation step, prompt user
-  if (!useBookingStore.getState().data.serviceId && currentStep !== 8) {
+  const hasServiceInUrl = !!searchParams.get('serviceId');
+  const hasServiceInCart = cartItems.length > 0;
+
+  if (!serviceId && !hasServiceInUrl && !hasServiceInCart && currentStep !== 8) {
     return (
       <div className="text-center py-20">
         <p className="text-gray-500 mb-4">No service selected. Please pick a service first.</p>
@@ -116,6 +120,11 @@ function BookingFlow() {
         </Link>
       </div>
     );
+  }
+
+  // If serviceId is not yet loaded from cart/url, show a loading state
+  if (!serviceId && currentStep !== 8) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Initializing booking...</div>;
   }
 
   // Calculate step progress label (steps 4–8 = "Step 1 of 5" through "Step 5 of 5")
