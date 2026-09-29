@@ -407,14 +407,12 @@ export class BookingsService {
     const newTotalPrice = booking.pricing.totalPrice + surcharge.amount;
     const newBalanceDue = booking.pricing.balanceDue + surcharge.amount;
 
-    return this.bookingsRepository.update(id, {
-      pricing: {
-        ...booking.pricing,
-        surcharges: newSurcharges,
-        surchargesPrice: newSurchargesPrice,
-        totalPrice: newTotalPrice,
-        balanceDue: newBalanceDue,
-      },
+    // BUG-08 FIX: use booking._id not raw id string + use field-level updates not spread
+    return this.bookingsRepository.update(booking._id.toString(), {
+      "pricing.surcharges": newSurcharges,
+      "pricing.surchargesPrice": newSurchargesPrice,
+      "pricing.totalPrice": newTotalPrice,
+      "pricing.balanceDue": newBalanceDue,
     });
   }
 
@@ -460,7 +458,8 @@ export class BookingsService {
       }
     }
 
-    return this.bookingsRepository.update(bookingId, {
+    // BUG-07 FIX: use booking._id (ObjectId) not bookingId (BKG string)
+    return this.bookingsRepository.update(booking._id.toString(), {
       sellerId: new Types.ObjectId(sellerId),
       status: BookingStatus.ASSIGNED,
     });
@@ -488,7 +487,18 @@ export class BookingsService {
       throw new ForbiddenException('You are not assigned to this booking');
     }
 
-    return this.bookingsRepository.update(bookingId, { status });
+    // BUG-15 FIX: whitelist only statuses sellers are allowed to set
+    const ALLOWED_SELLER_STATUSES = [
+      BookingStatus.IN_PROGRESS,
+      BookingStatus.COMPLETED,
+      BookingStatus.EDITING,
+      BookingStatus.DELIVERED,
+    ];
+    if (!ALLOWED_SELLER_STATUSES.includes(status)) {
+      throw new BadRequestException(`Sellers cannot set booking status to ${status}`);
+    }
+    // BUG-07 variant: use booking._id not BKG string
+    return this.bookingsRepository.update(booking._id.toString(), { status });
   }
 
   async updateDeliveryLink(bookingId: string, deliveryLink: string, userId: string, userRole: string) {
