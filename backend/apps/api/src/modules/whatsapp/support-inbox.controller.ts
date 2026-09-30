@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, UseGuards, Param } from '@nestjs/common';
 import { WhatsappService } from './whatsapp.service';
 import { JwtAuthGuard, RolesGuard, Roles, Role } from '@app/auth';
 
-@Controller('w-chat-sync')
+@Controller('business-inquiries')
 export class SupportInboxController {
   constructor(private readonly whatsappService: WhatsappService) {}
 

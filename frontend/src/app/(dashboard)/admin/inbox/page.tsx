@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '@/hooks/use-auth-store';
 import { Send, Check, CheckCheck, Loader2 } from 'lucide-react';
+import { fetchApi } from '@/lib/api';
 
 interface Message {
   messageId: string;
@@ -40,14 +41,10 @@ export default function WhatsAppInbox() {
 
   const fetchConversations = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/w-chat-sync/conversations`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const data = await fetchApi('/business-inquiries/conversations', {
         cache: 'no-store'
       });
-      if (res.ok) {
-        const data = await res.json();
-        setConversations(data);
-      }
+      setConversations(data || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -63,9 +60,8 @@ export default function WhatsAppInbox() {
     if (conv && conv.unreadCount > 0) {
       // Mark as read
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/w-chat-sync/conversations/${phone}/read`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
+        await fetchApi(`/business-inquiries/conversations/${phone}/read`, {
+          method: 'POST'
         });
         setConversations(prev => prev.map(c => c.phone === phone ? { ...c, unreadCount: 0 } : c));
       } catch (e) {
@@ -80,24 +76,16 @@ export default function WhatsAppInbox() {
 
     setSending(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/w-chat-sync/conversations/${activePhone}/reply`, {
+      await fetchApi(`/business-inquiries/conversations/${activePhone}/reply`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
         body: JSON.stringify({ message: replyText })
       });
 
-      if (res.ok) {
-        setReplyText('');
-        fetchConversations(); // refresh
-      } else {
-        alert('Failed to send message. Customer might be outside the 24-hour service window.');
-      }
-    } catch (error) {
+      setReplyText('');
+      fetchConversations(); // refresh
+    } catch (error: any) {
       console.error(error);
-      alert('Error sending message');
+      alert(error.message || 'Error sending message');
     } finally {
       setSending(false);
     }
