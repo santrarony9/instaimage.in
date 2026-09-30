@@ -40,7 +40,7 @@ export default function WhatsAppInbox() {
 
   const fetchConversations = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/support-inbox/conversations`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/w-chat-sync/conversations`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store'
       });
@@ -63,7 +63,7 @@ export default function WhatsAppInbox() {
     if (conv && conv.unreadCount > 0) {
       // Mark as read
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/support-inbox/conversations/${phone}/read`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/w-chat-sync/conversations/${phone}/read`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -80,7 +80,7 @@ export default function WhatsAppInbox() {
 
     setSending(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/support-inbox/conversations/${activePhone}/reply`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/w-chat-sync/conversations/${activePhone}/reply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
