@@ -87,5 +87,17 @@ The project is hosted on Vercel and is highly sensitive to billing spikes. Do NO
   - Fixed "Unauthorized" auth error redirect loop in checkout to correctly route back to `/login`.
   - Added strict 20km maximum limit to travel distance calculations to prevent exorbitant automated travel fees for out-of-bounds locations (e.g. stopping 2 Lakh ₹ test booking invoices).
 
-### 2. Pending / Work-In-Progress
+### 2. Recent Updates (Sept 29, 2026)
+- **Service Area via PIN Codes:** Replaced the 20km radius coordinate check with a strict 6-digit PIN code whitelist (covering Kolkata, Salt Lake, New Town, etc.).
+- **Platform Fee & Travel Charges Disabled:** Hardcoded `platformFee = 0` and removed Travel Configuration UI from Admin panel per user request.
+- **Service Gallery Revert:** Reverted the Masonry media grid back to a traditional layout (1 large main image + small thumbnails) because services with fewer than 5 photos showed broken placeholder boxes.
+- **Deep Backend Audit & Fixes:** 
+  - Fixed coupon/wallet race conditions (coupons now only increment after successful Razorpay payment).
+  - Fixed wallet deduction order on 100% wallet-paid bookings.
+  - Secured `UsersController` (missing Guards) and `/coupons/:id` (was public).
+  - Fixed soft-deleted records (`isDeleted: true`) bleeding into public service APIs.
+  - Hardened referral reward logic to only trigger once on `PAID` status.
+  - Restricted sellers to only update status to `IN_PROGRESS`, `COMPLETED`, `EDITING`, `DELIVERED`.
+
+### 3. Pending / Work-In-Progress
 - **Gallery Watermarking & Client Approval Flow:** The user has a specific design/idea for how clients will approve watermarked preview photos to unlock clean HD downloads. **DO NOT build this yet.** Wait for the user to provide their materials/instructions before modifying the gallery or upload system further.

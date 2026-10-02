@@ -8,6 +8,7 @@ import {
   Req,
   Post,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles, Role, Public, JwtAuthGuard, RolesGuard } from '@app/auth';

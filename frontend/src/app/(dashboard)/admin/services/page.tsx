@@ -31,6 +31,28 @@ export default function ServicesManagementPage() {
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [isUploadingReel, setIsUploadingReel] = useState(false);
+
+  const handleReelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setIsUploadingReel(true);
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+    try {
+      const response = await fetchApi('/uploads', {
+        method: 'POST',
+        body: uploadData,
+      });
+      setFormData({ ...formData, reelVideoUrl: response.url });
+      toast.success('Reel video uploaded successfully');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to upload video');
+    } finally {
+      setIsUploadingReel(false);
+      e.target.value = '';
+    }
+  };
 
   const loadData = async () => {
     setIsLoading(true);
@@ -685,7 +707,13 @@ export default function ServicesManagementPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Reel Video URL (Vertical 9:16)</label>
-                      <input type="url" value={formData.reelVideoUrl || ''} onChange={e => setFormData({ ...formData, reelVideoUrl: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="https://example.com/reel.mp4" />
+                      <div className="flex items-center gap-2 mt-1">
+                        <input type="url" value={formData.reelVideoUrl || ''} onChange={e => setFormData({ ...formData, reelVideoUrl: e.target.value })} className="block w-full border border-gray-300 rounded p-2" placeholder="https://example.com/reel.mp4" />
+                        <label className="cursor-pointer bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 px-3 py-2 rounded text-sm font-medium whitespace-nowrap">
+                          {isUploadingReel ? 'Uploading...' : 'Upload Video'}
+                          <input type="file" accept="video/mp4,video/webm" className="hidden" onChange={handleReelUpload} disabled={isUploadingReel} />
+                        </label>
+                      </div>
                     </div>
                     <div className="pt-2 flex flex-col space-y-3">
                       <label className="flex items-center space-x-2 cursor-pointer">
