@@ -267,6 +267,24 @@ export default function ServiceDetailsClient({ initialService }: { initialServic
             </div>
             */}
 
+            {service.reelVideoUrl && (
+              <div className="mb-12">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <svg className="w-5 h-5 mr-2 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                  Service Reel
+                </h3>
+                <div className="relative w-full max-w-[320px] aspect-[9/16] rounded-2xl overflow-hidden shadow-xl border-4 border-gray-900 bg-black">
+                  <video 
+                    src={service.reelVideoUrl.startsWith('/') ? `https://api.instaimage.in${service.reelVideoUrl}` : service.reelVideoUrl}
+                    controls
+                    playsInline
+                    loop
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="prose max-w-none text-gray-600 leading-relaxed mb-12 text-lg">
               <div className="whitespace-pre-line">
                 {service.description}

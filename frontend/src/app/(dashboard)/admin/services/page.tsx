@@ -683,6 +683,10 @@ export default function ServicesManagementPage() {
                       <label className="block text-sm font-medium text-gray-700">Video URL (Optional)</label>
                       <input type="url" value={formData.videoUrl || ''} onChange={e => setFormData({ ...formData, videoUrl: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="https://youtube.com/..." />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Reel Video URL (Vertical 9:16)</label>
+                      <input type="url" value={formData.reelVideoUrl || ''} onChange={e => setFormData({ ...formData, reelVideoUrl: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded p-2" placeholder="https://example.com/reel.mp4" />
+                    </div>
                     <div className="pt-2 flex flex-col space-y-3">
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input type="checkbox" checked={formData.isActive !== false} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded h-5 w-5 text-indigo-600 focus:ring-indigo-500" />

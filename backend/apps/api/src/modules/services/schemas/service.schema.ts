@@ -87,6 +87,9 @@ export class Service extends AbstractDocument {
   @Prop()
   videoUrl?: string;
 
+  @Prop()
+  reelVideoUrl?: string;
+
   @Prop({
     type: [
       {

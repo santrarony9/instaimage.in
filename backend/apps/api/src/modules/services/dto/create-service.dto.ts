@@ -94,6 +94,10 @@ export class CreateServiceDto {
   @IsOptional()
   videoUrl?: string;
 
+  @IsString()
+  @IsOptional()
+  reelVideoUrl?: string;
+
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
